@@ -3,4 +3,8 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD 
 
-# from .queue import make_celery
+from dmp.extensions import celery
+
+@celery.task
+def add(x, y):
+    return x + y

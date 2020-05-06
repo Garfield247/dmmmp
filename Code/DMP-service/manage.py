@@ -5,13 +5,8 @@
 
 import os
 from flask_script import Manager,Server
-from dmp import create_app
+from dmp import app
 from flask_migrate import MigrateCommand
-#获取配置
-config_name = os.environ.get('FLASK_CONFIG') or 'default'
-
-#创建实例
-app = create_app(config_name)
 
 #创建命令起动控制对象
 manager = Manager(app)

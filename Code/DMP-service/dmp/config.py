@@ -17,6 +17,8 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or ''
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')or ''
 
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/1/"
+    CELERY_BROKER_URL = "redis://localhost:6379/2"
 
     @staticmethod
     def init_app(app):
