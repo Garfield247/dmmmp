@@ -125,7 +125,7 @@ DMP( *Data Management Platform*)数据管理平台
 
 ### 案例表
 
-表名：dmp_data_case
+表名：dmp_case
 
 | 字段        | 数据类型 | 限制       | 介绍           |
 | ----------- | -------- | ---------- | -------------- |
@@ -166,7 +166,7 @@ DMP( *Data Management Platform*)数据管理平台
 | Isdate            | boolearn | 默认FALSE          | 是否为时间日期字段 |
 | description       | string   |                    | 字段说明           |
 ### 数据列区间
-表名：dmp_table_column_range
+表名：dmp_data_table_column_range
 
 | 字段                     | 数据类型 | 限制               | 介绍 |
 | ------------------------ | -------- | ------------------ | ---- |
@@ -174,7 +174,7 @@ DMP( *Data Management Platform*)数据管理平台
 | dmp_data_table_column_id | Int      | 非空               | 列ID |
 | context                  | String   | 非空               | 内容 |
 ### 数据从数据库添加表单表
-表名：dmp_from_add_data_table
+表名：dmp_form_add_data_table
 
 | 字段            | 数据类型 | 限制               | 介绍     |
 | --------------- | -------- | ------------------ | -------- |
@@ -197,7 +197,7 @@ DMP( *Data Management Platform*)数据管理平台
 
 
 ### 数据文件上传单表
-表名：dmp_from_upload
+表名：dmp_form_upload
 
 | 字段                        | 数据类型 | 限制               | 介绍                               |
 | --------------------------- | -------- | ------------------ | ---------------------------------- |
@@ -225,7 +225,7 @@ DMP( *Data Management Platform*)数据管理平台
 
 
 ### 数据迁移表单表
-表名：dmp_from_migrate
+表名：dmp_form_migrate
 
 | 字段                        | 数据类型 | 限制               | 介绍                               |
 | --------------------------- | -------- | ------------------ | ---------------------------------- |
@@ -249,7 +249,7 @@ DMP( *Data Management Platform*)数据管理平台
 
 
 ### 数据下载表单表
-表名：dmp_from_download
+表名：dmp_form_download
 
 | 字段                  | 数据类型 | 限制               | 介绍                               |
 | --------------------- | -------- | ------------------ | ---------------------------------- |
@@ -588,11 +588,11 @@ DMP( *Data Management Platform*)数据管理平台
 
 **请求说明**
 
-| URL           | /verify/email/ |
-| ------------- | -------------- |
-| 格式          | JSON           |
-| http 请求方式 | GET            |
-| 登陆保护      | 否             |
+| URL           | /verifier/email/ |
+| ------------- | ---------------- |
+| 格式          | JSON             |
+| http 请求方式 | GET              |
+| 登陆保护      | 否               |
 
  **请求参数**
 
@@ -621,11 +621,11 @@ DMP( *Data Management Platform*)数据管理平台
 
 **请求说明**
 
-| URL           | /verify/username/ |
-| ------------- | ----------------- |
-| 格式          | JSON              |
-| http 请求方式 | GET               |
-| 登陆保护      | 否                |
+| URL           | /verifier/username/ |
+| ------------- | ------------------- |
+| 格式          | JSON                |
+| http 请求方式 | GET                 |
+| 登陆保护      | 否                  |
 
  **请求参数**
 
@@ -1531,11 +1531,11 @@ DMP( *Data Management Platform*)数据管理平台
 
 **请求说明**
 
-| URL           | /datatable/column |
-| ------------- | ----------------- |
-| 格式          | JSON              |
-| http 请求方式 | GET               |
-| 登陆保护      | 是                |
+| URL           | /dbtable/column |
+| ------------- | --------------- |
+| 格式          | JSON            |
+| http 请求方式 | GET             |
+| 登陆保护      | 是              |
 
  **请求参数**
 
@@ -1582,11 +1582,11 @@ DMP( *Data Management Platform*)数据管理平台
 
 **请求说明**
 
-| URL           | /datatable/columnsetting |
-| ------------- | ------------------------ |
-| 格式          | JSON                     |
-| http 请求方式 | POST                     |
-| 登陆保护      | 是                       |
+| URL           | /dbtable/columnsetting |
+| ------------- | ---------------------- |
+| 格式          | JSON                   |
+| http 请求方式 | POST                   |
+| 登陆保护      | 是                     |
 
  **请求参数**
 
@@ -1828,7 +1828,7 @@ DMP( *Data Management Platform*)数据管理平台
 
 **请求说明**
 
-| URL           | /from/migration/ |
+| URL           | /form/migration/ |
 | ------------- | ---------------- |
 | 格式          | JSON             |
 | http 请求方式 | POST             |

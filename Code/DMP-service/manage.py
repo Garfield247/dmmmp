@@ -5,7 +5,7 @@
 
 import os
 from flask_script import Manager,Server
-from app import create_app
+from dmp import create_app
 from flask_migrate import MigrateCommand
 #获取配置
 config_name = os.environ.get('FLASK_CONFIG') or 'default'

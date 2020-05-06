@@ -5,9 +5,9 @@
 
 
 from flask import Flask
-from app.config import config
-from app.extensions import config_extensions
-from app.api import config_blueprint
+from dmp.config import config
+from dmp.extensions import config_extensions
+from dmp.api import config_blueprint
 #封装一个方法，专门用于创建Flask实例
 def create_app(config_name):
     #创建应用实例

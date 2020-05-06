@@ -4,3 +4,7 @@
 # @Author  : SHTD 
 
 
+from dmp.extensions import db
+
+class Dmp_data_table(db.Model):
+    pass
