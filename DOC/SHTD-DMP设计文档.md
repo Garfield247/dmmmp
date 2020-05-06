@@ -407,7 +407,9 @@ DMP( *Data Management Platform*)数据管理平台
 {
  "status": 0,
   "msg": "ok",
-  "results":None
+  "results":{
+  		"token":"212fsdf32fdwffdsfsd"
+  }
 }
 ```
 
@@ -492,7 +494,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /user/changepwd/ |
 | ------------- | ---------------- |
 | 格式          | JSON             |
-| http 请求方式 | post             |
+| http 请求方式 | put              |
 | 登陆保护      | 否               |
 
  **请求参数**
@@ -690,10 +692,10 @@ DMP( *Data Management Platform*)数据管理平台
 
 **请求说明**
 
-| URL           | /user/chengeprofile/ |
+| URL           | /user/changeprofile/ |
 | ------------- | -------------------- |
 | 格式          | JSON                 |
-| http 请求方式 | POST                 |
+| http 请求方式 | PUT                  |
 | 登陆保护      | 是                   |
 
  **请求参数**
@@ -798,7 +800,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /user/del |
 | ------------- | --------- |
 | 格式          | JSON      |
-| http 请求方式 | POST      |
+| http 请求方式 | DEL       |
 | 登陆保护      | 是        |
 
  **请求参数**
@@ -1198,7 +1200,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /database/del |
 | ------------- | ------------- |
 | 格式          | JSON          |
-| http 请求方式 | POST          |
+| http 请求方式 | DEL           |
 | 登陆保护      | 是            |
 
  **请求参数**
@@ -1929,7 +1931,7 @@ DMP( *Data Management Platform*)数据管理平台
  "status": 0,
   "msg": "ok",
   "results":{
-    committed:[
+    "committed":[
       {"id":"",
       "form_type":1,
       "submit_on":"",
@@ -1947,8 +1949,8 @@ DMP( *Data Management Platform*)数据管理平台
       "changed_on":"",
       }
     ],
-    pending:[],
-    complete:[]
+    "pending":[],
+    "complete":[]
   }
 }
 ```
@@ -1973,7 +1975,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /form/approve |
 | ------------- | ------------- |
 | 格式          | JSON          |
-| http 请求方式 | POST          |
+| http 请求方式 | PUT           |
 | 登陆保护      | 是            |
 
  **请求参数**
