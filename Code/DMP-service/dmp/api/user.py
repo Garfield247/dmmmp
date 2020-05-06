@@ -8,7 +8,7 @@ from flask import Blueprint,jsonify
 
 user = Blueprint("user",__name__)
 
-@user.route("/register/",method=["POST"])
+@user.route("/register/",methods=["POST"])
 def register():
     result = {
         "status": 0,
@@ -18,7 +18,7 @@ def register():
     }
     return jsonify(result)
 
-@user.route("/activate/",method=["POST"])
+@user.route("/activate/",methods=["POST"])
 def activate():
     result = {
         "status": 0,
@@ -28,7 +28,7 @@ def activate():
     }
     return jsonify(result)
 
-@user.route("/login/",method=["POST"])
+@user.route("/login/",methods=["POST"])
 def login():
     result = {
         "status": 0,
@@ -39,7 +39,7 @@ def login():
     }
     return jsonify(result)
 
-@user.route("/forgetpwd/",method=["POST"])
+@user.route("/forgetpwd/",methods=["POST"])
 def forgetpwd():
     result = {
         "status": 0,
@@ -49,7 +49,7 @@ def forgetpwd():
     }
     return jsonify(result)
 
-@user.route("/changepwd/",method=["PUT"])
+@user.route("/changepwd/",methods=["PUT"])
 def changepwd():
     result = {
         "status": 0,
@@ -59,7 +59,7 @@ def changepwd():
     }
     return jsonify(result)
 
-@user.route("/info/",method=["get"])
+@user.route("/info/",methods=["get"])
 def info():
     result = {
         "status": 0,
@@ -79,7 +79,7 @@ def info():
     }
     return jsonify(result)
 
-@user.route("/icon/",method=["POST"])
+@user.route("/icon/",methods=["POST"])
 def icon():
     result = {
         "status": 0,
@@ -89,7 +89,7 @@ def icon():
     }
     return jsonify(result)
 
-@user.route("/changeprofile/",method=["PUT"])
+@user.route("/changeprofile/",methods=["PUT"])
 def changeprofile():
     result = {
         "status": 0,
@@ -99,7 +99,7 @@ def changeprofile():
     }
     return jsonify(result)
 
-@user.route("/list/",method=["GET"])
+@user.route("/list/",methods=["GET"])
 def ulist():
     result = {
     "status": 0,
@@ -132,7 +132,7 @@ def ulist():
 
     return jsonify(result)
 
-@user.route("/del/",method=["DEL"])
+@user.route("/del/",methods=["DEL"])
 def udel():
     result = {
         "status": 0,

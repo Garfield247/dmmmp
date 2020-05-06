@@ -8,7 +8,7 @@ from flask import Blueprint,jsonify
 
 rights = Blueprint("rights",__name__)
 
-@rights.route("/all/",method=["GET"])
+@rights.route("/all/",methods=["GET"])
 def all():
     result = {
         "status": 0,

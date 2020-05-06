@@ -8,7 +8,7 @@ from flask import Blueprint,jsonify
 
 usergroup = Blueprint("usergroup",__name__)
 
-@usergroup.route("/info/",method=["GET"])
+@usergroup.route("/info/",methods=["GET"])
 def info():
     result = {
         "status": 0,
@@ -37,7 +37,7 @@ def info():
 
     return jsonify(result)
 
-@usergroup.route("/post/",method=["POST"])
+@usergroup.route("/post/",methods=["POST"])
 def post():
     result = {
         "status": 0,
@@ -48,7 +48,7 @@ def post():
     return jsonify(result)
 
 
-@usergroup.route("/del/",method=["DEL"])
+@usergroup.route("/del/",methods=["DEL"])
 def ugdel():
     result = {
         "status": 0,

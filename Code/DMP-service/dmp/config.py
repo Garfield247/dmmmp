@@ -17,22 +17,26 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or ''
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')or ''
 
-    CELERY_RESULT_BACKEND = "redis://localhost:6379/1/"
-    CELERY_BROKER_URL = "redis://localhost:6379/2"
 
     @staticmethod
     def init_app(app):
         pass
 #开发环境
 class DevelopmentConfig(Config):
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/1/"
+    CELERY_BROKER_URL = "redis://localhost:6379/2"
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir,'dmp-dev.sqlite')
 
 #测试环境
 class TestingConfig(Config):
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/1/"
+    CELERY_BROKER_URL = "redis://localhost:6379/2"
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir,'dmp-test.sqlite')
 
 #生产环境
 class ProductionConfig(Config):
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/1/"
+    CELERY_BROKER_URL = "redis://localhost:6379/2"
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir,'dmp.sqlite')
 
 #配置字典

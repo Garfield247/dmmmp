@@ -7,7 +7,7 @@ from flask import Blueprint,jsonify
 
 form = Blueprint("form",__name__)
 
-@form.route("/fromdb/",method=["POST"])
+@form.route("/fromdb/",methods=["POST"])
 def fromdb():
     result = {
         "status": 0,
@@ -17,7 +17,7 @@ def fromdb():
     }
     return jsonify(result)
 
-@form.route("/fromfile/",method=["POST"])
+@form.route("/fromfile/",methods=["POST"])
 def fromfile():
     result = {
         "status": 0,
@@ -27,7 +27,7 @@ def fromfile():
     }
     return jsonify(result)
 
-@form.route("/migration/",method=["POST"])
+@form.route("/migration/",methods=["POST"])
 def migration():
     result = {
         "status": 0,
@@ -37,7 +37,7 @@ def migration():
     }
     return jsonify(result)
 
-@form.route("/download/",method=["POST"])
+@form.route("/download/",methods=["POST"])
 def download():
     result = {
         "status": 0,
@@ -47,7 +47,7 @@ def download():
     }
     return jsonify(result)
 
-@form.route("/info/",method=["GET"])
+@form.route("/info/",methods=["GET"])
 def info():
     result = {
         "status": 0,
@@ -77,7 +77,7 @@ def info():
 
     return jsonify(result)
 
-@form.route("/approve/",method=["PUT"])
+@form.route("/approve/",methods=["PUT"])
 def fromdb():
     result = {
         "status": 0,

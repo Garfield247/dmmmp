@@ -8,7 +8,7 @@ from flask import Blueprint,jsonify
 
 verifier = Blueprint("verifier",__name__)
 
-@verifier.route("/email/",method=["GET"])
+@verifier.route("/email/",methods=["GET"])
 def email():
     result = {
         "status": 0,
@@ -19,7 +19,7 @@ def email():
     }
     return jsonify(result)
 
-@verifier.route("/username/",method=["GET"])
+@verifier.route("/username/",methods=["GET"])
 def username():
     result = {
         "status": 0,

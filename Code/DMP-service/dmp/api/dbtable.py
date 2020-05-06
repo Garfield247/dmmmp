@@ -8,7 +8,7 @@ from flask import Blueprint,jsonify
 
 dbtable = Blueprint("dbtable",__name__)
 
-@dbtable.route("/info/",method=["GET"])
+@dbtable.route("/info/",methods=["GET"])
 def info():
     result = {
  "status": 0,
@@ -43,7 +43,7 @@ def info():
         }
     return jsonify(result)
 
-@dbtable.route("/column/",method=["GET"])
+@dbtable.route("/column/",methods=["GET"])
 def column():
     result = {
         "status": 0,
@@ -61,7 +61,7 @@ def column():
 
     return jsonify(result)
 
-@dbtable.route("/columnsetting/",method=["POST"])
+@dbtable.route("/columnsetting/",methods=["POST"])
 def columnsetting():
     result = {
         "status": 0,
@@ -71,7 +71,7 @@ def columnsetting():
     }
     return jsonify(result)
 
-@dbtable.route("/del/",method=["DEL"])
+@dbtable.route("/del/",methods=["DEL"])
 def dbtdel():
     result = {
         "status": 0,

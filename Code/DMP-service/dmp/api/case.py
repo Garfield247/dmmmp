@@ -8,7 +8,7 @@ from flask import Blueprint,jsonify
 
 case = Blueprint("case",__name__)
 
-@case.route("/all/",method=["GET"])
+@case.route("/all/",methods=["GET"])
 def all():
     result = {
         "status": 0,
@@ -38,7 +38,7 @@ def all():
 
     return jsonify(result)
 
-@case.route("/del/",method=["DEL"])
+@case.route("/del/",methods=["DEL"])
 def cdel():
     result = {
         "status": 0,

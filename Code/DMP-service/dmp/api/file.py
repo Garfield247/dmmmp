@@ -8,7 +8,7 @@ from flask import Blueprint,jsonify
 
 file = Blueprint("file",__name__)
 
-@file.route("/upload/",method=["POST"])
+@file.route("/upload/",methods=["POST"])
 def upload():
     result = {
         "status": 0,
@@ -18,7 +18,7 @@ def upload():
     }
     return jsonify(result)
 
-@file.route("/success/",method=["GET"])
+@file.route("/success/",methods=["GET"])
 def success():
     result = {
         "status": 0,
@@ -28,7 +28,7 @@ def success():
     }
     return jsonify(result)
 
-@file.route("/dlcomplete/",method=["GET"])
+@file.route("/dlcomplete/",methods=["GET"])
 def dlcomplete():
     result = {
         "status": 0,

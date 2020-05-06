@@ -8,6 +8,9 @@ from flask_script import Manager,Server
 from dmp import app
 from flask_migrate import MigrateCommand
 
+
+
+
 #创建命令起动控制对象
 manager = Manager(app)
 # 添加数据库迁移命令
