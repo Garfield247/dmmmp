@@ -9,7 +9,7 @@ from dmp.extensions import db
 
 class Users(db.Model):
     """用户表"""
-    __tablename_ = 'dmp_user'
+    __tablename__ = 'dmp_user'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='用户ID')
     dmp_username = db.Column(db.String(32), unique=True, nullable=False, comment='用户名')
     real_name = db.Column(db.String(32), nullable=False, comment='真实姓名')

@@ -21,10 +21,10 @@ class FromAddDataTable(db.Model):
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
     submit_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), nullable=False, comment='提交人')
     dmp_database_id = db.Column(db.Integer, db.ForeignKey('dmp_database.id'), nullable=False, comment='数据库ID')
-    dmp_case_id = db.Column(db.Integer, db.ForeignKey('dmp_data_case.id'), nullable=False, comment='所属案例ID')
+    dmp_case_id = db.Column(db.Integer, db.ForeignKey('dmp_case.id'), nullable=False, comment='所属案例ID')
     approve_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), comment='审批人')
 
     submit_users = db.relationship('Users', backref='submitusers_from_add_data_table')
     approve_users = db.relationship('Users', backref='approveusers_from_add_data_table')
     database = db.relationship('Database', backref='database_from_add_data_table')
-    datacase = db.relationship('DataCase', backref='datacase_from_add_data_table')
+    datacase = db.relationship('Case', backref='case_from_add_data_table')

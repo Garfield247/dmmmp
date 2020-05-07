@@ -5,6 +5,7 @@
 
 import datetime
 from dmp.extensions import db
+from .dmp_user import Users
 
 class DataTable(db.Model):
     """数据表"""
