@@ -26,7 +26,7 @@ def create_app(config_name):
     return app
 
 #获取配置
-config_name = os.environ.get('FLASK_CONFIG') or 'default'
+config_name = os.environ.get('DMP_CONFIG') or 'default'
 
 #创建实例
 app = create_app(config_name)
