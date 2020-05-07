@@ -17,9 +17,21 @@ def test():
         "status": 0,
         "msg": "success",
         "results":{
-            "res":"OK",
         }
 }
+    return jsonify(result)
+
+
+@main.route("/cccc")
+def teccccst():
+    db.create_all()
+    result = {
+        "status": 0,
+        "msg": "success",
+        "results": {
+            "res": "OK",
+        }
+    }
     return jsonify(result)
 
 @main.route("/dddd")
