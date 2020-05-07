@@ -22,6 +22,17 @@ def test():
 }
     return jsonify(result)
 
+@main.route("/dddd")
+def tddddest():
+    db.create_all()
+    result = {
+        "status": 0,
+        "msg": "success",
+        "results":{
+            "res":"OK",
+        }
+}
+    return jsonify(result)
 
 @main.route('/testAdd', methods=["GET"])
 def test_add():
