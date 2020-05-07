@@ -17,7 +17,6 @@ def create_app(config_name):
     app.config.from_object(config.get(config_name) or config['default'])
     #调用初始化函数
     config[config_name].init_app(app)
-
     #配置扩展
     config_extensions(app)
     #配置蓝本

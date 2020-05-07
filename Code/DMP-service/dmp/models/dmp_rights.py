@@ -5,5 +5,8 @@
 
 from dmp.extensions import db
 
-class Dmp_rights(db.Model):
-    pass
+class Rights(db.Model):
+    """权利表"""
+    __tablename__ = 'dmp_rights'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='功能ID')
+    dmp_rights_name = db.Column(db.String(32), nullable=False, comment='路由功能名称')

@@ -5,23 +5,43 @@
 
 import os
 from flask_script import Manager,Server
-from dmp import app
 from flask_migrate import MigrateCommand
+from dmp import app
+from dmp.extensions import db
 
 
 
-
-#创建命令起动控制对象
+# 创建命令起动控制对象
 manager = Manager(app)
 # 添加数据库迁移命令
 manager.add_command('db', MigrateCommand)
 # 添加服务配置
 manager.add_command('runserver',Server(host='0.0.0.0',port=7789))
 
-#路由列表命令
+# 路由列表命令
 @manager.command
 def url_map():
+    from dmp.api import config_blueprint
+    config_blueprint(app)
     app.logger.info(app.url_map)
+
+
+# 删除所有表
+@manager.command
+def drop_db():
+    db.drop_all()
+
+# 创建所有表
+@manager.command
+def create_db():
+    db.create_all()
+
+# 初始化
+@manager.command
+def sys_init():
+    db.drop_all()
+    db.create_all()
+
 
 if __name__ == '__main__':
     manager.run()

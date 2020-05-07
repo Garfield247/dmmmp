@@ -5,10 +5,14 @@
 
 from flask import Blueprint,jsonify
 from dmp.utils.task import add
+from dmp.models import *
+from dmp.extensions import db
+
 main = Blueprint("mian",__name__)
 
 @main.route("/")
 def test():
+    db.create_all()
     result = {
         "status": 0,
         "msg": "success",
