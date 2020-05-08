@@ -45,6 +45,11 @@ def init_permission():
     from dmp.models.dmp_permission import Permissions
     Permissions.init_permission()
 
+@manager.command
+def init_group():
+    from dmp.models.dmp_group import Group
+    Group.init_group()
+
 # 初始化
 @manager.command
 def sys_init():

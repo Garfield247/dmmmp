@@ -4,6 +4,7 @@
 # @Author  : SHTD 
 
 import datetime
+from flask import current_app
 from dmp.extensions import db
 from .dmp_group_permission import group_permission
 from .dmp_group_rights import group_rights
@@ -17,13 +18,25 @@ class Group(db.Model):
     created_on = db.Column(db.DateTime, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
 
-    # permissions = db.relationship('Permissions', secondary=group_permission)
+    permissions = db.relationship('Permissions', secondary=group_permission)
     # rights = db.relationship('Rights', secondary=group_rights)
 
     @classmethod
     def init_group(cls):
-        admin_group = Group()
-        admin_group.id = 1
-        admin_group.dmp_group_name = "admin"
-        admin_group.max_count = 3
+        try:
+            from .dmp_permission import Permissions
+            admin_group = Group()
+            admin_group.dmp_group_name = "admin"
+            admin_group.max_count = 3
+            current_app.logger.info(Permissions.query.all())
+            db.session.add(admin_group)
+            db.session.commit()
+            for per in Permissions.query.all():
+                admin_group.permissions.append(per)
+            db.session.commit()
+
+            current_app.logger.info("create admin group")
+
+        except Exception as err:
+            current_app.logger.error(err)
 
