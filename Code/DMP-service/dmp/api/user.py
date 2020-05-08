@@ -9,7 +9,7 @@ from flask import Blueprint,jsonify
 user = Blueprint("user",__name__)
 
 @user.route("/register/",methods=["POST"],defaults={"desc":"用户注册"})
-def register():
+def register(desc):
     result = {
         "status": 0,
         "msg": "success",
@@ -19,7 +19,7 @@ def register():
     return jsonify(result)
 
 @user.route("/activate/",methods=["POST"],defaults={"desc":"用户激活"})
-def activate():
+def activate(desc):
     result = {
         "status": 0,
         "msg": "success",
@@ -29,7 +29,7 @@ def activate():
     return jsonify(result)
 
 @user.route("/login/",methods=["POST"],defaults={"desc":"用户登录"})
-def login():
+def login(desc):
     result = {
         "status": 0,
         "msg": "success",
@@ -40,7 +40,7 @@ def login():
     return jsonify(result)
 
 @user.route("/forgetpwd/",methods=["POST"],defaults={"desc":"找回密码"})
-def forgetpwd():
+def forgetpwd(desc):
     result = {
         "status": 0,
         "msg": "success",
@@ -50,7 +50,7 @@ def forgetpwd():
     return jsonify(result)
 
 @user.route("/changepwd/",methods=["PUT"],defaults={"desc":"重设密码"})
-def changepwd():
+def changepwd(desc):
     result = {
         "status": 0,
         "msg": "success",
@@ -60,7 +60,7 @@ def changepwd():
     return jsonify(result)
 
 @user.route("/info/",methods=["get"],defaults={"desc":"用户资料"})
-def info():
+def info(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -80,7 +80,7 @@ def info():
     return jsonify(result)
 
 @user.route("/icon/",methods=["POST"],defaults={"desc":"修改头像"})
-def icon():
+def icon(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -90,7 +90,7 @@ def icon():
     return jsonify(result)
 
 @user.route("/changeprofile/",methods=["PUT"],defaults={"desc":"修改资料"})
-def changeprofile():
+def changeprofile(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -100,7 +100,7 @@ def changeprofile():
     return jsonify(result)
 
 @user.route("/list/",methods=["GET"],defaults={"desc":"用户列表"})
-def ulist():
+def ulist(desc):
     result = {
     "status": 0,
     "msg": "ok",
@@ -133,7 +133,7 @@ def ulist():
     return jsonify(result)
 
 @user.route("/del/",methods=["DEL"],defaults={"desc":"删除用户"})
-def udel():
+def udel(desc):
     result = {
         "status": 0,
         "msg": "ok",

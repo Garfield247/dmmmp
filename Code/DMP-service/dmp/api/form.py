@@ -8,7 +8,7 @@ from flask import Blueprint,jsonify
 form = Blueprint("form",__name__)
 
 @form.route("/fromdb/",methods=["POST"],defaults={"desc":"从数据库添加数据表的表单"})
-def fromdb():
+def fromdb(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -18,7 +18,7 @@ def fromdb():
     return jsonify(result)
 
 @form.route("/fromfile/",methods=["POST"],defaults={"desc":"从文件添加数据表的表单"})
-def fromfile():
+def fromfile(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -28,7 +28,7 @@ def fromfile():
     return jsonify(result)
 
 @form.route("/migration/",methods=["POST"],defaults={"desc":"数据迁移表单"})
-def migration():
+def migration(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -38,7 +38,7 @@ def migration():
     return jsonify(result)
 
 @form.route("/download/",methods=["POST"],defaults={"desc":"文件下载表单"})
-def download():
+def download(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -48,7 +48,7 @@ def download():
     return jsonify(result)
 
 @form.route("/info/",methods=["GET"],defaults={"desc":"获取表单信息"})
-def info():
+def info(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -78,7 +78,7 @@ def info():
     return jsonify(result)
 
 @form.route("/approve/",methods=["PUT"],defaults={"desc":"表单审批"})
-def fromdb():
+def fromdb(desc):
     result = {
         "status": 0,
         "msg": "ok",

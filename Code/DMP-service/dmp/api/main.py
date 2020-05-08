@@ -15,7 +15,7 @@ from dmp.extensions import db
 main = Blueprint("mian",__name__)
 
 @main.route("/",defaults={"desc":"服务跟路由"})
-def test():
+def test(desc):
     db.create_all()
     result = {
         "status": 0,
@@ -31,7 +31,7 @@ def apilist(desc):
 
 
 @main.route('/testAdd', methods=["GET"],defaults={"desc":"celery测试路由"})
-def test_add():
+def test_add(desc):
     """
     测试相加
     :return:

@@ -9,7 +9,7 @@ from flask import Blueprint,jsonify
 usergroup = Blueprint("usergroup",__name__)
 
 @usergroup.route("/info/",methods=["GET"],defaults={"desc":"获取用户组信息"})
-def info():
+def info(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -38,7 +38,7 @@ def info():
     return jsonify(result)
 
 @usergroup.route("/post/",methods=["POST"],defaults={"desc":"修改添加用户组"})
-def post():
+def post(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -49,7 +49,7 @@ def post():
 
 
 @usergroup.route("/del/",methods=["DEL"],defaults={"desc":"删除用户组"})
-def ugdel():
+def ugdel(desc):
     result = {
         "status": 0,
         "msg": "ok",
