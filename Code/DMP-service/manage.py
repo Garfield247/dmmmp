@@ -27,22 +27,6 @@ def url_map():
     for i in app.url_map.__dict__.get("_rules"):
         app.logger.info([i.rule,i.defaults.get("desc")])
 
-@manager.command
-def init_permission():
-    permission_list = [{"route":r.rule,"desc":None if not r.defaults else r.defaults.get("desc")} for r in app.url_map.__dict__.get("_rules")]
-    app.logger.info(permission_list)
-    from dmp.models.dmp_permission import Permissions
-    try:
-        for rout in permission_list:
-            app.logger.info(rout)
-            permission = Permissions()
-            permission.route = str(rout.get("route"))
-            permission.dmp_permission_name = str(rout.get("desc"))
-            db.session.add(permission)
-        # db.session.commit()
-        app.logger.info("permission init complete")
-    except Exception as err:
-        app.logger.error(err)
 
 # 删除所有表
 @manager.command
@@ -56,10 +40,10 @@ def create_db():
     app.logger.info("create db")
     db.create_all()
 
-# @manager.command
-# def init_permission():
-#     from dmp.models.dmp_permission import Permissions
-#     Permissions.init_permission()
+@manager.command
+def init_permission():
+    from dmp.models.dmp_permission import Permissions
+    Permissions.init_permission()
 
 # 初始化
 @manager.command
