@@ -3,7 +3,9 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD 
 
+import time
 import datetime
+from faker import Faker
 from dmp.extensions import db
 
 
@@ -26,3 +28,14 @@ class Users(db.Model):
 
     groups = db.relationship('Groups', backref='users')
     leader = db.relationship('Users', backref='leader')
+
+    @classmethod
+    def user_init(cls):
+        """初始化管理员用户"""
+        f = Faker("zh_CN")
+
+
+        pass
+    @classmethod
+    def create_test_data(cls):
+        pass

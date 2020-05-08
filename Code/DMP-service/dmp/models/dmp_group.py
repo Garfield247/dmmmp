@@ -19,3 +19,11 @@ class Group(db.Model):
 
     permissions = db.relationship('Permissions', secondary=group_permission)
     rights = db.relationship('Rights', secondary=group_rights)
+
+    @classmethod
+    def init_group(cls):
+        admin_group = Group()
+        admin_group.id = 1
+        admin_group.dmp_group_name = "admin"
+        admin_group.max_count = 3
+

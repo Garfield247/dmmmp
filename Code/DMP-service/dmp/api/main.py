@@ -3,10 +3,14 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD 
 
-from flask import Blueprint,jsonify
+from flask import (Blueprint,
+                   jsonify,
+                   current_app
+                   )
 from dmp.utils.task import add
 from dmp.models import *
 from dmp.extensions import db
+
 
 main = Blueprint("mian",__name__)
 
@@ -21,7 +25,10 @@ def test():
 }
     return jsonify(result)
 
-
+@main.route("/apilist",defaults={"desc":"API列表"})
+def apilist():
+    current_app.logger.info(current_app.url_map)
+    return str(current_app.url_map)
 
 
 @main.route('/testAdd', methods=["GET"])
