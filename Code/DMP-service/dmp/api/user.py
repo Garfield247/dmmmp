@@ -8,8 +8,8 @@ from flask import Blueprint,jsonify
 
 user = Blueprint("user",__name__)
 
-@user.route("/register/",methods=["POST"])
-def register():
+@user.route("/register/",methods=["POST"],defaults={"desc":"用户注册"})
+def register(desc):
     result = {
         "status": 0,
         "msg": "success",
@@ -18,8 +18,8 @@ def register():
     }
     return jsonify(result)
 
-@user.route("/activate/",methods=["POST"])
-def activate():
+@user.route("/activate/",methods=["POST"],defaults={"desc":"用户激活"})
+def activate(desc):
     result = {
         "status": 0,
         "msg": "success",
@@ -28,8 +28,8 @@ def activate():
     }
     return jsonify(result)
 
-@user.route("/login/",methods=["POST"])
-def login():
+@user.route("/login/",methods=["POST"],defaults={"desc":"用户登录"})
+def login(desc):
     result = {
         "status": 0,
         "msg": "success",
@@ -39,8 +39,8 @@ def login():
     }
     return jsonify(result)
 
-@user.route("/forgetpwd/",methods=["POST"])
-def forgetpwd():
+@user.route("/forgetpwd/",methods=["POST"],defaults={"desc":"找回密码"})
+def forgetpwd(desc):
     result = {
         "status": 0,
         "msg": "success",
@@ -49,8 +49,8 @@ def forgetpwd():
     }
     return jsonify(result)
 
-@user.route("/changepwd/",methods=["PUT"])
-def changepwd():
+@user.route("/changepwd/",methods=["PUT"],defaults={"desc":"重设密码"})
+def changepwd(desc):
     result = {
         "status": 0,
         "msg": "success",
@@ -59,8 +59,8 @@ def changepwd():
     }
     return jsonify(result)
 
-@user.route("/info/",methods=["get"])
-def info():
+@user.route("/info/",methods=["get"],defaults={"desc":"用户资料"})
+def info(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -79,8 +79,8 @@ def info():
     }
     return jsonify(result)
 
-@user.route("/icon/",methods=["POST"])
-def icon():
+@user.route("/icon/",methods=["POST"],defaults={"desc":"修改头像"})
+def icon(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -89,8 +89,8 @@ def icon():
     }
     return jsonify(result)
 
-@user.route("/changeprofile/",methods=["PUT"])
-def changeprofile():
+@user.route("/changeprofile/",methods=["PUT"],defaults={"desc":"修改资料"})
+def changeprofile(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -99,8 +99,8 @@ def changeprofile():
     }
     return jsonify(result)
 
-@user.route("/list/",methods=["GET"])
-def ulist():
+@user.route("/list/",methods=["GET"],defaults={"desc":"用户列表"})
+def ulist(desc):
     result = {
     "status": 0,
     "msg": "ok",
@@ -132,8 +132,8 @@ def ulist():
 
     return jsonify(result)
 
-@user.route("/del/",methods=["DEL"])
-def udel():
+@user.route("/del/",methods=["DEL"],defaults={"desc":"删除用户"})
+def udel(desc):
     result = {
         "status": 0,
         "msg": "ok",

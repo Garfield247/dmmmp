@@ -3,7 +3,9 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD 
 
+import time
 import datetime
+from faker import Faker
 from dmp.extensions import db
 
 
@@ -24,5 +26,16 @@ class Users(db.Model):
     dmp_group_id = db.Column(db.Integer, db.ForeignKey('dmp_group.id'), nullable=False, comment='所属用户组ID，默认学生用户组')
     leader_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), comment='直属管理者，默认是超级管理员用户, 自关联')
 
-    groups = db.relationship('Groups', backref='users')
-    leader = db.relationship('Users', backref='leader')
+    # groups = db.relationship('Groups', backref='users')
+    # leader = db.relationship('Users', backref='leader')
+
+    @classmethod
+    def user_init(cls):
+        """初始化管理员用户"""
+        f = Faker("zh_CN")
+
+
+        pass
+    @classmethod
+    def create_test_data(cls):
+        pass

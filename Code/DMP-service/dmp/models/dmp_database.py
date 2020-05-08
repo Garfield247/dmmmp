@@ -22,4 +22,4 @@ class Database(db.Model):
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
     dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), nullable=False, comment='所属用户ID')
 
-    users = db.relationship('Users', backref='database')
+    # users = db.relationship('Users', backref='database')

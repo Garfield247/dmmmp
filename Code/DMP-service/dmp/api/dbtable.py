@@ -8,8 +8,8 @@ from flask import Blueprint,jsonify
 
 dbtable = Blueprint("dbtable",__name__)
 
-@dbtable.route("/info/",methods=["GET"])
-def info():
+@dbtable.route("/info/",methods=["GET"],defaults={"desc":"获取数据表信息"})
+def info(desc):
     result = {
  "status": 0,
   "msg": "ok",
@@ -43,8 +43,8 @@ def info():
         }
     return jsonify(result)
 
-@dbtable.route("/column/",methods=["GET"])
-def column():
+@dbtable.route("/column/",methods=["GET"],defaults={"desc":"获取数据表的列信息"})
+def column(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -61,8 +61,8 @@ def column():
 
     return jsonify(result)
 
-@dbtable.route("/columnsetting/",methods=["POST"])
-def columnsetting():
+@dbtable.route("/columnsetting/",methods=["POST"],defaults={"desc":"数据表的数据列设置"})
+def columnsetting(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -71,8 +71,8 @@ def columnsetting():
     }
     return jsonify(result)
 
-@dbtable.route("/del/",methods=["DEL"])
-def dbtdel():
+@dbtable.route("/del/",methods=["DEL"],defaults={"desc":"删除数据表"})
+def dbtdel(desc):
     result = {
         "status": 0,
         "msg": "ok",

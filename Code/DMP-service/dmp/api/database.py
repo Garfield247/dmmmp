@@ -7,8 +7,8 @@ from flask import Blueprint,jsonify
 
 database = Blueprint("database",__name__)
 
-@database.route("/info/",methods=["GET"])
-def info():
+@database.route("/info/",methods=["GET"],defaults={"desc":"数据库信息"})
+def info(desc):
     result = {
  "status": 0,
   "msg": "ok",
@@ -41,8 +41,8 @@ def info():
         }
     return jsonify(result)
 
-@database.route("/del/",methods=["DEL"])
-def dbdel():
+@database.route("/del/",methods=["DEL"],defaults={"desc":"删除数据库连接信息"})
+def dbdel(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -51,8 +51,8 @@ def dbdel():
     }
     return jsonify(result)
 
-@database.route("/connect/",methods=["POST"])
-def connect():
+@database.route("/connect/",methods=["POST"],defaults={"desc":"测试数据库连接"})
+def connect(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -61,8 +61,8 @@ def connect():
     }
     return jsonify(result)
 
-@database.route("/post/",methods=["POST"])
-def post():
+@database.route("/post/",methods=["POST"],defaults={"desc":"添加/修改数据库信息"})
+def post(desc):
     result = {
         "status": 0,
         "msg": "ok",

@@ -4,6 +4,7 @@
 # @Author  : SHTD 
 
 import datetime
+from flask import current_app
 from dmp.extensions import db
 from .dmp_group_permission import group_permission
 from .dmp_group_rights import group_rights
@@ -18,4 +19,41 @@ class Group(db.Model):
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
 
     permissions = db.relationship('Permissions', secondary=group_permission)
-    rights = db.relationship('Rights', secondary=group_rights)
+    # rights = db.relationship('Rights', secondary=group_rights)
+
+    @classmethod
+    def init_group(cls):
+        try:
+            from .dmp_permission import Permissions
+            admin_group = Group()
+            admin_group.dmp_group_name = "admin"
+            admin_group.max_count = 3
+            current_app.logger.info(Permissions.query.all())
+            db.session.add(admin_group)
+            db.session.commit()
+            for per in Permissions.query.all():
+                admin_group.permissions.append(per)
+            db.session.commit()
+            current_app.logger.info("create admin group")
+            teacher_group = Group()
+            teacher_group.dmp_group_name = "teacher"
+            db.session.add(teacher_group)
+            db.session.commit()
+            teacher_permissions_id = [1,2,5,6,7,8,9,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28]
+            for permission_id in teacher_permissions_id:
+                teacher_group.permissions.append(Permissions.query.get(permission_id))
+            current_app.logger.info("create teacher group")
+            student_group = Group()
+            student_group.dmp_group_name = "student"
+            db.session.add(student_group)
+            db.session.commit()
+            student_permissions_id = [2,5,6,7,8,9,11,12,13,16,17,18,18,19,21,22,23,24,25,26,28]
+            for permission_id in student_permissions_id:
+                student_group.permissions.append(Permissions.query.get(permission_id))
+            db.session.commit()
+            current_app.logger.info("create student group")
+
+
+        except Exception as err:
+            current_app.logger.error(err)
+

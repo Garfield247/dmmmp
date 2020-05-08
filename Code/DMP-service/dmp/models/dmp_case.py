@@ -16,3 +16,4 @@ class Case(db.Model):
     url = db.Column(db.String(64), comment='网址')
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
+
