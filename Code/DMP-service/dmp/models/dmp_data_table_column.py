@@ -16,4 +16,4 @@ class DataTableColumn(db.Model):
     description = db.Column(db.String(128), comment='字段说明')
     dmp_data_table_id = db.Column(db.Integer, db.ForeignKey('dmp_data_table.id'), nullable=False, comment='数据ID')
 
-    datatable = db.relationship('DataTable', backref='data_table_column')
+    # datatable = db.relationship('DataTable', backref='data_table_column')

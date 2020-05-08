@@ -17,8 +17,8 @@ class Group(db.Model):
     created_on = db.Column(db.DateTime, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
 
-    permissions = db.relationship('Permissions', secondary=group_permission)
-    rights = db.relationship('Rights', secondary=group_rights)
+    # permissions = db.relationship('Permissions', secondary=group_permission)
+    # rights = db.relationship('Rights', secondary=group_rights)
 
     @classmethod
     def init_group(cls):

@@ -20,6 +20,6 @@ class DataTable(db.Model):
     dmp_database_id = db.Column(db.Integer, db.ForeignKey('dmp_database.id'), nullable=False, comment='数据库ID')
     dmp_case_id = db.Column(db.Integer, db.ForeignKey('dmp_case.id'), nullable=False, comment='所属案例ID')
 
-    users = db.relationship('Users', backref='users_datatable')
-    database = db.relationship('Database', backref='database_datatable')
-    case = db.relationship('Case', backref='case_datatable')
+    # users = db.relationship('Users', backref='users_datatable')
+    # database = db.relationship('Database', backref='database_datatable')
+    # case = db.relationship('Case', backref='case_datatable')

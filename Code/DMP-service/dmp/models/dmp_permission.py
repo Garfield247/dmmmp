@@ -3,8 +3,9 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD 
 
-
+from flask import current_app
 from dmp.extensions import db
+
 
 class Permissions(db.Model):
     """权限表"""
@@ -13,6 +14,3 @@ class Permissions(db.Model):
     route = db.Column(db.String(64), nullable=False, comment='权限路由')
     dmp_permission_name = db.Column(db.String(32), nullable=False, comment='路由功能名称')
 
-    @classmethod
-    def init_permission(cls):
-        pass

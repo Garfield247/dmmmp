@@ -13,4 +13,4 @@ class DataTableColumnRange(db.Model):
     dmp_data_table_column_id = db.Column(db.Integer, db.ForeignKey('dmp_data_table_column.id'), nullable=False,
                                          comment='列ID')
 
-    data_table_column = db.relationship('DataTableColumn', backref='table_column_range')
+    # data_table_column = db.relationship('DataTableColumn', backref='table_column_range')

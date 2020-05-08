@@ -28,7 +28,7 @@ class FromMigrate(db.Model):
                                             comment='目标数据库ID')
     approve_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), comment='审批人')
 
-    submit_users = db.relationship('Users', backref='submitusers_from_migrate')
-    approve_users = db.relationship('Users', backref='approveusers_from_migrate')
-    datatable = db.relationship('DataTable', backref='datatable_from_migrate')
-    database = db.relationship('Database', backref='database_from_migrate')
+    # submit_users = db.relationship('Users', backref='submitusers_from_migrate')
+    # approve_users = db.relationship('Users', backref='approveusers_from_migrate')
+    # datatable = db.relationship('DataTable', backref='datatable_from_migrate')
+    # database = db.relationship('Database', backref='database_from_migrate')

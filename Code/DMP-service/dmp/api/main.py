@@ -25,7 +25,7 @@ def test():
     return jsonify(result)
 
 @main.route("/apilist",defaults={"desc":"API列表"})
-def apilist():
+def apilist(desc):
     current_app.logger.info(current_app.url_map)
     return str(current_app.url_map)
 
