@@ -8,7 +8,7 @@ from flask import Blueprint,jsonify
 form = Blueprint("form",__name__)
 
 @form.route("/fromdb/",methods=["POST"],defaults={"desc":"从数据库添加数据表的表单"})
-def fromdb(desc):
+def from_db(desc):
     result = {
         "status": 0,
         "msg": "ok",
@@ -18,7 +18,7 @@ def fromdb(desc):
     return jsonify(result)
 
 @form.route("/fromfile/",methods=["POST"],defaults={"desc":"从文件添加数据表的表单"})
-def fromfile(desc):
+def from_file(desc):
     result = {
         "status": 0,
         "msg": "ok",

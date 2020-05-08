@@ -25,7 +25,7 @@ manager.add_command('runserver',Server(host='0.0.0.0',port=7789))
 @manager.command
 def url_map():
     for i in app.url_map.__dict__.get("_rules"):
-        app.logger.info([i.rule,i.defaults.get("desc")])
+        app.logger.info(i)
 
 
 # 删除所有表
