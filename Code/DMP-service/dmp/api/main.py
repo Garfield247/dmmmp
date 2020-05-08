@@ -14,14 +14,13 @@ from dmp.extensions import db
 
 main = Blueprint("mian",__name__)
 
-@main.route("/")
+@main.route("/",defaults={"desc":"服务跟路由"})
 def test():
     db.create_all()
     result = {
         "status": 0,
         "msg": "success",
-        "results":{
-        }
+        "results":"DMP_SERVERS"
 }
     return jsonify(result)
 
@@ -31,7 +30,7 @@ def apilist():
     return str(current_app.url_map)
 
 
-@main.route('/testAdd', methods=["GET"])
+@main.route('/testAdd', methods=["GET"],defaults={"desc":"celery测试路由"})
 def test_add():
     """
     测试相加

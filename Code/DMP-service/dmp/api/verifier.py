@@ -9,7 +9,7 @@ from dmp.models import Users
 
 verifier = Blueprint("verifier",__name__)
 
-@verifier.route("/email/",methods=["POST"])
+@verifier.route("/email/",methods=["POST"],defaults={"desc":"验证邮箱占用"})
 def email():
     email = request.form.get('email')
     user_email_obj = Users.query.filter(Users.email == email).first()
@@ -31,7 +31,7 @@ def email():
     }
     return jsonify(result)
 
-@verifier.route("/username/", methods=["POST"])
+@verifier.route("/username/", methods=["POST"],defaults={"desc":"验证用户名占用"})
 def username():
     username = request.form.get('username')
     user_obj = Users.query.filter(Users.dmp_username==username).first()

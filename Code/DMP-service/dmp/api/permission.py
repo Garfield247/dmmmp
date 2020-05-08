@@ -8,7 +8,7 @@ from flask import Blueprint,jsonify
 
 permission = Blueprint("permission",__name__)
 
-@permission.route("/all/",methods=["GET"])
+@permission.route("/all/",methods=["GET"],defaults={"desc":"获取所有权限"})
 def all():
     result = {
     "status": 0,

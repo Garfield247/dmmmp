@@ -7,7 +7,7 @@ from flask import Blueprint,jsonify
 
 form = Blueprint("form",__name__)
 
-@form.route("/fromdb/",methods=["POST"])
+@form.route("/fromdb/",methods=["POST"],defaults={"desc":"从数据库添加数据表的表单"})
 def fromdb():
     result = {
         "status": 0,
@@ -17,7 +17,7 @@ def fromdb():
     }
     return jsonify(result)
 
-@form.route("/fromfile/",methods=["POST"])
+@form.route("/fromfile/",methods=["POST"],defaults={"desc":"从文件添加数据表的表单"})
 def fromfile():
     result = {
         "status": 0,
@@ -27,7 +27,7 @@ def fromfile():
     }
     return jsonify(result)
 
-@form.route("/migration/",methods=["POST"])
+@form.route("/migration/",methods=["POST"],defaults={"desc":"数据迁移表单"})
 def migration():
     result = {
         "status": 0,
@@ -37,7 +37,7 @@ def migration():
     }
     return jsonify(result)
 
-@form.route("/download/",methods=["POST"])
+@form.route("/download/",methods=["POST"],defaults={"desc":"文件下载表单"})
 def download():
     result = {
         "status": 0,
@@ -47,7 +47,7 @@ def download():
     }
     return jsonify(result)
 
-@form.route("/info/",methods=["GET"])
+@form.route("/info/",methods=["GET"],defaults={"desc":"获取表单信息"})
 def info():
     result = {
         "status": 0,
@@ -77,7 +77,7 @@ def info():
 
     return jsonify(result)
 
-@form.route("/approve/",methods=["PUT"])
+@form.route("/approve/",methods=["PUT"],defaults={"desc":"表单审批"})
 def fromdb():
     result = {
         "status": 0,
