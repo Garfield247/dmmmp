@@ -3,8 +3,6 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD 
 
-import os
-from typing import Dict
 
 from flask_script import Manager,Server
 from flask_migrate import MigrateCommand

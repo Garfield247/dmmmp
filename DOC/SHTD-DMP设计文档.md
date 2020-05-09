@@ -130,7 +130,7 @@ DMP( *Data Management Platform*)数据管理平台
 | 字段        | 数据类型 | 限制       | 介绍           |
 | ----------- | -------- | ---------- | -------------- |
 | id          | int      | Primay Key |                |
-| dmo_case_name | String   | 非空       | 案例名称       |
+| dmp_case_name | String   | 非空       | 案例名称       |
 | description | string   |            | 案例说明       |
 | url_name    | string   |            | 可视化网站名称 |
 | Url         | String   |            | 网址           |
