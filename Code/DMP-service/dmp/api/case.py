@@ -38,6 +38,16 @@ def all(desc):
 
     return jsonify(result)
 
+@case.route("/post/",methods=["DEL"],defaults={"desc":"添加、修改案例"})
+def cpost(desc):
+    result = {
+        "status": 0,
+        "msg": "ok",
+        "results": {
+        }
+    }
+    return jsonify(result)
+
 @case.route("/del/",methods=["DEL"],defaults={"desc":"删除案例"})
 def cdel(desc):
     result = {

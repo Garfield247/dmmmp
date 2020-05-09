@@ -42,12 +42,12 @@ def create_db():
 
 @manager.command
 def init_permission():
-    from dmp.models.dmp_permission import Permissions
+    from dmp.models import Permissions
     Permissions.init_permission()
 
 @manager.command
 def init_group():
-    from dmp.models.dmp_group import Group
+    from dmp.models import Group
     Group.init_group()
 
 # 初始化
@@ -55,7 +55,12 @@ def init_group():
 def sys_init():
     db.drop_all()
     db.create_all()
-
+    from dmp.models import Permissions
+    Permissions.init_permission()
+    from dmp.models import Group
+    Group.init_group()
+    from dmp.models import Users
+    Users.create_test_user()
 
 if __name__ == '__main__':
     manager.run()
