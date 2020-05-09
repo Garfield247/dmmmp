@@ -5,8 +5,9 @@
 
 import datetime
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class Case(db.Model):
+class Case(db.Model,DMPModel):
     """案例表"""
     __tablename__ = 'dmp_case'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

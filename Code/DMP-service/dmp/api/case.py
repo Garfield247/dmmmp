@@ -30,17 +30,19 @@ def all(desc):
 @case.route("/post/",methods=["POST"],defaults={"desc":"添加、修改案例"})
 def cpost(desc):
     if request.method == "POST":
-        if not request.args.get("case_id"):
+        data = request.json
+        if not data.get("case_id"):
             try:
                 current_app.logger.info(request.json)
                 case = Case(
-                    dmp_case_name = request.form.get("dmp_case_name"),
-                    description = request.form.get("description"),
-                    url = request.form.get("url"),
-                    url_name = request.form.get("url_name")
+                    dmp_case_name = data.get("dmp_case_name"),
+                    description = data.get("description"),
+                    url = data.get("url"),
+                    url_name = data.get("url_name")
                 )
                 db.session.add(case)
                 db.session.commit()
+                current_app.logger.info("add case")
                 result = {
                     "status":0,
                     "msg":"oK",
@@ -56,11 +58,12 @@ def cpost(desc):
                     }
                 }
                 return jsonify(result)
-        elif request.form.get("case_id"):
+        elif data.get("case_id"):
             pass
 
 @case.route("/del/",methods=["DEL"],defaults={"desc":"删除案例"})
 def cdel(desc):
+
     result = {
         "status": 0,
         "msg": "ok",
