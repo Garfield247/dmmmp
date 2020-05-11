@@ -1247,6 +1247,7 @@ DMP( *Data Management Platform*)数据管理平台
 | db_host     | string | 是       |          | 数据库主机地址 |
 | db_port     | int    | 是       |          | 数据库端口号   |
 | db_user     | string | 否       |          | 数据库用户名   |
+| db_name     |        |          |          |                |
 | db_password | string | 否       |          | 数据库密码     |
 
 **返回结果**
