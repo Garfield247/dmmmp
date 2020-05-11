@@ -4,42 +4,34 @@
 # @Author  : SHTD
 
 from flask import Blueprint, jsonify, request, current_app
+from dmp.models import Database
 
 database = Blueprint("database",__name__)
 
 @database.route("/info/",methods=["GET"],defaults={"desc":"数据库信息"})
 def info(desc):
-    result = {
- "status": 0,
-  "msg": "ok",
-  "results":[
-        {
-        "id":1,
-        "dmp_datebase_name":"main",
-        "dmp_user_id":1,
-        "db_type":1,
-        "db_host":"192.168.3.221",
-        "db_port":"3306",
-        "db_name":"dmp",
-        "description":"主数据库HIVE数据库",
-        "created_on":"2020-03-18 15:00:00",
-        "changed_on":"2020-03-28 15:00:00",
-        },
-        {
-        "id":3,
-        "dmp_datebase_name":"test_mysql",
-        "dmp_user_id":12,
-        "db_type":2,
-        "db_host":"192.168.3.221",
-        "db_port":"3306",
-        "db_name":"dmp",
-        "description":"测试使用的mysql数据库",
-        "created_on":"2020-03-18 15:00:00",
-        "changed_on":"2020-03-28 15:00:00",
-        }
-        ]
-        }
-    return jsonify(result)
+    if request.method == "GET":
+        try:
+            database_id = request.json.get("dmp_database_id") if request.json else None
+            if database_id:
+                data = Database.query.get(database_id).__json__()
+            else:
+                data = [d.__json__() for d in  Database.query.all()]
+
+            result = {
+                "status": 0,
+                "msg": "ok",
+                "results":data
+                    }
+            return jsonify(result)
+        except Exception as err:
+            result = {
+                "status": 0,
+                "msg": "ok",
+                "results":str(err)
+                    }
+            return jsonify(result)
+
 
 @database.route("/del/",methods=["DEL"],defaults={"desc":"删除数据库连接信息"})
 def dbdel(desc):
