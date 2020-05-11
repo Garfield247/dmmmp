@@ -5,9 +5,10 @@
 
 from flask import current_app
 from dmp.extensions import db
+from dmp.models import DMPModel
 
 
-class Permissions(db.Model):
+class Permissions(db.Model,DMPModel):
     """权限表"""
     __tablename__ = 'dmp_permission'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='权限ID')

@@ -5,8 +5,9 @@
 
 import datetime
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class FromMigrate(db.Model):
+class FromMigrate(db.Model,DMPModel):
     """数据迁移表单表"""
     __tablename__ = 'dmp_from_migrate'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

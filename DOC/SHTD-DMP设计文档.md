@@ -1426,7 +1426,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /case/del |
 | ------------- | --------- |
 | 格式          | JSON      |
-| http 请求方式 | GET       |
+| http 请求方式 | DEL       |
 | 登陆保护      | 是        |
 
  **请求参数**

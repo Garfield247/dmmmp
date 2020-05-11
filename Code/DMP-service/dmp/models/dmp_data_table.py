@@ -6,8 +6,9 @@
 import datetime
 from dmp.extensions import db
 from .dmp_user import Users
+from dmp.models import DMPModel
 
-class DataTable(db.Model):
+class DataTable(db.Model,DMPModel):
     """数据表"""
     __tablename__ = 'dmp_data_table'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

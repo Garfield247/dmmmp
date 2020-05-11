@@ -9,11 +9,11 @@ from faker import Faker
 from flask import current_app
 from itsdangerous import Serializer, BadSignature, SignatureExpired
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from dmp.models import DMPModel
 from dmp.extensions import db
 
 
-class Users(db.Model):
+class Users(db.Model,DMPModel):
     """用户表"""
     __tablename__ = 'dmp_user'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='用户ID')

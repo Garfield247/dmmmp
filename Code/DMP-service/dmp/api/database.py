@@ -3,7 +3,7 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD 
 
-from flask import Blueprint,jsonify
+from flask import Blueprint, jsonify, request
 
 database = Blueprint("database",__name__)
 
@@ -53,12 +53,17 @@ def dbdel(desc):
 
 @database.route("/connect/",methods=["POST"],defaults={"desc":"测试数据库连接"})
 def connect(desc):
-    result = {
-        "status": 0,
-        "msg": "ok",
-        "results": {
+    if request.method == "POST":
+        db_info = request.josn
+        db_type = db_info.get("db_type")
+        if db_type == 1:
+            pass
+        result = {
+            "status": 0,
+            "msg": "ok",
+            "results": {
+            }
         }
-    }
     return jsonify(result)
 
 @database.route("/post/",methods=["POST"],defaults={"desc":"添加/修改数据库信息"})

@@ -5,8 +5,9 @@
 
 import datetime
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class Database(db.Model):
+class Database(db.Model,DMPModel):
     """数据库表"""
     __tablename__ = 'dmp_database'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

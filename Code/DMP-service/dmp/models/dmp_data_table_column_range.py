@@ -4,8 +4,9 @@
 # @Author  : SHTD 
 
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class DataTableColumnRange(db.Model):
+class DataTableColumnRange(db.Model,DMPModel):
     """数据列区间表"""
     __tablename__ = 'dmp_data_table_column_range'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

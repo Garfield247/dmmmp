@@ -5,8 +5,9 @@
 
 import datetime
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class FromUpload(db.Model):
+class FromUpload(db.Model,DMPModel):
     """数据文件上传表单表"""
     __tablename__ = 'dmp_from_upload'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

@@ -7,18 +7,16 @@
 from flask import Blueprint, jsonify, request, current_app
 
 from dmp.extensions import db
-from dmp.models import Case
+from dmp.models import Case,DataTable
 
 case = Blueprint("case",__name__)
 
 @case.route("/all/",methods=["GET"],defaults={"desc":"案例列表"})
 def all(desc):
-    """
-    获取案例信息
-    :param desc:
-    :return:
-    """
-    cases = list(Case.query.all())
+    """获取案例信息"""
+    cases = list([c.__json__() for c in Case.query.all()])
+    current_app.logger.info(dir(cases))
+    # current_app.logger.info(cases.__json__())
     result = {
         "status": 0,
         "msg": "ok",
@@ -29,6 +27,7 @@ def all(desc):
 
 @case.route("/post/",methods=["POST"],defaults={"desc":"添加、修改案例"})
 def cpost(desc):
+    """添加修改案例"""
     if request.method == "POST":
         data = request.json
         if not data.get("case_id"):
@@ -61,15 +60,30 @@ def cpost(desc):
         elif data.get("case_id"):
             pass
 
-@case.route("/del/",methods=["DEL"],defaults={"desc":"删除案例"})
+@case.route("/del/",methods=["DELETE"],defaults={"desc":"删除案例"})
 def cdel(desc):
-
-    result = {
-        "status": 0,
-        "msg": "ok",
-        "results": {
+    del_case_id = request.json.get("case_id")
+    current_app.logger.info("del case , case_id :%d"%del_case_id)
+    try:
+        if DataTable.query.filter_by(dmp_case_id=del_case_id).count()<=0:
+            del_case = Case.query.get(del_case_id)
+            del_case.delete()
+        result = {
+            "status": 0,
+            "msg": "ok",
+            "results": {
+                "ok":"OK!"
+            }
         }
-    }
-    return jsonify(result)
+        return jsonify(result)
+    except Exception as err:
+        result = {
+            "status": 203,
+            "msg": "err",
+            "results": {
+                "error":str(err)
+            }
+        }
+        return result
 
 

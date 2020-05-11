@@ -5,8 +5,9 @@
 
 import datetime
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class FromDownload(db.Model):
+class FromDownload(db.Model,DMPModel):
     """数据下载表单表"""
     __tablename__ = 'dmp_from_download'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

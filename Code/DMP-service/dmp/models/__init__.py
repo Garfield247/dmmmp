@@ -45,6 +45,11 @@ class DMPModel(object):
             self.rollback()
             raise
 
+    def to_josn(self):
+        pass
+
+
+
     def __json__(self):
         _d = {}
         if hasattr(self, '_json_cache') and self._json_cache:

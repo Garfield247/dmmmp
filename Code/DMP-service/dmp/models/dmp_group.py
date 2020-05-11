@@ -8,8 +8,9 @@ from flask import current_app
 from dmp.extensions import db
 from .dmp_group_permission import group_permission
 from .dmp_group_rights import group_rights
+from dmp.models import DMPModel
 
-class Group(db.Model):
+class Group(db.Model,DMPModel):
     """用户组表"""
     __tablename__ = 'dmp_group'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='用户组ID')

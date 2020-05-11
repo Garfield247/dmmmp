@@ -4,8 +4,9 @@
 # @Author  : SHTD 
 
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class DataTableColumn(db.Model):
+class DataTableColumn(db.Model,DMPModel):
     """数据列信息表"""
     __tablename__ = 'dmp_data_table_column'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
