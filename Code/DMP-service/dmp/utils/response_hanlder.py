@@ -12,9 +12,13 @@ response_code = {
 }
 
 
-def resp_hanlder(code,msg,result):
+def resp_hanlder(**option):
+    code = option.get("code") or 0
+    msg = option.get("msg")
+    result = option.get("result")
     response_body = {
         "status":code,
         "msg":response_code.get(code) if not msg else msg,
         "results":result
     }
+    return  response_body
