@@ -4,7 +4,7 @@
 # @Author  : SHTD
 
 from flask import Blueprint, jsonify, request, current_app
-from dmp.models import Database
+from dmp.models import Database,Users,DataTable
 from dmp.utils import resp_hanlder
 
 database = Blueprint("database",__name__)
@@ -23,15 +23,36 @@ def info(desc):
             return resp_hanlder(code=999,err=err)
 
 
-@database.route("/del/",methods=["DEL"],defaults={"desc":"删除数据库连接信息"})
+@database.route("/del/",methods=["DELETE"],defaults={"desc":"删除数据库连接信息"})
 def dbdel(desc):
-    result = {
-        "status": 0,
-        "msg": "ok",
-        "results": {
-        }
-    }
-    return jsonify(result)
+    if request.method == "DELETE":
+        try:
+            current_user_id = 3
+            # current_user_id = get_current_user().id
+            del_database_id = request.json.get("dmp_database_id")
+            if del_database_id:
+                del_database = Database.get(del_database_id)
+                if del_database:
+                    is_user = Users.get(Database.get(del_database_id).dmp_user_id).id == current_user_id
+                    is_user_leader = Users.get(Database.get(del_database_id).dmp_user_id).leader_dmp_user_id == current_user_id
+                    is_admin = Users.get(current_user_id).dmp_group_id == 1
+                    if is_user or is_user_leader or is_admin:
+                        # current_app.logger.info(DataTable.query.filter_by(dmp_database_id=current_user_id).count())
+                        if DataTable.query.filter_by(dmp_database_id=current_user_id).count() == 0:
+                            del_database.delete()
+                            current_app.logger.info("del db complete!")
+                            return resp_hanlder(result="OK")
+                        else:
+                            return resp_hanlder(code=401)
+                    else:
+                        return resp_hanlder(code=301)
+                else:
+                    return resp_hanlder(code=404)
+            else:
+                return resp_hanlder(code=101)
+        except Exception as err:
+            return resp_hanlder(err=err)
+
 
 @database.route("/connect/",methods=["POST"],defaults={"desc":"测试数据库连接"})
 def connect(desc):

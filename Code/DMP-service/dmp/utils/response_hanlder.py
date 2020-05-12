@@ -8,8 +8,11 @@ from flask import jsonify
 response_code = {
     0:"success",
     101:"required_parameter_missing",
-    201:"Invalid_token",
-    303:"Connection——Failed",
+    201:"Invalid_Token",
+    301:"Permission_Denied",
+    401:"Connection_Failed",
+    402:"Database_Occupied",
+    404:"Item_Does_Not_Exist",
     999:"unknow_error"
 }
 
