@@ -30,6 +30,8 @@ class DevelopmentConfig(Config):
     CELERY_BROKER_URL = "redis://localhost:6379/2"
     # DB
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir,'dmp-dev.sqlite')
+    # UPLOADED
+    UPLOADED_PATH = os.path.join(base_dir,"static/upload")
 
 #测试环境
 class TestingConfig(Config):
@@ -42,7 +44,8 @@ class TestingConfig(Config):
     CELERY_BROKER_URL = "amqp://dmp:dmp123.@192.168.3.87:5672/dmpvhost"
     # db
     SQLALCHEMY_DATABASE_URI = "mysql://root:shtd123.@192.168.3.87/3306/dmpdb?charset=utf-8"
-
+    # UPLOADED
+    UPLOADED_PATH = os.path.join(base_dir,"static/upload")
 
 #生产环境
 class ProductionConfig(Config):
