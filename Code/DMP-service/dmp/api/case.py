@@ -8,6 +8,7 @@ from flask import Blueprint, jsonify, request, current_app
 
 from dmp.extensions import db
 from dmp.models import Case,DataTable
+from dmp.utils import resp_hanlder
 
 case = Blueprint("case",__name__)
 
@@ -17,19 +18,13 @@ def all(desc):
     cases = list([c.__json__() for c in Case.query.all()])
     current_app.logger.info(dir(cases))
     # current_app.logger.info(cases.__json__())
-    result = {
-        "status": 0,
-        "msg": "ok",
-        "results":cases
-    }
+    return resp_hanlder(result=cases)
 
-    return jsonify(result)
-
-@case.route("/post/",methods=["POST"],defaults={"desc":"添加、修改案例"})
+@case.route("/post/",methods=["POST","PUT"],defaults={"desc":"添加、修改案例"})
 def cpost(desc):
     """添加修改案例"""
+    data = request.json
     if request.method == "POST":
-        data = request.json
         if not data.get("case_id"):
             try:
                 current_app.logger.info(request.json)
@@ -42,23 +37,28 @@ def cpost(desc):
                 db.session.add(case)
                 db.session.commit()
                 current_app.logger.info("add case")
-                result = {
-                    "status":0,
-                    "msg":"oK",
-                    "result":"OK"
-                }
-                return jsonify(result)
+                return resp_hanlder(result="OK")
             except Exception as err:
-                result = {
-                    "status": 202,
-                    "msg": "error",
-                    "results": {
-                        "error":str(err)
-                    }
-                }
-                return jsonify(result)
-        elif data.get("case_id"):
-            pass
+                return resp_hanlder(code=202,err=err)
+    if request.method == "PUT":
+        if data.get("case_id"):
+            try:
+                case = Case.query.get(data.get("case_id"))
+                current_app.logger.info(case)
+                if data.get("dmp_case_name"):
+                    case.dmp_case_name = data.get("dmp_case_name")
+                if data.get("description"):
+                    case.description = data.get("description")
+                if data.get("url"):
+                    case.url = data.get("url")
+                if data.get("url_name"):
+                    case.url_name = data.get("url_name")
+                case.put()
+                current_app.logger.info("修改完成")
+                return resp_hanlder(result={"update":"OK!"})
+            except Exception as err:
+                return resp_hanlder(cdoe=203,err=err)
+
 
 @case.route("/del/",methods=["DELETE"],defaults={"desc":"删除案例"})
 def cdel(desc):
@@ -68,22 +68,8 @@ def cdel(desc):
         if DataTable.query.filter_by(dmp_case_id=del_case_id).count()<=0:
             del_case = Case.query.get(del_case_id)
             del_case.delete()
-        result = {
-            "status": 0,
-            "msg": "ok",
-            "results": {
-                "ok":"OK!"
-            }
-        }
-        return jsonify(result)
+        return resp_hanlder(result="OK")
     except Exception as err:
-        result = {
-            "status": 203,
-            "msg": "err",
-            "results": {
-                "error":str(err)
-            }
-        }
-        return result
+        return resp_hanlder(code=203,err=err)
 
 

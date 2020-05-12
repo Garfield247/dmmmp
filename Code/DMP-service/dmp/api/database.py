@@ -5,6 +5,7 @@
 
 from flask import Blueprint, jsonify, request, current_app
 from dmp.models import Database
+from dmp.utils import resp_hanlder
 
 database = Blueprint("database",__name__)
 
@@ -17,20 +18,9 @@ def info(desc):
                 data = Database.query.get(database_id).__json__()
             else:
                 data = [d.__json__() for d in  Database.query.all()]
-
-            result = {
-                "status": 0,
-                "msg": "ok",
-                "results":data
-                    }
-            return jsonify(result)
+            return resp_hanlder(result=data)
         except Exception as err:
-            result = {
-                "status": 0,
-                "msg": "ok",
-                "results":str(err)
-                    }
-            return jsonify(result)
+            return resp_hanlder(code=999,err=err)
 
 
 @database.route("/del/",methods=["DEL"],defaults={"desc":"删除数据库连接信息"})
@@ -62,7 +52,7 @@ def connect(desc):
                 current_app.logger.info(conn.server_version)
                 res = {"connect":"ok!"}
             except Exception as err:
-                res = {"connect":"fail!","error_message":str(err)}
+                return resp_hanlder(code=303,err=err)
         elif int(db_type) == 2:
             try:
                 from pymongo import MongoClient
@@ -70,20 +60,15 @@ def connect(desc):
                 current_app.logger.info(conn.server_info())
                 res = {"connect":"ok!"}
             except Exception as err:
-                res = {"connect":"fail!","error_message":str(err)}
+                return resp_hanlder(code=303,err=err)
         elif int(db_type) == 3:
             try:
                 from pyhive import hive
                 conn = hive.Connection(host=db_host,port=db_port,username=db_user,password=db_password,database=db_name)
                 current_app.logger.info(conn.__dict__)
             except Exception as err:
-                res = {"connect":"fail!","error_message":str(err)}
-        result = {
-            "status": 0,
-            "msg": "ok",
-            "results": res
-        }
-        return jsonify(result)
+                return resp_hanlder(code=303,err=err)
+        return resp_hanlder(result=res)
 
 @database.route("/post/",methods=["POST"],defaults={"desc":"添加/修改数据库信息"})
 def post(desc):
