@@ -8,7 +8,7 @@ from dmp.extensions import db
 from .dmp_group_permission import group_permission
 from .dmp_group_rights import group_rights
 
-class Group(db.Model):
+class Groups(db.Model):
     """用户组表"""
     __tablename__ = 'dmp_group'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='用户组ID')
@@ -19,3 +19,16 @@ class Group(db.Model):
 
     permissions = db.relationship('Permissions', secondary=group_permission)
     rights = db.relationship('Rights', secondary=group_rights)
+
+    def __repr__(self):
+        return self.dmp_group_name
+
+    def group_to_dict(self):
+        group_dict = {
+            'id': self.id,
+            'dmp_group_name': self.dmp_group_name,
+            'max_count': self.max_count,
+            'created_on': self.created_on,
+            'changed_on': self.changed_on,
+        }
+        return group_dict

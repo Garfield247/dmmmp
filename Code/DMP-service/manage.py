@@ -4,19 +4,25 @@
 # @Author  : SHTD 
 
 import os
-from flask_script import Manager,Server
+from flask import jsonify
+from flask_script import Manager, Server
 from flask_migrate import MigrateCommand
 from dmp import app
+from dmp.config import Config
 from dmp.extensions import db
-
-
+from dmp.utils.email import send_mail, EmailBody
+from dmp.utils.validation import ValidationEmail
 
 # 创建命令起动控制对象
+from dmp.models import Users, Groups, Permissions
+from dmp.utils.put_data import put_data
+
 manager = Manager(app)
 # 添加数据库迁移命令
 manager.add_command('db', MigrateCommand)
 # 添加服务配置
-manager.add_command('runserver',Server(host='0.0.0.0',port=7789))
+manager.add_command('runserver', Server(host='0.0.0.0', port=7789))
+
 
 # 路由列表命令
 @manager.command
@@ -31,10 +37,12 @@ def url_map():
 def drop_db():
     db.drop_all()
 
+
 # 创建所有表
 @manager.command
 def create_db():
     db.create_all()
+
 
 # 初始化
 @manager.command
@@ -43,6 +51,65 @@ def sys_init():
     db.create_all()
 
 
+@manager.option('-n', '-dmp_username', dest='dmp_username')
+@manager.option('-r', '-real_name', dest='real_name')
+@manager.option('-p', '-passwd', dest='passwd')
+@manager.option('-e', '-email', dest='email')
+def createsuperuser(dmp_username, real_name, passwd, email):
+    """创建管理员用户"""
+    if not all([dmp_username, real_name, passwd, email]):
+        return jsonify({
+            'status': -1,
+            'msg': 'Insufficient parameter, please recreate superuser',
+            'results': {}
+        })
+
+    user = Users(dmp_username=dmp_username, real_name=real_name, passwd=passwd, email=email)
+    user.dmp_group_id = 1
+    user_root_list = Users.query.filter(Users.dmp_group_id == 1).all()
+    rootgroup = Groups.query.filter(Groups.dmp_group_name == "root").first()
+
+    if len(user_root_list) == rootgroup.max_count == 3:
+        return jsonify({
+            'status': -1,
+            'msg': 'The maximum number of administrators has been reached',
+            'results': {}
+        })
+
+    elif len(user_root_list) == 0 and rootgroup.max_count == None:
+        user.leader_dmp_user_id = None
+        put_data(rootgroup, user)
+
+        # 给Group用户组的管理员添加权限
+        rootgroup_permissions_list = rootgroup.permissions
+        rootgroup_permissions_list.clear()
+        permissions_list = Permissions.query.all()
+        for p in permissions_list:
+            rootgroup_permissions_list.append(p)
+
+        ValidationEmail().activate_email(user, email)
+
+    elif len(user_root_list) == rootgroup.max_count and rootgroup.max_count <= 3 and rootgroup.max_count != None:
+        user.leader_dmp_user_id = 1
+        put_data(rootgroup, user)
+
+        # 给Group用户组的管理员添加权限
+        rootgroup_permissions_list = rootgroup.permissions
+        rootgroup_permissions_list.clear()
+        permissions_list = Permissions.query.all()
+        for p in permissions_list:
+            rootgroup_permissions_list.append(p)
+
+        ValidationEmail().activate_email(user, email)
+
+    else:
+        if len(user_root_list) != rootgroup.max_count:
+            return jsonify({
+                'status': -1,
+                'msg': 'The data has been tampered with, please contact the administrator to view and fix it',
+                'results': {}
+            })
+
+
 if __name__ == '__main__':
     manager.run()
-

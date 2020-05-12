@@ -14,20 +14,39 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
+    LEADER_ID = 1
+
     @staticmethod
     def init_app(app):
         pass
 #开发环境
 class DevelopmentConfig(Config):
     # Mail
-    MAIL_SERVER = os.environ.get('MAIL_SERVER') or ''
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or ''
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')or ''
+    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.163.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or '15010080053@163.com'
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')or 'KPIKDLKPCQSQELTF'
     # Celery
     CELERY_RESULT_BACKEND = "redis://localhost:6379/1/"
     CELERY_BROKER_URL = "redis://localhost:6379/2"
     # DB
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir,'dmp-dev.sqlite')
+    DEBUG = True
+    # White_list
+    WHITE_LIST = [
+        r"^/user/login/",
+        r"^/static/",
+        # r"^/libs/",
+        r"^/user/register/$",
+        r"^/user/logout/$",
+        r"^/user/icon/$",
+        r"^/user/activate/.*",
+    ]
+    # 免认证
+    NO_PERMISSION_LIST = [
+        r'^/user/index/$',
+    ]
 
 #测试环境
 class TestingConfig(Config):
@@ -56,9 +75,9 @@ class ProductionConfig(Config):
 
 #配置字典
 config = {
-    'development':DevelopmentConfig,
+    'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
-    'default':DevelopmentConfig,
+    'default': DevelopmentConfig,
 }
 
