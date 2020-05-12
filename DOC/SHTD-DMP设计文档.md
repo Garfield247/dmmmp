@@ -1289,8 +1289,9 @@ DMP( *Data Management Platform*)数据管理平台
 | db_type       | int    | 是       |          | 数据库类型编号，添加时必填           |
 | db_host       | string | 是       |          | 数据库主机地址，添加时必填           |
 | db_port       | int    | 是       |          | 数据库端口号，添加时必填             |
-| db_user       | string | 否       |          | 数据库用户名                         |
-| db_password   | string | 否       |          | 数据库密码                           |
+| db_username | string | 否       |          | 数据库用户名                         |
+| db_passwd   | string | 否       |          | 数据库密码                     |
+| db_name | string | 否 | | 数据库名称 |
 | description   | string | 否       |          | 数据库简介                           |
 
 **返回结果**

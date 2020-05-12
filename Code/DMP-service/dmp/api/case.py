@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
+# @Author  : SHTD
 
 
 from flask import Blueprint, jsonify, request, current_app
@@ -23,37 +23,36 @@ def all(desc):
 @case.route("/post/",methods=["POST","PUT"],defaults={"desc":"添加、修改案例"})
 def cpost(desc):
     """添加修改案例"""
-    data = request.json
+    case_info = request.json
     if request.method == "POST":
-        if not data.get("case_id"):
+        if not case_info.get("case_id"):
             try:
                 current_app.logger.info(request.json)
-                case = Case(
-                    dmp_case_name = data.get("dmp_case_name"),
-                    description = data.get("description"),
-                    url = data.get("url"),
-                    url_name = data.get("url_name")
+                new_case = Case(
+                    dmp_case_name = case_info.get("dmp_case_name"),
+                    description = case_info.get("description"),
+                    url = case_info.get("url"),
+                    url_name = case_info.get("url_name")
                 )
-                db.session.add(case)
-                db.session.commit()
+                new_case.save()
                 current_app.logger.info("add case")
                 return resp_hanlder(result="OK")
             except Exception as err:
                 return resp_hanlder(code=202,err=err)
-    if request.method == "PUT":
-        if data.get("case_id"):
+    elif request.method == "PUT":
+        if case_info.get("case_id"):
             try:
-                case = Case.query.get(data.get("case_id"))
-                current_app.logger.info(case)
-                if data.get("dmp_case_name"):
-                    case.dmp_case_name = data.get("dmp_case_name")
-                if data.get("description"):
-                    case.description = data.get("description")
-                if data.get("url"):
-                    case.url = data.get("url")
-                if data.get("url_name"):
-                    case.url_name = data.get("url_name")
-                case.put()
+                modify_case = Case.query.get(case_info.get("case_id"))
+                current_app.logger.info(modify_case)
+                if case_info.get("dmp_case_name"):
+                    modify_case.dmp_case_name = case_info.get("dmp_case_name")
+                if case_info.get("description"):
+                    modify_case.description = case_info.get("description")
+                if case_info.get("url"):
+                    modify_case.url = case_info.get("url")
+                if case_info.get("url_name"):
+                    modify_case.url_name = case_info.get("url_name")
+                modify_case.put()
                 current_app.logger.info("修改完成")
                 return resp_hanlder(result={"update":"OK!"})
             except Exception as err:
