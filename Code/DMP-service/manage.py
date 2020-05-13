@@ -10,8 +10,6 @@ from dmp import app
 from dmp.extensions import db
 
 
-
-
 # 创建命令起动控制对象
 manager = Manager(app)
 # 添加数据库迁移命令
@@ -38,6 +36,7 @@ def create_db():
     app.logger.info("create db")
     db.create_all()
 
+# 生成数据表测试数据
 @manager.command
 def create_test_db_table_data():
     import random

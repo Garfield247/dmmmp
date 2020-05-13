@@ -5,7 +5,7 @@
 
 
 from flask import Blueprint, jsonify, request, current_app
-from dmp.models import Case,DataTable
+from dmp.models import Case,DataTable,Users
 from dmp.utils import resp_hanlder
 
 
@@ -76,10 +76,26 @@ def columnsetting(desc):
 
 @dbtable.route("/del/",methods=["DEL"],defaults={"desc":"删除数据表"})
 def dbtdel(desc):
-    result = {
-        "status": 0,
-        "msg": "ok",
-        "results": {
-        }
-    }
-    return jsonify(result)
+    if request.method == "DELETE":
+        try:
+            current_user_id = 3
+            # current_user_id = get_current_user().id
+            del_data_table_id = request.json.get("dmp_data_table_id")
+            if del_data_table_id:
+                del_data_table = DataTable.get(del_data_table_id)
+                if del_data_table:
+                    is_user = Users.get(DataTable.get(del_data_table_id).dmp_user_id).id == current_user_id
+                    is_user_leader = Users.get(DataTable.get(del_data_table_id).dmp_user_id).leader_dmp_user_id == current_user_id
+                    is_admin = Users.get(current_user_id).dmp_group_id == 1
+                    if is_user or is_user_leader or is_admin:
+                        del_data_table.delete()
+                        current_app.logger.info("del db table complete!")
+                        return resp_hanlder(result="OK")
+                    else:
+                        return resp_hanlder(code=501)
+                else:
+                    return resp_hanlder(code=404)
+            else:
+                return resp_hanlder(code=101)
+        except Exception as err:
+            return resp_hanlder(err=err)
