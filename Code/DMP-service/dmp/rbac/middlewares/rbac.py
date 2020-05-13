@@ -7,6 +7,7 @@ from dmp.config import config
 
 def rbac_middleware():
     url_rule = str(request.path)
+    print('vvv', url_rule)
     for i in config['default'].WHITE_LIST:
         if re.match(i, url_rule):
             return
@@ -35,10 +36,7 @@ def rbac_middleware():
     permissions = session.get('SESSION_PERMISSION_URL')
     for i in permissions:
         if re.match(r'^{}$'.format(i['route']), url_rule):
-            return jsonify({
-                'status': 0,
-                'msg': 'Have access to the route, you can get access to it'
-            })
+            return
     print('The user does not have access rights')
     return jsonify({
         'status': 301,

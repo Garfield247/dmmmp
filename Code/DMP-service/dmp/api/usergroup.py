@@ -14,7 +14,7 @@ usergroup = Blueprint("usergroup", __name__)
 
 @usergroup.route("/info/", methods=["GET"])
 def info():
-    # 获取用户组信息及用户组对应的权限
+    # 获取所有用户组信息及用户组对应的权限
     groups_all = Groups.query.all()
     groups_list = []
     for per_group_obj in groups_all:
@@ -73,13 +73,11 @@ def editgroup():
         dmp_group_id = request.form.get('dmp_group_id')
         dmp_group_name = request.form.get('dmp_group_name')
         max_count = request.form.get('max_count')
-        current_user_dict = session.get('user')
-        creator = current_user_dict.get('dmp_username')
         dmp_permission_str = request.form.getlist('dmp_permission')
+        creator = request.form.get('creator')
         dmp_permission_list = [int(p) for p in dmp_permission_str]
 
-        dmp_group_id = int(dmp_group_id)
-        if dmp_group_id == 1:
+        if int(dmp_group_id) == 1:
             return jsonify({
                 'status': -1,
                 'msg': 'The maximum capacity of the administrator user group cannot be modified',
@@ -89,7 +87,13 @@ def editgroup():
         edit_group_obj.dmp_group_name = dmp_group_name
         edit_group_obj.max_count = max_count
         ret_data = edit_group_obj.group_to_dict()
-        ret_data['creator'] = creator
+        if creator:
+            ret_data['creator'] = creator
+        else:
+            current_user_dict = session.get('user')
+            creator = current_user_dict.get('dmp_username')
+            ret_data['creator'] = creator
+
         db.session.add(edit_group_obj)
         db.session.commit()
 
@@ -134,20 +138,23 @@ def post():
     try:
         dmp_group_name = request.form.get('dmp_group_name')
         max_count = request.form.get('max_count')
-
-        current_user_dict = session.get('user')
-        creator = current_user_dict.get('dmp_username')
-
+        creator = request.form.get('creator')
         dmp_permission_str = request.form.getlist('dmp_permission')
         dmp_permission_list = [int(p) for p in dmp_permission_str]
-
+        # 不允许给管理员设置最大用户组容量，默认为3个，创建管理员时已进行设置判断
+        if dmp_group_name == 'root':
+            max_count = None
         group_obj = Groups(dmp_group_name=dmp_group_name, max_count=max_count)
         db.session.add(group_obj)
         db.session.commit()
 
         ret_data = group_obj.group_to_dict()
-        ret_data['creator'] = creator
-        session['creator'] = creator
+        if creator:
+            ret_data['creator'] = creator
+        else:
+            current_user_dict = session.get('user')
+            creator = current_user_dict.get('dmp_username')
+            ret_data['creator'] = creator
 
         # 用户勾选的权限，并在数据库权限表中找到对应的权限信息对象
         add_permission_list = []
@@ -175,7 +182,7 @@ def post():
         result = {
             'status': 0,
             'msg': 'User group and corresponding permissions were added successfully',
-            'results': {}
+            'results': ret_data
         }
         return jsonify(result)
 

@@ -19,44 +19,53 @@ user = Blueprint("user", __name__, static_folder='Code/DMP-service/')
 
 @user.route("/register/", methods=["POST"])
 def register():
-    user_obj = Users.query.all()
-    if not user_obj:
-        return jsonify({
-            'status': -1,
-            'msg': 'Please create the super administrator first',
-            'results': {}
-        })
-    dmp_username = request.form.get('dmp_username')
-    real_name = request.form.get('real_name')
-    passwd = request.form.get('password')
-    email = request.form.get('email')
-    user = Users(dmp_username=dmp_username, real_name=real_name, passwd=passwd, email=email,
-                 leader_dmp_user_id=Config.LEADER_ID)
-    # 管理员单一添加用户-默认是学生用户组，直属管理者是root(1),邮箱已激活
-    if session.get('is_login') and session.get('user').get('dmp_group_id') == 1:
-        dmp_group_id = request.form.get('dmp_group_id')
-        # 如果有所属组参数，则数据库跟新为所选所属组，如果没有参数，默认为3-students
-        if dmp_group_id:
-            user.dmp_group_id = dmp_group_id
-        else:
-            user.dmp_group_id = 3
-        user.confirmed = True
+    try:
+        user_obj = Users.query.all()
+        if not user_obj:
+            return jsonify({
+                'status': -1,
+                'msg': 'Do not have a super administrator, '
+                       'please contact the administrator to create a super administrator first',
+                'results': {}
+            })
+        dmp_username = request.form.get('dmp_username')
+        real_name = request.form.get('real_name')
+        passwd = request.form.get('password')
+        email = request.form.get('email')
+        user = Users(dmp_username=dmp_username, real_name=real_name, passwd=passwd, email=email,
+                     leader_dmp_user_id=Config.LEADER_ROOT_ID)
+        # 管理员单一添加用户-默认是学生用户组，直属管理者是root(1),邮箱已激活
+        if session.get('is_login') and session.get('user').get('dmp_group_id') == 1:
+            dmp_group_id = request.form.get('dmp_group_id')
+            # 如果有所属组参数，则数据库跟新为所选所属组，如果没有参数，默认为3-students
+            if dmp_group_id:
+                user.dmp_group_id = dmp_group_id
+            else:
+                user.dmp_group_id = 3
+            user.confirmed = True
+            db.session.add(user)
+            db.session.commit()
+            return jsonify({
+                'status': 0,
+                'msg': 'User single added successfully',
+                'results': {}
+            })
         db.session.add(user)
         db.session.commit()
+        ValidationEmail().activate_email(user, email)
+        result = {
+            "status": 0,
+            "msg": "The email has been sent. Please verify it",
+            "results": 'OK'
+        }
+        return jsonify(result)
+    except Exception:
+        db.session.rollback()
         return jsonify({
-            'status': 0,
-            'msg': 'User single added successfully',
+            'status': -1,
+            'msg': 'register error',
             'results': {}
         })
-    db.session.add(user)
-    db.session.commit()
-    ValidationEmail().activate_email(user, email)
-    result = {
-        "status": 0,
-        "msg": "The email has been sent. Please verify it",
-        "results": 'OK'
-    }
-    return jsonify(result)
 
 
 @user.route('/activate/<token>/', methods=['GET'])
@@ -201,24 +210,102 @@ def changepwd():
 
 
 @user.route("/list/", methods=["GET"])
-def user_list():
-    user_obj_list = Users.query.all()
-    user_list = []
-    for per_user_obj in user_obj_list:
-        user_list.append(per_user_obj)
-    user_obj_dict = [u.user_to_dict() for u in user_list]
-    res_user_obj_list = []
-    for item in user_obj_dict:
-        # del item['passwd']
-        # del item['dmp_group_id']
-        # del item['leader_dmp_user_id']
-        res_user_obj_list.append(item)
-    result = {
-        'status': 0,
-        'msg': 'Gets a list of all user information. OK',
-        'results': res_user_obj_list
-    }
-    return jsonify(result)
+def ulist():
+    current_obj_dict = session['user']
+    if current_obj_dict['dmp_group_id'] == 1:
+        all_user_obj_list = Users.query.all()
+        user_obj_dict_list = [u.user_to_dict() for u in all_user_obj_list]
+        new_user_obj_dict_list = []
+        for per_obj in user_obj_dict_list:
+            dmp_group_obj = Groups.query.filter(Groups.id == per_obj['dmp_group_id']).first()
+            if per_obj['leader_dmp_user_id'] == None:
+                per_obj['leader_name'] = None
+                dmp_group_name = dmp_group_obj.dmp_group_name
+                group_permissions_list = dmp_group_obj.permissions
+                p_list = []
+                for p in group_permissions_list:
+                    p_dict = {}
+                    p_dict['id'] = p.id
+                    p_dict['dmp_permission_name'] = p.dmp_permission_name
+                    p_dict['route'] = p.route
+                    p_list.append(p_dict)
+                per_obj['dmp_group_name'] = dmp_group_name
+                per_obj['u_group_permission'] = p_list
+                new_user_obj_dict_list.append(per_obj)
+                continue
+            leader_obj_name = Users.query.filter(Users.id == per_obj['leader_dmp_user_id']).first().dmp_username
+            dmp_group_name = dmp_group_obj.dmp_group_name
+            group_permissions_list = dmp_group_obj.permissions
+            p_list = []
+            for p in group_permissions_list:
+                p_dict = {}
+                p_dict['id'] = p.id
+                p_dict['dmp_permission_name'] = p.dmp_permission_name
+                p_dict['route'] = p.route
+                p_list.append(p_dict)
+
+            per_obj['leader_name'] = leader_obj_name
+            per_obj['dmp_group_name'] = dmp_group_name
+            per_obj['u_group_permission'] = p_list
+            new_user_obj_dict_list.append(per_obj)
+
+        return jsonify({
+            'status': 0,
+            'msg': 'Display all user information',
+            'results': new_user_obj_dict_list
+        })
+    # 管理员、教师登录，只需要显示用户的直属管理者是谁即可
+    else:
+        teacher_obj_dict = session.get('user')
+        all_students_list = Users.query.filter(Users.leader_dmp_user_id == teacher_obj_dict['id']).all()
+        stu_obj_dict_list = [u.user_to_dict() for u in all_students_list]
+        new_stu_obj_dict_list = []
+        for per_obj in stu_obj_dict_list:
+            dmp_group_obj = Groups.query.filter(Groups.id == per_obj['dmp_group_id']).first()
+            dmp_group_name = dmp_group_obj.dmp_group_name
+            leader_obj_name = Users.query.filter(Users.leader_dmp_user_id == teacher_obj_dict['id']).first().dmp_username
+
+            group_permissions_list = dmp_group_obj.permissions
+            p_list = []
+            for p in group_permissions_list:
+                p_dict = {}
+                p_dict['id'] = p.id
+                p_dict['dmp_permission_name'] = p.dmp_permission_name
+                p_dict['route'] = p.route
+                p_list.append(p_dict)
+
+            per_obj['leader_name'] = leader_obj_name
+            per_obj['dmp_group_name'] = dmp_group_name
+            per_obj['u_group_permission'] = p_list
+            new_stu_obj_dict_list.append(per_obj)
+
+        return jsonify({
+            'status': 0,
+            'msg': 'Display all user information',
+            'results': new_stu_obj_dict_list
+        })
+
+
+
+
+
+        # dmp_group_name = Groups.query.filter(Groups.id == current_obj_dict['dmp_group_id']).first().dmp_group_name
+        # u_group = current_obj.groups
+        # u_group_permissions_list = u_group.permissions
+        # l_list = []
+        # for u in u_group_permissions_list:
+        #     l_dict = {}
+        #     l_dict['id'] = u.id
+        #     l_dict['dmp_permission_name'] = u.dmp_permission_name
+        #     l_dict['route'] = u.route
+        #     l_list.append(l_dict)
+        # current_obj_dict['dmp_group_name'] = dmp_group_name
+        # current_obj_dict['u_group_permission'] = l_list
+        # return jsonify({
+        #     'status': 0,
+        #     'msg': 'Display all user information',
+        #     'results': current_obj_dict
+        # })
 
 
 @user.route("/info/", methods=["GET"])
@@ -229,6 +316,7 @@ def info():
     if not id:
         current_user_dict = session.get('user')
         current_obj = Users.query.filter(Users.id == current_user_dict['id']).first()
+        dmp_group_name = Groups.query.filter(Groups.id == current_user_dict['dmp_group_id']).first().dmp_group_name
         u_group = current_obj.groups
         u_group_permissions_list = u_group.permissions
         u_list = []
@@ -238,6 +326,7 @@ def info():
             p_dict['dmp_permission_name'] = p.dmp_permission_name
             p_dict['route'] = p.route
             u_list.append(p_dict)
+        current_user_dict['dmp_group_name'] = dmp_group_name
         current_user_dict['u_group_permission'] = u_list
         # 如果是管理员登录，则直属管理者只显示管理员
         if current_obj.dmp_group_id == 1:

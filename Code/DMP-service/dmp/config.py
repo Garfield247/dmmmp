@@ -14,7 +14,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
-    LEADER_ID = 1
+    LEADER_ROOT_ID = 1
 
     @staticmethod
     def init_app(app):
@@ -37,11 +37,12 @@ class DevelopmentConfig(Config):
     WHITE_LIST = [
         r"^/user/login/",
         r"^/static/",
-        # r"^/libs/",
         r"^/user/register/$",
         r"^/user/logout/$",
         r"^/user/icon/$",
         r"^/user/activate/.*",
+        r"^/verifier/email/",
+        r"^/verifier/username/",
     ]
     # 免认证
     NO_PERMISSION_LIST = [
