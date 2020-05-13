@@ -43,9 +43,9 @@ def dbdel(desc):
                             current_app.logger.info("del db complete!")
                             return resp_hanlder(result="OK")
                         else:
-                            return resp_hanlder(code=401)
+                            return resp_hanlder(code=501)
                     else:
-                        return resp_hanlder(code=301)
+                        return resp_hanlder(code=501)
                 else:
                     return resp_hanlder(code=404)
             else:

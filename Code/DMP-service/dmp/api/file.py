@@ -48,7 +48,8 @@ def success(desc):
             chunk += 1
             # 删除该分片，节约空间
             os.remove(filename)
-    return resp_hanlder(result={"filename":filename})
+    current_app.logger.info(target_filename)
+    return resp_hanlder(result={"filename":target_filename})
 
 @file.route("/dlcomplete/",methods=["GET"],defaults={"desc":"文件下载完成"})
 def dlcomplete(desc):

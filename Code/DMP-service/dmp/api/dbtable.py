@@ -1,47 +1,50 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
+# @Author  : SHTD
 
 
-from flask import Blueprint,jsonify
+from flask import Blueprint, jsonify, request, current_app
+from dmp.models import Case,DataTable
+from dmp.utils import resp_hanlder
+
 
 dbtable = Blueprint("dbtable",__name__)
 
 @dbtable.route("/info/",methods=["GET"],defaults={"desc":"获取数据表信息"})
 def info(desc):
-    result = {
- "status": 0,
-  "msg": "ok",
-  "results":[
-        {
-        "id":1,
-        "data_table_name":"zhiliandata",
-        "db_table_name":"zhanlian_data",
-        "dmp_database_id":"01",
-        "dmp_datebase_name":"main",
-        "db_type":1,
-        "dmp_case_id":"10",
-        "user_id":"124",
-        "description":"test",
-        "created_on":"2020-03-18 15:00:00",
-        "changed_on":"2020-03-28 15:00:00",
-        },{
-        "id":1,
-        "data_table_name":"zhiliandata",
-        "db_table_name":"zhanlian_data",
-        "dmp_database_id":1,
-        "dmp_datebase_name":"main",
-        "db_type":1,
-        "dmp_case_id":10,
-        "user_id":123,
-        "description":"test",
-        "created_on":"2020-03-18 15:00:00",
-        "changed_on":"2020-03-28 15:00:00",
-        }
-        ]
-        }
-    return jsonify(result)
+    if request.method == "GET":
+        try:
+            dmp_data_table_id = request.json.get("dmp_data_table_id")
+            dmp_case_id = request.json.get("dmp_case_id")
+            if dmp_case_id and not dmp_data_table_id:
+                dbtables =[dtb.__json__() for dtb in DataTable.query.filter_by(dmp_case_id=dmp_case_id).all()]
+                current_app.logger.info(dbtables)
+                return  resp_hanlder(result=dbtables)
+            elif dmp_data_table_id and not dmp_case_id:
+                db_table = DataTable.get(dmp_data_table_id).__json__()
+                current_app.logger.info(db_table)
+                return  resp_hanlder(result=db_table)
+        except Exception as err:
+            return  resp_hanlder(err=err)
+
+def post(dmp_data_table_name,
+        db_table_name,
+        description,
+        dmp_user_id,
+        dmp_database_id,
+        dmp_case_id):
+    """添加数据表"""
+    new_db_table = DataTable(
+        dmp_data_table_name = dmp_data_table_name,
+        db_table_name = db_table_name,
+        description = description,
+        dmp_user_id = dmp_user_id,
+        dmp_database_id = dmp_database_id,
+        dmp_case_id = dmp_case_id)
+    new_db_table.save()
+    return new_db_table.__json__()
+
 
 @dbtable.route("/column/",methods=["GET"],defaults={"desc":"获取数据表的列信息"})
 def column(desc):
