@@ -34,3 +34,8 @@ nohup ./celery_run.sh &
 # flask server
 python manage.py runserver
 ```
+
+```
+--- 不定时启动celery:
+    celery worker -A dmp.extensions.celery --loglevel=info -P eventlet
+```

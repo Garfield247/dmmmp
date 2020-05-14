@@ -33,7 +33,14 @@ class FromUpload(db.Model,DMPModel):
     dmp_case_id = db.Column(db.Integer, db.ForeignKey('dmp_case.id'), nullable=False, comment='所属案例')
     approve_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), comment='审批人')
 
+<<<<<<< HEAD
     # submit_users = db.relationship('Users', backref='submitusers_from_upload')
     # approve_users = db.relationship('Users', backref='approveusers_from_upload')
     # database = db.relationship('Database', backref='database_from_upload')
     # datacase = db.relationship('Case', backref='case_from_upload')
+=======
+    submit_users = db.relationship('Users', foreign_keys=submit_dmp_user_id, backref='submitusers_from_upload')
+    approve_users = db.relationship('Users', foreign_keys=approve_dmp_user_id, backref='approveusers_from_upload')
+    database = db.relationship('Database', backref='database_from_upload')
+    datacase = db.relationship('Case', backref='case_from_upload')
+>>>>>>> 86cec918be112616cf9c9d2bd61ae808ed8b2538

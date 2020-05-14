@@ -25,7 +25,9 @@ class FromAddDataTable(db.Model,DMPModel):
     dmp_case_id = db.Column(db.Integer, db.ForeignKey('dmp_case.id'), nullable=False, comment='所属案例ID')
     approve_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), comment='审批人')
 
+
     # submit_users = db.relationship('Users', backref='submitusers_from_add_data_table')
     # approve_users = db.relationship('Users', backref='approveusers_from_add_data_table')
     # database = db.relationship('Database', backref='database_from_add_data_table')
     # datacase = db.relationship('Case', backref='case_from_add_data_table')
+

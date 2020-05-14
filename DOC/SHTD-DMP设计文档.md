@@ -494,7 +494,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /user/changepwd/ |
 | ------------- | ---------------- |
 | 格式          | JSON             |
-| http 请求方式 | put              |
+| http 请求方式 | PUT              |
 | 登陆保护      | 否               |
 
  **请求参数**
@@ -800,7 +800,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /user/del |
 | ------------- | --------- |
 | 格式          | JSON      |
-| http 请求方式 | DEL       |
+| http 请求方式 | DELETE    |
 | 登陆保护      | 是        |
 
  **请求参数**
@@ -989,7 +989,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /usergroup/post |
 | ------------- | --------------- |
 | 格式          | JSON            |
-| http 请求方式 | POST            |
+| http 请求方式 | POST/PUT        |
 | 登陆保护      | 是              |
 
  **请求参数**
@@ -1200,7 +1200,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /database/del |
 | ------------- | ------------- |
 | 格式          | JSON          |
-| http 请求方式 | DEL           |
+| http 请求方式 | DELETE        |
 | 登陆保护      | 是            |
 
  **请求参数**
@@ -1277,7 +1277,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /database/post |
 | ------------- | -------------- |
 | 格式          | JSON           |
-| http 请求方式 | POST           |
+| http 请求方式 | POST/PUT       |
 | 登陆保护      | 是             |
 
  **请求参数**
@@ -1387,7 +1387,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /case/post |
 | ------------- | ---------- |
 | 格式          | JSON       |
-| http 请求方式 | POST       |
+| http 请求方式 | PUT        |
 | 登陆保护      | 是         |
 
  **请求参数**
@@ -1428,7 +1428,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /case/del |
 | ------------- | --------- |
 | 格式          | JSON      |
-| http 请求方式 | DEL       |
+| http 请求方式 | DELETE    |
 | 登陆保护      | 是        |
 
  **请求参数**
@@ -1634,7 +1634,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /dbtable/del |
 | ------------- | ------------ |
 | 格式          | JSON         |
-| http 请求方式 | GET          |
+| http 请求方式 | DELETE       |
 | 登陆保护      | 是           |
 
  **请求参数**

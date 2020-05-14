@@ -3,19 +3,19 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD 
 
-from flask import Blueprint,jsonify
+from flask import Blueprint, jsonify, request
+
+from dmp.utils import resp_hanlder
 
 form = Blueprint("form",__name__)
 
 @form.route("/fromdb/",methods=["POST"],defaults={"desc":"从数据库添加数据表的表单"})
 def from_db(desc):
-    result = {
-        "status": 0,
-        "msg": "ok",
-        "results": {
-        }
-    }
-    return jsonify(result)
+    if request.method == "POST":
+        try:
+            pass
+        except Exception as err:
+            return
 
 @form.route("/fromfile/",methods=["POST"],defaults={"desc":"从文件添加数据表的表单"})
 def from_file(desc):
