@@ -33,9 +33,9 @@ class INIT_PERMISSION(object):
                     'dmp_permission_name': item.dmp_permission_name,
                     'route': item.route
                 })
-        print(permission_list)
+        # print(permission_list)
         # [{'route': '/user/list/'}, {'route': '/usergroup/info/'}]
-        print(menu_dict)
+        # print(menu_dict)
         # {1: {'children': [{'dmp_permission_name': '用户管理', 'route': '/user/list/'},
         #                   {'dmp_permission_name': '用户组管理 ', 'route': '/usergroup/info/'}]}}
 

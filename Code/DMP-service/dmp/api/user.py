@@ -11,8 +11,9 @@ from dmp.config import Config
 from dmp.extensions import db
 from dmp.models import Users, Groups
 from dmp.rbac.middlewares.rbac import rbac_middleware
-from dmp.rbac.service.init_permission import INIT_PERMISSION
+from dmp.utils.put_data import PuttingData
 from dmp.utils.validation import ValidationEmail
+from dmp.utils.verify import LoginVerify, UserVerify
 
 user = Blueprint("user", __name__, static_folder='Code/DMP-service/')
 
@@ -21,35 +22,20 @@ user = Blueprint("user", __name__, static_folder='Code/DMP-service/')
 def register():
     try:
         user_obj = Users.query.all()
-        if not user_obj:
-            return jsonify({
-                'status': -1,
-                'msg': 'Do not have a super administrator, '
-                       'please contact the administrator to create a super administrator first',
-                'results': {}
-            })
+        # 判断初始状态有没有超级用管理员，没有则不能创建用户，必须要先创建一个超级管理员
+        res = UserVerify.judge_superuser(user_obj)
+        if res:
+            return jsonify(res)
+
         dmp_username = request.form.get('dmp_username')
         real_name = request.form.get('real_name')
         passwd = request.form.get('password')
         email = request.form.get('email')
         user = Users(dmp_username=dmp_username, real_name=real_name, passwd=passwd, email=email,
                      leader_dmp_user_id=Config.LEADER_ROOT_ID)
-        # 管理员单一添加用户-默认是学生用户组，直属管理者是root(1),邮箱已激活
-        if session.get('is_login') and session.get('user').get('dmp_group_id') == 1:
-            dmp_group_id = request.form.get('dmp_group_id')
-            # 如果有所属组参数，则数据库跟新为所选所属组，如果没有参数，默认为3-students
-            if dmp_group_id:
-                user.dmp_group_id = dmp_group_id
-            else:
-                user.dmp_group_id = 3
-            user.confirmed = True
-            db.session.add(user)
-            db.session.commit()
-            return jsonify({
-                'status': 0,
-                'msg': 'User single added successfully',
-                'results': {}
-            })
+        res = PuttingData.root_add_user(user)
+        if res:
+            return jsonify(res)
         db.session.add(user)
         db.session.commit()
         ValidationEmail().activate_email(user, email)
@@ -94,51 +80,25 @@ def login():
     remember_me = request.form.get('remember_me')
     if dmp_username and not email:
         user = Users.query.filter(Users.dmp_username == dmp_username, Users.passwd == passwd).first()
-        if user == None:
+        r = LoginVerify.login_username_verify_init(user, remember_me)
+        if r == True:
             return jsonify({
-                'status': -1,
-                'msg': 'User name or password entered wrong, please login again',
+                'status': 0,
+                'msg': 'Successful user login',
                 'results': {}
             })
-        if user.confirmed == False:
-            email = user.email
-            ValidationEmail().reactivate_email(user, email)
-            return jsonify({
-                'status': -1,
-                'msg': 'Login failed, mailbox not activated.'
-                       'The email reactivation link has been sent, please wait a moment',
-                'results': {}
-            })
-        INIT_PERMISSION.permission_init(user)
-        user_dict = user.user_to_dict()
-        session['user'] = user_dict
-        session['is_login'] = True
-        session['remember_me'] = remember_me
-        return jsonify({
-            'status': 0,
-            'msg': 'Successful user login',
-            'results': {}
-        })
+        else:return jsonify(r)
+
     elif email and not dmp_username:
         user = Users.query.filter(Users.email == email, Users.passwd == passwd).first()
-        if user.confirmed == False:
-            ValidationEmail().reactivate_email(user, email)
+        r = LoginVerify.login_email_verify_init(user, remember_me)
+        if r == True:
             return jsonify({
-                'status': -1,
-                'msg': 'Login failed, mailbox not activated.'
-                       'The email reactivation link has been sent, please wait a moment',
+                'status': 0,
+                'msg': 'Successful user login',
                 'results': {}
             })
-        INIT_PERMISSION.permission_init(user)
-        user_dict = user.user_to_dict()
-        session['user'] = user_dict
-        session['is_login'] = True
-        session['remember_me'] = remember_me
-        return jsonify({
-            'status': 0,
-            'msg': 'Successful user login',
-            'results': {}
-        })
+        else:return jsonify(r)
     else:
         return jsonify({
             'status': -1,

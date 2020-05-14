@@ -15,7 +15,7 @@ from dmp.utils.validation import ValidationEmail
 
 # 创建命令起动控制对象
 from dmp.models import Users, Groups, Permissions
-from dmp.utils.put_data import put_data
+from dmp.utils.put_data import PuttingData
 
 manager = Manager(app)
 # 添加数据库迁移命令
@@ -70,45 +70,56 @@ def createsuperuser(dmp_username, real_name, passwd, email):
     rootgroup = Groups.query.filter(Groups.dmp_group_name == "root").first()
 
     if len(user_root_list) == rootgroup.max_count == 3:
-        return jsonify({
-            'status': -1,
-            'msg': 'The maximum number of administrators has been reached',
-            'results': {}
-        })
+        return {'msg': 'The maximum number of administrators has been reached'}
+        # return jsonify({
+        #     'status': -1,
+        #     'msg': 'The maximum number of administrators has been reached',
+        #     'results': {}
+        # })
 
     elif len(user_root_list) == 0 and rootgroup.max_count == None:
-        user.leader_dmp_user_id = None
-        put_data(rootgroup, user)
+        try:
+            user.leader_dmp_user_id = None
+            PuttingData.put_data(rootgroup, user)
 
-        # 给Group用户组的管理员添加权限
-        rootgroup_permissions_list = rootgroup.permissions
-        rootgroup_permissions_list.clear()
-        permissions_list = Permissions.query.all()
-        for p in permissions_list:
-            rootgroup_permissions_list.append(p)
+            # 给Group用户组的管理员添加权限
+            rootgroup_permissions_list = rootgroup.permissions
+            rootgroup_permissions_list.clear()
+            permissions_list = Permissions.query.all()
+            for p in permissions_list:
+                rootgroup_permissions_list.append(p)
 
-        ValidationEmail().activate_email(user, email)
+            ValidationEmail().activate_email(user, email)
+        except Exception:
+            # raise e
+            return { 'msg': 'Registration failed, please check the relevant reason (username or mailbox may have been used)'}
+
 
     elif len(user_root_list) == rootgroup.max_count and rootgroup.max_count <= 3 and rootgroup.max_count != None:
-        user.leader_dmp_user_id = 1
-        put_data(rootgroup, user)
+        try:
+            user.leader_dmp_user_id = 1
+            PuttingData.put_data(rootgroup, user)
 
-        # 给Group用户组的管理员添加权限
-        rootgroup_permissions_list = rootgroup.permissions
-        rootgroup_permissions_list.clear()
-        permissions_list = Permissions.query.all()
-        for p in permissions_list:
-            rootgroup_permissions_list.append(p)
+            # 给Group用户组的管理员添加权限
+            rootgroup_permissions_list = rootgroup.permissions
+            rootgroup_permissions_list.clear()
+            permissions_list = Permissions.query.all()
+            for p in permissions_list:
+                rootgroup_permissions_list.append(p)
 
-        ValidationEmail().activate_email(user, email)
+            ValidationEmail().activate_email(user, email)
+        except Exception:
+            # raise e
+            return {'msg': 'Registration failed, please check the relevant reason (username or mailbox may have been used)'}
 
     else:
         if len(user_root_list) != rootgroup.max_count:
-            return jsonify({
-                'status': -1,
-                'msg': 'The data has been tampered with, please contact the administrator to view and fix it',
-                'results': {}
-            })
+            return {'msg': 'The data has been tampered with, please contact the administrator to view and fix it'}
+            # return jsonify({
+            #     'status': -1,
+            #     'msg': 'The data has been tampered with, please contact the administrator to view and fix it',
+            #     'results': {}
+            # })
 
 
 if __name__ == '__main__':
