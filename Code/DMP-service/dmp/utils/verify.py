@@ -6,11 +6,17 @@ from dmp.utils.validation import ValidationEmail
 
 class LoginVerify():
     """登录校验及用户信息保存"""
+
     @classmethod
     def __session_init(cls, user, remember_me):
+        # 初始化用户对应用户组的权限
         INIT_PERMISSION.permission_init(user)
-        user_dict = user.user_to_dict()
-        session['user'] = user_dict
+
+        # 保存用户信息到session中
+        # user_dict = user.user_to_dict()
+        # session['user'] = user_dict
+
+        # 保存用户登录状态
         session['is_login'] = True
         session['remember_me'] = remember_me
 

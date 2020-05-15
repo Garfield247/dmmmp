@@ -4,8 +4,9 @@
 # @Author  : SHTD 
 
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class DataTableColumn(db.Model):
+class DataTableColumn(db.Model,DMPModel):
     """数据列信息表"""
     __tablename__ = 'dmp_data_table_column'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -16,4 +17,4 @@ class DataTableColumn(db.Model):
     description = db.Column(db.String(128), comment='字段说明')
     dmp_data_table_id = db.Column(db.Integer, db.ForeignKey('dmp_data_table.id'), nullable=False, comment='数据ID')
 
-    datatable = db.relationship('DataTable', backref='data_table_column')
+    # datatable = db.relationship('DataTable', backref='data_table_column')

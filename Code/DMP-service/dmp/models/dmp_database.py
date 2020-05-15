@@ -5,8 +5,9 @@
 
 import datetime
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class Database(db.Model):
+class Database(db.Model,DMPModel):
     """数据库表"""
     __tablename__ = 'dmp_database'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -22,4 +23,4 @@ class Database(db.Model):
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
     dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), nullable=False, comment='所属用户ID')
 
-    users = db.relationship('Users', backref='database')
+    # users = db.relationship('Users', backref='database')

@@ -132,7 +132,7 @@ def editgroup():
         })
 
 
-@usergroup.route("/post/", methods=["POST"])
+@usergroup.route("/post/", methods=["POST"], defaults={"desc":"修改添加用户组"})
 def post():
     # 添加用户组
     try:
@@ -195,7 +195,7 @@ def post():
         })
 
 
-@usergroup.route("/del/", methods=["POST"])
+@usergroup.route("/del/", methods=["POST"], defaults={"desc":"删除用户组"})
 def ugdel():
     # 删除用户组
     dmp_group_id = request.form.get('dmp_group_id')
@@ -207,3 +207,4 @@ def ugdel():
         'msg': 'Group deletion successful',
         'results': {}
     })
+

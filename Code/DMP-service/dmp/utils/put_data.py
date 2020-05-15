@@ -1,6 +1,8 @@
 from flask import session, request
 
 from dmp.extensions import db
+from dmp.models import Users
+
 
 class PuttingData():
 
@@ -18,6 +20,17 @@ class PuttingData():
             db.session.commit()
         except Exception:
             db.session.rollback()
+
+    @staticmethod
+    def get_obj_data(Model, token):
+        resp = Model.decode_auth_token(token)
+        if not isinstance(resp, str):
+            user_obj = Users.query.filter_by(id=resp).first()
+            # print('ooss', user_obj.__json__(), type(user_obj.__json__()))
+            user_obj_dict = user_obj.__json__()
+            return user_obj_dict
+        else:
+            return False
 
 
     @classmethod

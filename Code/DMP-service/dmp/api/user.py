@@ -18,8 +18,8 @@ from dmp.utils.verify import LoginVerify, UserVerify
 user = Blueprint("user", __name__, static_folder='Code/DMP-service/')
 
 
-@user.route("/register/", methods=["POST"])
-def register():
+@user.route("/register/", methods=["POST"], defaults={"desc":"用户注册"})
+def register(desc):
     try:
         user_obj = Users.query.all()
         # 判断初始状态有没有超级用管理员，没有则不能创建用户，必须要先创建一个超级管理员
@@ -31,8 +31,7 @@ def register():
         real_name = request.form.get('real_name')
         passwd = request.form.get('password')
         email = request.form.get('email')
-        user = Users(dmp_username=dmp_username, real_name=real_name, passwd=passwd, email=email,
-                     leader_dmp_user_id=Config.LEADER_ROOT_ID)
+        user = Users(dmp_username=dmp_username, real_name=real_name, passwd=passwd, email=email,leader_dmp_user_id=Config.LEADER_ROOT_ID)
         res = PuttingData.root_add_user(user)
         if res:
             return jsonify(res)
@@ -44,6 +43,7 @@ def register():
             "msg": "The email has been sent. Please verify it",
             "results": 'OK'
         }
+
         return jsonify(result)
     except Exception:
         db.session.rollback()
@@ -54,8 +54,8 @@ def register():
         })
 
 
-@user.route('/activate/<token>/', methods=['GET'])
-def emailactivate(token):
+@user.route("/activate/<token>",methods=["GET"],defaults={"desc":"用户激活"})
+def activate(desc, token):
     if Users.check_activate_token(token) == True:
         result = {
             "status": 0,
@@ -72,34 +72,45 @@ def emailactivate(token):
         return jsonify(result)
 
 
-@user.route("/login/", methods=["POST"])
-def login():
-    dmp_username = request.form.get('dmp_username')
-    email = request.form.get('email')
-    passwd = request.form.get('password')
-    remember_me = request.form.get('remember_me')
-    if dmp_username and not email:
-        user = Users.query.filter(Users.dmp_username == dmp_username, Users.passwd == passwd).first()
-        r = LoginVerify.login_username_verify_init(user, remember_me)
-        if r == True:
-            return jsonify({
-                'status': 0,
-                'msg': 'Successful user login',
-                'results': {}
-            })
-        else:return jsonify(r)
+@user.route("/login/", methods=["POST"], defaults={"desc":"用户登录"})
+def login(desc):
+    try:
+        dmp_username = request.form.get('dmp_username')
+        email = request.form.get('email')
+        passwd = request.form.get('password')
+        remember_me = request.form.get('remember_me')
+        if dmp_username and not email:
+            user = Users.query.filter(Users.dmp_username == dmp_username, Users.passwd == passwd).first()
+            r = LoginVerify.login_username_verify_init(user, remember_me)
+            if r == True:
+                auth_token = user.encode_auth_token()
+                print('vvvvb', auth_token)
+                if auth_token:
+                    return jsonify({
+                        'status': 0,
+                        'msg': 'Successful user login',
+                        'results': auth_token.decode('utf-8')
+                    })
+                return jsonify({
+                    'status': -1,
+                    'msg': 'Token error.',
+                    'results': {}
+                })
+            else:return jsonify(r)
 
-    elif email and not dmp_username:
-        user = Users.query.filter(Users.email == email, Users.passwd == passwd).first()
-        r = LoginVerify.login_email_verify_init(user, remember_me)
-        if r == True:
-            return jsonify({
-                'status': 0,
-                'msg': 'Successful user login',
-                'results': {}
-            })
-        else:return jsonify(r)
-    else:
+        elif email and not dmp_username:
+            user = Users.query.filter(Users.email == email, Users.passwd == passwd).first()
+            r = LoginVerify.login_email_verify_init(user, remember_me)
+            if r == True:
+                auth_token = user.encode_auth_token()
+                return jsonify({
+                    'status': 0,
+                    'msg': 'Successful user login',
+                    'results': auth_token.decode('utf-8')
+                })
+            else:return jsonify(r)
+
+    except Exception:
         return jsonify({
             'status': -1,
             'msg': 'Login error',
@@ -107,28 +118,50 @@ def login():
         })
 
 
-@user.route("/logout/", methods=["GET"])
-def logout():
+@user.route("/logout/", methods=["GET"], defaults={"desc":"用户退出"})
+def logout(desc):
+    # 用户退出--1. 拿到token，则直接退出 2、拿不到token(失效)---则直接退出，并给出提示 3.如果token被修改或者到期的问题
+
+
     # 使用seesion控制登录、退出状态保存，可设置session的过期时间
-    session.clear()
-    return jsonify({
-        'status': -1,
-        'msg': 'User has logged out',
-        'results': {}
-    })
+    auth_token = request.form.get('auth_token')
+    if auth_token:
+        from dmp.utils.put_data import PuttingData
+        res = PuttingData.get_obj_data(Users, auth_token)
+        print('qqqq', res)
+        if res != False:
+            session.clear()
+            return jsonify({
+                'status': -1,
+                'msg': 'User has logged out',
+                'results': {}
+            })
+        return jsonify({
+            'status': -1,
+            'msg': 'Token error.',
+            'results': {}
+        })
+    else:
+        return jsonify({
+            'stauts': -1,
+            'msg': 'Provide a valid auth token.',
+            'results': {}
+        })
 
 
-@user.route("/forgetpwd/", methods=["POST"])
+@user.route("/forgetpwd/",methods=["POST"],defaults={"desc":"找回密码"})
 def forgetpwd():
     email = request.form.get('email')
     user = Users.query.filter(Users.email == email).first()
     ValidationEmail().change_pwd(user, email)
+
     result = {
         "status": 0,
         "msg": "The password reset request has been sent to the mailbox. Please confirm the reset",
         "results": {}
     }
     return jsonify(result)
+
 
 @user.route('/gettoken/<token>', methods=['GET'])
 def gettoken(token):
@@ -138,7 +171,7 @@ def gettoken(token):
         'results': token
     })
 
-@user.route('/changepwd/', methods=['POST'])
+@user.route('/changepwd/', methods=['POST'], defaults={"desc":"重设密码"})
 def changepwd():
     token = request.form.get('token')
     newpassword = request.form.get('newpassword')
@@ -156,20 +189,8 @@ def changepwd():
             'results': {}
         })
 
-# @user.route("/changepwd/<token>", methods=["GET"])
-# def changepwd(token):
-#     print('xxx', token)
-#     new_password = request.form.get('newpassword')
-#     success = Users.reset_password(token, new_password)
-#     if success:
-#         return jsonify({
-#             'status': 0,
-#             'msg': 'Reset password successfully, please login again',
-#             'results': {}
-#         })
 
-
-@user.route("/list/", methods=["GET"])
+@user.route("/list/", methods=["GET"], defaults={"desc":"用户列表"})
 def ulist():
     current_obj_dict = session['user']
     if current_obj_dict['dmp_group_id'] == 1:
@@ -247,29 +268,8 @@ def ulist():
 
 
 
-
-
-        # dmp_group_name = Groups.query.filter(Groups.id == current_obj_dict['dmp_group_id']).first().dmp_group_name
-        # u_group = current_obj.groups
-        # u_group_permissions_list = u_group.permissions
-        # l_list = []
-        # for u in u_group_permissions_list:
-        #     l_dict = {}
-        #     l_dict['id'] = u.id
-        #     l_dict['dmp_permission_name'] = u.dmp_permission_name
-        #     l_dict['route'] = u.route
-        #     l_list.append(l_dict)
-        # current_obj_dict['dmp_group_name'] = dmp_group_name
-        # current_obj_dict['u_group_permission'] = l_list
-        # return jsonify({
-        #     'status': 0,
-        #     'msg': 'Display all user information',
-        #     'results': current_obj_dict
-        # })
-
-
-@user.route("/info/", methods=["GET"])
-def info():
+@user.route("/info/", methods=["GET"], defaults={"desc":"用户资料"})
+def info(desc):
     # 默认返回当前用户信息，若传dmp_user_id参数，则返回指定id的用户信息
     # 返回json中包含当前用户的权限信息
     id = request.form.get('dmp_user_id')
@@ -338,16 +338,9 @@ def info():
         l_list.append(l_dict)
     get_user_info_dict['leader_list'] = l_list
 
-    result = {
-        'status': 0,
-        'msg': 'Returns the object information by you choose',
-        'results': get_user_info_dict
-    }
-    return jsonify(result)
 
-
-@user.route("/icon/", methods=["POST"])
-def icon():
+@user.route("/icon/", methods=["POST"], defaults={"desc":"修改头像"})
+def icon(desc):
     from dmp.utils.uuid_str import uuid_str
     current_obj_dict = session.get('user')
     current_obj = Users.query.filter(Users.id == current_obj_dict['id']).first()
@@ -383,7 +376,7 @@ def icon():
 
 # 问题1：管理员单一添加默认的所属组是学生，直属管理者归为root1
 # 添加所属组(相当于给用户分配权限)、直属管理者参数(默认不修改权限，修改权限到修改用户组那一栏修改)
-@user.route("/changeprofile/", methods=["PUT"])
+@user.route("/changeprofile/", methods=["PUT"], defaults={"desc":"修改资料"})
 def changeprofile():
     dmp_user_id = request.form.get('dmp_user_id')
     # dmp_username = request.form.get('dmp_username')
@@ -488,7 +481,8 @@ def changeprofile():
             'results': ret_obj_dict
         }
         return jsonify(result)
-    except:
+
+    except Exception:
         db.session.rollback()
         return jsonify({
             'status': -1,
@@ -497,8 +491,8 @@ def changeprofile():
         })
 
 
-@user.route("/frozen/", methods=["POST"])
-def frozen_user():
+@user.route("/frozen/", methods=["POST"], defaults={"desc":"冻结用户"})
+def frozen_user(desc):
     dmp_user_id = request.form.get('dmp_user_id')
     if not dmp_user_id:
         current_obj_dict = session.get('user')
@@ -519,8 +513,7 @@ def frozen_user():
         'results': {}
     })
 
-
-@user.route("/del/", methods=["POST"])
+@user.route("/del/", methods=["POST"], defaults={"desc":"删除用户"})
 def udel():
     dmp_user_id = request.form.get('dmp_user_id')
     # 超级管理员无法删除
@@ -543,3 +536,5 @@ def udel():
 @user.before_request
 def before_request():
     rbac_middleware()
+
+

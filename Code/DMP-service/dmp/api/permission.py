@@ -9,7 +9,8 @@ from dmp.models import Permissions
 
 permission = Blueprint("permission",__name__)
 
-@permission.route("/all/",methods=["GET"])
+
+@permission.route("/all/",methods=["GET"], defaults={"desc":"获取所有权限"})
 def all():
     # 获取当前所有权限信息
     permissions_all = Permissions.query.all()
@@ -17,7 +18,6 @@ def all():
     for per_permission_obj in permissions_all:
         permissions_list.append(per_permission_obj)
     res_permission_list = [p.permission_to_dict() for p in permissions_list]
-
     result = {
         'status': 0,
         'msg': 'Returned all the permissions list',

@@ -9,6 +9,7 @@ from .case import case
 from .database import database
 from .dbtable import dbtable
 from .file import file
+from .form import form
 from .permission import permission
 from .rights import rights
 from .user import user
@@ -22,6 +23,7 @@ DEFAULT_BLUEPRINT = (
     (database,'/database'),
     (dbtable,'/dbtable'),
     (file,'/file'),
+    (form,'/form'),
     (permission,'/permission'),
     (rights,'/rights'),
     (user,'/user'),
