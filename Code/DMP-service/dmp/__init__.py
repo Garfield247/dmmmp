@@ -22,7 +22,7 @@ def create_app(config_name):
     # 调用初始化函数
     config[config_name].init_app(app)
     # 配置日志等级
-    # app.logger.setLevel(logging.INFO)
+    app.logger.setLevel(logging.INFO)
     # 配置扩展
     config_extensions(app)
     # 配置蓝本

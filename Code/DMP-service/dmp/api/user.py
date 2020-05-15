@@ -94,7 +94,6 @@ def login(desc):
             r = LoginVerify.login_username_verify_init(user, remember_me)
             if r == True:
                 auth_token = user.encode_auth_token()
-                print('vvvvb', auth_token)
                 if auth_token:
                     return jsonify({
                         'status': 0,

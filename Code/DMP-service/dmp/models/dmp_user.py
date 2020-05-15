@@ -70,10 +70,7 @@ class Users(db.Model, DMPModel):
         return user_dict
 
     def encode_auth_token(self):
-        """
-        Generates the Auth Token
-        :return: string
-        """
+        '''用户登录后，发放有效的 JWT'''
         try:
             payload = {
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=1800),
