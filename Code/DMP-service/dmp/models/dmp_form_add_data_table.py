@@ -5,8 +5,10 @@
 
 import datetime
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class FromAddDataTable(db.Model):
+
+class FromAddDataTable(db.Model, DMPModel):
     """数据从数据库添加表单表"""
     __tablename__ = 'dmp_from_add_data_table'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

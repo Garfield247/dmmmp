@@ -5,8 +5,10 @@
 
 import datetime
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class FromUpload(db.Model):
+
+class FromUpload(db.Model, DMPModel):
     """数据文件上传表单表"""
     __tablename__ = 'dmp_from_upload'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -16,7 +18,7 @@ class FromUpload(db.Model):
     column = db.Column(db.String(32), comment='自定义列名')
     json_dimension_reduction = db.Column(db.Boolean, comment='json数据是否遍历存储')
     new_table_name = db.Column(db.String(32), nullable=False, comment='表名')
-    method = db.Column(db.Integer, default=1,comment='新建1、添加2或覆盖3')
+    method = db.Column(db.Integer, default=1, comment='新建1、添加2或覆盖3')
     description = db.Column(db.String(128), comment='说明')
     submit_on = db.Column(db.DateTime, nullable=False, comment='提交时间')
     approve_on = db.Column(db.DateTime, comment='审批时间')

@@ -130,7 +130,7 @@ DMP( *Data Management Platform*)数据管理平台
 | 字段        | 数据类型 | 限制       | 介绍           |
 | ----------- | -------- | ---------- | -------------- |
 | id          | int      | Primay Key |                |
-| dmo_case_name | String   | 非空       | 案例名称       |
+| dmp_case_name | String   | 非空       | 案例名称       |
 | description | string   |            | 案例说明       |
 | url_name    | string   |            | 可视化网站名称 |
 | Url         | String   |            | 网址           |
@@ -494,7 +494,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /user/changepwd/ |
 | ------------- | ---------------- |
 | 格式          | JSON             |
-| http 请求方式 | put              |
+| http 请求方式 | PUT              |
 | 登陆保护      | 否               |
 
  **请求参数**
@@ -800,7 +800,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /user/del |
 | ------------- | --------- |
 | 格式          | JSON      |
-| http 请求方式 | DEL       |
+| http 请求方式 | DELETE    |
 | 登陆保护      | 是        |
 
  **请求参数**
@@ -989,7 +989,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /usergroup/post |
 | ------------- | --------------- |
 | 格式          | JSON            |
-| http 请求方式 | POST            |
+| http 请求方式 | POST/PUT        |
 | 登陆保护      | 是              |
 
  **请求参数**
@@ -1200,7 +1200,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /database/del |
 | ------------- | ------------- |
 | 格式          | JSON          |
-| http 请求方式 | DEL           |
+| http 请求方式 | DELETE        |
 | 登陆保护      | 是            |
 
  **请求参数**
@@ -1247,6 +1247,7 @@ DMP( *Data Management Platform*)数据管理平台
 | db_host     | string | 是       |          | 数据库主机地址 |
 | db_port     | int    | 是       |          | 数据库端口号   |
 | db_user     | string | 否       |          | 数据库用户名   |
+| db_name     |        |          |          |                |
 | db_password | string | 否       |          | 数据库密码     |
 
 **返回结果**
@@ -1276,7 +1277,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /database/post |
 | ------------- | -------------- |
 | 格式          | JSON           |
-| http 请求方式 | POST           |
+| http 请求方式 | POST/PUT       |
 | 登陆保护      | 是             |
 
  **请求参数**
@@ -1288,8 +1289,9 @@ DMP( *Data Management Platform*)数据管理平台
 | db_type       | int    | 是       |          | 数据库类型编号，添加时必填           |
 | db_host       | string | 是       |          | 数据库主机地址，添加时必填           |
 | db_port       | int    | 是       |          | 数据库端口号，添加时必填             |
-| db_user       | string | 否       |          | 数据库用户名                         |
-| db_password   | string | 否       |          | 数据库密码                           |
+| db_username | string | 否       |          | 数据库用户名                         |
+| db_passwd   | string | 否       |          | 数据库密码                     |
+| db_name | string | 否 | | 数据库名称 |
 | description   | string | 否       |          | 数据库简介                           |
 
 **返回结果**
@@ -1385,7 +1387,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /case/post |
 | ------------- | ---------- |
 | 格式          | JSON       |
-| http 请求方式 | POST       |
+| http 请求方式 | PUT        |
 | 登陆保护      | 是         |
 
  **请求参数**
@@ -1426,7 +1428,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /case/del |
 | ------------- | --------- |
 | 格式          | JSON      |
-| http 请求方式 | GET       |
+| http 请求方式 | DELETE    |
 | 登陆保护      | 是        |
 
  **请求参数**
@@ -1632,7 +1634,7 @@ DMP( *Data Management Platform*)数据管理平台
 | URL           | /dbtable/del |
 | ------------- | ------------ |
 | 格式          | JSON         |
-| http 请求方式 | GET          |
+| http 请求方式 | DELETE       |
 | 登陆保护      | 是           |
 
  **请求参数**

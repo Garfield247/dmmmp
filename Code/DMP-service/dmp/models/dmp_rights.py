@@ -4,8 +4,10 @@
 # @Author  : SHTD 
 
 from dmp.extensions import db
+from dmp.models import DMPModel
 
-class Rights(db.Model):
+
+class Rights(db.Model, DMPModel):
     """权利表"""
     __tablename__ = 'dmp_rights'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='功能ID')

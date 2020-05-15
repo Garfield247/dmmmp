@@ -5,9 +5,10 @@
 
 from flask import current_app
 from dmp.extensions import db
+from dmp.models import DMPModel
 
 
-class Permissions(db.Model):
+class Permissions(db.Model, DMPModel):
     """权限表"""
     __tablename__ = 'dmp_permission'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='权限ID')
@@ -16,7 +17,8 @@ class Permissions(db.Model):
 
     @classmethod
     def init_permission(cls):
-        permission_list = [{"route":r.rule,"desc":None if not r.defaults else r.defaults.get("desc")} for r in current_app.url_map.__dict__.get("_rules")]
+        permission_list = [{"route": r.rule, "desc": None if not r.defaults else r.defaults.get("desc")} for r in
+                           current_app.url_map.__dict__.get("_rules")]
         current_app.logger.info(permission_list)
         try:
             for rout in permission_list:
