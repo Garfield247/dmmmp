@@ -10,11 +10,8 @@ from .dmp_group_permission import group_permission
 from .dmp_group_rights import group_rights
 from dmp.models import DMPModel
 
-<<<<<<< HEAD
-class Group(db.Model,DMPModel):
-=======
-class Groups(db.Model):
->>>>>>> 86cec918be112616cf9c9d2bd61ae808ed8b2538
+
+class Groups(db.Model, DMPModel):
     """用户组表"""
     __tablename__ = 'dmp_group'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='用户组ID')
@@ -24,14 +21,14 @@ class Groups(db.Model):
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
 
     permissions = db.relationship('Permissions', secondary=group_permission)
-<<<<<<< HEAD
+
     # rights = db.relationship('Rights', secondary=group_rights)
 
     @classmethod
     def init_group(cls):
         try:
             from .dmp_permission import Permissions
-            admin_group = Group()
+            admin_group = Groups()
             admin_group.dmp_group_name = "admin"
             admin_group.max_count = 3
             current_app.logger.info(Permissions.query.all())
@@ -41,19 +38,21 @@ class Groups(db.Model):
                 admin_group.permissions.append(per)
             db.session.commit()
             current_app.logger.info("create admin group")
-            teacher_group = Group()
+            teacher_group = Groups()
             teacher_group.dmp_group_name = "teacher"
             db.session.add(teacher_group)
             db.session.commit()
-            teacher_permissions_id = [1,2,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36]
+            teacher_permissions_id = [1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+                                      26, 27, 28, 29, 30, 31, 32, 33, 34, 36]
             for permission_id in teacher_permissions_id:
                 teacher_group.permissions.append(Permissions.query.get(permission_id))
             current_app.logger.info("create teacher group")
-            student_group = Group()
+            student_group = Groups()
             student_group.dmp_group_name = "student"
             db.session.add(student_group)
             db.session.commit()
-            student_permissions_id = [2,5,6,7,8,9,10,11,12,13,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34]
+            student_permissions_id = [2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+                                      28, 29, 30, 31, 32, 34]
             for permission_id in student_permissions_id:
                 student_group.permissions.append(Permissions.query.get(permission_id))
             db.session.commit()
@@ -62,20 +61,3 @@ class Groups(db.Model):
 
         except Exception as err:
             current_app.logger.error(err)
-
-=======
-    rights = db.relationship('Rights', secondary=group_rights)
-
-    def __repr__(self):
-        return self.dmp_group_name
-
-    def group_to_dict(self):
-        group_dict = {
-            'id': self.id,
-            'dmp_group_name': self.dmp_group_name,
-            'max_count': self.max_count,
-            'created_on': self.created_on,
-            'changed_on': self.changed_on,
-        }
-        return group_dict
->>>>>>> 86cec918be112616cf9c9d2bd61ae808ed8b2538

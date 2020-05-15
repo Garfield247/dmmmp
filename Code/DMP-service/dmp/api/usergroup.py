@@ -105,7 +105,7 @@ def editgroup():
                 break
             p_obj = Permissions.query.filter(Permissions.id == p).first()
             edit_permission_list.append(p_obj)
->>>>>>> 86cec918be112616cf9c9d2bd61ae808ed8b2538
+
 
         # 用户组所对应数据库中的权限信息，根据Groups表中的dmp_group_name找到对应用户组的权限
         edit_group_obj = Groups.query.filter(Groups.dmp_group_name == dmp_group_name).first()
@@ -115,36 +115,12 @@ def editgroup():
         # 然后添加勾选的权限信息对象
         for add_permission in edit_permission_list:
             edit_permission_obj_list.append(add_permission)
+    except Exception as e:
+        pass
 
-<<<<<<< HEAD
+
 @usergroup.route("/post/",methods=["POST"],defaults={"desc":"修改添加用户组"})
 def post(desc):
-    result = {
-        "status": 0,
-        "msg": "ok",
-        "results": {
-=======
-        group_pemission_list = []
-        for p in edit_permission_obj_list:
-            group_pemission_list.append(p.permission_to_dict())
-        ret_data['group_permission'] = group_pemission_list
-
-        return jsonify({
-            'status': 0,
-            'msg': 'User group edited successfully',
-            'results': ret_data
-        })
-    except Exception:
-        db.session.rollback()
-        return jsonify({
-            'status': -1,
-            'msg': 'User group name is unique, please select again',
-            'results': {}
-        })
-
-
-@usergroup.route("/post/", methods=["POST"])
-def post():
     # 添加用户组
     try:
         dmp_group_name = request.form.get('dmp_group_name')
@@ -194,7 +170,6 @@ def post():
             'status': 0,
             'msg': 'User group and corresponding permissions were added successfully',
             'results': ret_data
->>>>>>> 86cec918be112616cf9c9d2bd61ae808ed8b2538
         }
         return jsonify(result)
 
@@ -206,20 +181,9 @@ def post():
             'results': {}
         })
 
-<<<<<<< HEAD
+
 @usergroup.route("/del/",methods=["DEL"],defaults={"desc":"删除用户组"})
 def ugdel(desc):
-    result = {
-        "status": 0,
-        "msg": "ok",
-        "results": {
-        }
-    }
-    return jsonify(result)
-=======
-
-@usergroup.route("/del/", methods=["POST"])
-def ugdel():
     # 删除用户组
     dmp_group_id = request.form.get('dmp_group_id')
     del_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
@@ -230,4 +194,3 @@ def ugdel():
         'msg': 'Group deletion successful',
         'results': {}
     })
->>>>>>> 86cec918be112616cf9c9d2bd61ae808ed8b2538

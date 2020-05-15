@@ -7,10 +7,10 @@
 from flask import Blueprint, jsonify, request
 from dmp.models import Permissions
 
-permission = Blueprint("permission",__name__)
+permission = Blueprint("permission", __name__)
 
 
-@permission.route("/all/",methods=["GET"],defaults={"desc":"获取所有权限"})
+@permission.route("/all/", methods=["GET"], defaults={"desc": "获取所有权限"})
 def all(desc):
     # 获取当前所有权限信息
     permissions_all = Permissions.query.all()
@@ -24,4 +24,3 @@ def all(desc):
         'results': res_permission_list
     }
     return jsonify(result)
-

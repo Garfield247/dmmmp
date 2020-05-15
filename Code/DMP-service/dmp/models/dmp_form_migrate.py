@@ -7,7 +7,8 @@ import datetime
 from dmp.extensions import db
 from dmp.models import DMPModel
 
-class FromMigrate(db.Model,DMPModel):
+
+class FromMigrate(db.Model, DMPModel):
     """数据迁移表单表"""
     __tablename__ = 'dmp_from_migrate'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -17,7 +18,7 @@ class FromMigrate(db.Model,DMPModel):
     description = db.Column(db.String(128), comment='说明')
     submit_on = db.Column(db.DateTime, nullable=False, comment='提交时间')
     approve_on = db.Column(db.DateTime, comment='审批时间')
-    approve_result = db.Column(db.Integer, default=0,comment='审批结果,默认:0,通过:1,不通过:2')
+    approve_result = db.Column(db.Integer, default=0, comment='审批结果,默认:0,通过:1,不通过:2')
     answer = db.Column(db.String(32), comment='审批答复')
     migrate = db.Column(db.Boolean, comment='迁移成功')
     migrate_result = db.Column(db.String(32), comment='迁移结果')
@@ -29,14 +30,7 @@ class FromMigrate(db.Model,DMPModel):
                                             comment='目标数据库ID')
     approve_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), comment='审批人')
 
-<<<<<<< HEAD
     # submit_users = db.relationship('Users', backref='submitusers_from_migrate')
     # approve_users = db.relationship('Users', backref='approveusers_from_migrate')
     # datatable = db.relationship('DataTable', backref='datatable_from_migrate')
     # database = db.relationship('Database', backref='database_from_migrate')
-=======
-    submit_users = db.relationship('Users', foreign_keys=submit_dmp_user_id, backref='submit_users_from_migrate')
-    approve_users = db.relationship('Users', foreign_keys=approve_dmp_user_id, backref='approve_users_from_migrate')
-    datatable = db.relationship('DataTable', backref='datatable_from_migrate')
-    database = db.relationship('Database', backref='database_from_migrate')
->>>>>>> 86cec918be112616cf9c9d2bd61ae808ed8b2538

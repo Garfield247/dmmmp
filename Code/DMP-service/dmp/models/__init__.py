@@ -3,13 +3,13 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 
-from datetime import datetime,date
+from datetime import datetime, date
 
 from sqlalchemy import inspect
 from flask import json as _json
 
 from dmp.extensions import db
-from dmp.utils.wetime import default_date_format,default_datetime_format
+from dmp.utils.wetime import default_date_format, default_datetime_format
 
 
 class DMPModel(object):
@@ -48,8 +48,6 @@ class DMPModel(object):
     def to_josn(self):
         pass
 
-
-
     def __json__(self):
         _d = {}
         if hasattr(self, '_json_cache') and self._json_cache:
@@ -66,17 +64,17 @@ class DMPModel(object):
 
     def __repr__(self):
         return '####<%s %s> ' % \
-            (self.__class__.__name__, self.__mapper__.primary_key[0].name)
+               (self.__class__.__name__, self.__mapper__.primary_key[0].name)
 
     def __len__(self):
         return 1
+
 
 class JSONEncoder(_json.JSONEncoder):
     def default(self, o):
         if isinstance(o, DMPModel):
             return o.__json__()
         return _json.JSONEncoder.default(self, o)
-
 
 
 from .dmp_case import Case
