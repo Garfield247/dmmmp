@@ -26,7 +26,7 @@ class Config:
 # 开发环境
 class DevelopmentConfig(Config):
     TESTING = True
-    LOG_LEVE = "info"
+    # LOG_LEVE = "info"
     # Mail
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.163.com'
     EMAIL_PORT = 587
