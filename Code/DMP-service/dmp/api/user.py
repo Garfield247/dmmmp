@@ -11,6 +11,7 @@ from dmp.config import Config
 from dmp.extensions import db
 from dmp.models import Users, Groups
 from dmp.rbac.middlewares.rbac import rbac_middleware
+from dmp.rbac.service.init_permission import INIT_PERMISSION
 from dmp.utils.put_data import PuttingData
 from dmp.utils.validation import ValidationEmail
 from dmp.utils.verify import LoginVerify, UserVerify
@@ -18,7 +19,10 @@ from dmp.utils.verify import LoginVerify, UserVerify
 user = Blueprint("user", __name__, static_folder='Code/DMP-service/')
 
 
-@user.route("/register/", methods=["POST"], defaults={"desc":"用户注册"})
+
+
+@user.route("/register/", methods=["POST"], defaults={"desc": "用户注册"})
+
 def register(desc):
     try:
         user_obj = Users.query.all()
@@ -54,6 +58,11 @@ def register(desc):
         })
 
 
+# @user.route("/activate/", methods=["POST"], defaults={"desc": "用户激活"})
+# def activate(desc):
+#     pass
+
+
 @user.route("/activate/<token>",methods=["GET"],defaults={"desc":"用户激活"})
 def activate(desc, token):
     if Users.check_activate_token(token) == True:
@@ -70,6 +79,7 @@ def activate(desc, token):
             "results": {}
         }
         return jsonify(result)
+
 
 
 @user.route("/login/", methods=["POST"], defaults={"desc":"用户登录"})
@@ -118,6 +128,7 @@ def login(desc):
         })
 
 
+
 @user.route("/logout/", methods=["GET"], defaults={"desc":"用户退出"})
 def logout(desc):
     # 用户退出--1. 拿到token，则直接退出 2、拿不到token(失效)---则直接退出，并给出提示 3.如果token被修改或者到期的问题
@@ -149,18 +160,19 @@ def logout(desc):
         })
 
 
-@user.route("/forgetpwd/",methods=["POST"],defaults={"desc":"找回密码"})
-def forgetpwd():
+
+@user.route("/forgetpwd/", methods=["POST"], defaults={"desc": "找回密码"})
+def forgetpwd(desc):
     email = request.form.get('email')
     user = Users.query.filter(Users.email == email).first()
     ValidationEmail().change_pwd(user, email)
-
     result = {
         "status": 0,
         "msg": "The password reset request has been sent to the mailbox. Please confirm the reset",
         "results": {}
     }
     return jsonify(result)
+
 
 
 @user.route('/gettoken/<token>', methods=['GET'])
@@ -171,7 +183,10 @@ def gettoken(token):
         'results': token
     })
 
+
+
 @user.route('/changepwd/', methods=['POST'], defaults={"desc":"重设密码"})
+
 def changepwd():
     token = request.form.get('token')
     newpassword = request.form.get('newpassword')
@@ -190,8 +205,9 @@ def changepwd():
         })
 
 
-@user.route("/list/", methods=["GET"], defaults={"desc":"用户列表"})
-def ulist():
+@user.route("/list/", methods=["GET"], defaults={"desc": "用户列表"})
+def ulist(desc):
+
     current_obj_dict = session['user']
     if current_obj_dict['dmp_group_id'] == 1:
         all_user_obj_list = Users.query.all()
@@ -244,7 +260,8 @@ def ulist():
         for per_obj in stu_obj_dict_list:
             dmp_group_obj = Groups.query.filter(Groups.id == per_obj['dmp_group_id']).first()
             dmp_group_name = dmp_group_obj.dmp_group_name
-            leader_obj_name = Users.query.filter(Users.leader_dmp_user_id == teacher_obj_dict['id']).first().dmp_username
+            leader_obj_name = Users.query.filter(
+                Users.leader_dmp_user_id == teacher_obj_dict['id']).first().dmp_username
 
             group_permissions_list = dmp_group_obj.permissions
             p_list = []
@@ -268,7 +285,7 @@ def ulist():
 
 
 
-@user.route("/info/", methods=["GET"], defaults={"desc":"用户资料"})
+@user.route("/info/", methods=["get"], defaults={"desc": "用户资料"})
 def info(desc):
     # 默认返回当前用户信息，若传dmp_user_id参数，则返回指定id的用户信息
     # 返回json中包含当前用户的权限信息
@@ -339,7 +356,8 @@ def info(desc):
     get_user_info_dict['leader_list'] = l_list
 
 
-@user.route("/icon/", methods=["POST"], defaults={"desc":"修改头像"})
+
+@user.route("/icon/", methods=["POST"], defaults={"desc": "修改头像"})
 def icon(desc):
     from dmp.utils.uuid_str import uuid_str
     current_obj_dict = session.get('user')
@@ -353,12 +371,13 @@ def icon(desc):
     icon = open(save_url + icon_name, 'wb')
     icon.write(icon_data)
     icon.close()
-    icon_obj = 'http://localhost:7789/static/icon/'+ icon_name
+    icon_obj = 'http://localhost:7789/static/icon/' + icon_name
 
     if os.path.exists(save_url + icon_name):
         origin_icon = current_obj.icon
         origin_icon_name = origin_icon.split('/')[-1]
-        if origin_icon == None or origin_icon == '': pass
+        if origin_icon == None or origin_icon == '':
+            pass
         elif origin_icon != None or origin_icon != '':
             os.remove(os.path.join(save_url, origin_icon_name))
 
@@ -376,8 +395,10 @@ def icon(desc):
 
 # 问题1：管理员单一添加默认的所属组是学生，直属管理者归为root1
 # 添加所属组(相当于给用户分配权限)、直属管理者参数(默认不修改权限，修改权限到修改用户组那一栏修改)
-@user.route("/changeprofile/", methods=["PUT"], defaults={"desc":"修改资料"})
-def changeprofile():
+
+@user.route("/changeprofile/", methods=["PUT"], defaults={"desc": "修改资料"})
+def changeprofile(desc):
+
     dmp_user_id = request.form.get('dmp_user_id')
     # dmp_username = request.form.get('dmp_username')
     # real_name = request.form.get('real_name')
@@ -491,8 +512,9 @@ def changeprofile():
         })
 
 
+
 @user.route("/frozen/", methods=["POST"], defaults={"desc":"冻结用户"})
-def frozen_user(desc):
+def frozen_user():
     dmp_user_id = request.form.get('dmp_user_id')
     if not dmp_user_id:
         current_obj_dict = session.get('user')
@@ -513,8 +535,10 @@ def frozen_user(desc):
         'results': {}
     })
 
-@user.route("/del/", methods=["POST"], defaults={"desc":"删除用户"})
-def udel():
+
+@user.route("/del/", methods=["DELETE"], defaults={"desc": "删除用户"})
+def udel(desc):
+
     dmp_user_id = request.form.get('dmp_user_id')
     # 超级管理员无法删除
     if dmp_user_id == "1":
@@ -536,5 +560,4 @@ def udel():
 @user.before_request
 def before_request():
     rbac_middleware()
-
 

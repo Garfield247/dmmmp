@@ -7,7 +7,8 @@ import datetime
 from dmp.extensions import db
 from dmp.models import DMPModel
 
-class Case(db.Model,DMPModel):
+
+class Case(db.Model, DMPModel):
     """案例表"""
     __tablename__ = 'dmp_case'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -17,4 +18,3 @@ class Case(db.Model,DMPModel):
     url = db.Column(db.String(64), comment='网址')
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
-

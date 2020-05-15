@@ -7,7 +7,8 @@ import datetime
 from dmp.extensions import db
 from dmp.models import DMPModel
 
-class FromAddDataTable(db.Model,DMPModel):
+
+class FromAddDataTable(db.Model, DMPModel):
     """数据从数据库添加表单表"""
     __tablename__ = 'dmp_from_add_data_table'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -25,13 +26,14 @@ class FromAddDataTable(db.Model,DMPModel):
     dmp_case_id = db.Column(db.Integer, db.ForeignKey('dmp_case.id'), nullable=False, comment='所属案例ID')
     approve_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), comment='审批人')
 
+
     submit_users = db.relationship('Users', foreign_keys=submit_dmp_user_id, backref='submitusers_from_add_data_table')
     approve_users = db.relationship('Users', foreign_keys=approve_dmp_user_id, backref='approveusers_from_add_data_table')
     database = db.relationship('Database', backref='database_from_add_data_table')
     datacase = db.relationship('Case', backref='case_from_add_data_table')
 
+
     # submit_users = db.relationship('Users', backref='submitusers_from_add_data_table')
     # approve_users = db.relationship('Users', backref='approveusers_from_add_data_table')
     # database = db.relationship('Database', backref='database_from_add_data_table')
     # datacase = db.relationship('Case', backref='case_from_add_data_table')
-

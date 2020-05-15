@@ -7,9 +7,10 @@ import os
 from flask import Blueprint, jsonify, request, current_app
 from dmp.utils import resp_hanlder
 
-file = Blueprint("file",__name__)
+file = Blueprint("file", __name__)
 
-@file.route("/upload/",methods=["POST"],defaults={"desc":"文件上传"})
+
+@file.route("/upload/", methods=["POST"], defaults={"desc": "文件上传"})
 def upload(desc):
     if request.method == 'POST':
         try:
@@ -22,22 +23,23 @@ def upload(desc):
             # 构成该分片唯一标识符
             filename = '%s%s' % (task, chunk)
             # 保存分片到本地
-            upload_file.save(os.path.join(current_app.config.get("UPLOADED_PATH"),filename))
+            upload_file.save(os.path.join(current_app.config.get("UPLOADED_PATH"), filename))
             return resp_hanlder()
         except Exception as err:
             current_app.logger.error(err)
-            return  resp_hanlder()
+            return resp_hanlder()
 
-@file.route("/success/",methods=["GET"],defaults={"desc":"文件上传完成"})
+
+@file.route("/success/", methods=["GET"], defaults={"desc": "文件上传完成"})
 def success(desc):
     target_filename = request.args.get('filename')
     task = request.args.get('task_id')
     chunk = 0
-    with open(os.path.join(current_app.config.get("UPLOADED_PATH"),target_filename), 'wb' ) as target_file:
+    with open(os.path.join(current_app.config.get("UPLOADED_PATH"), target_filename), 'wb') as target_file:
         while True:
             try:
-                filename = os.path.join(current_app.config.get("UPLOADED_PATH"),'%s%d' % (
-      task, chunk))
+                filename = os.path.join(current_app.config.get("UPLOADED_PATH"), '%s%d' % (
+                    task, chunk))
                 # 按序打开每个分片
                 source_file = open(filename, 'rb')
                 # 读取分片内容写入新文件
@@ -49,9 +51,10 @@ def success(desc):
             # 删除该分片，节约空间
             os.remove(filename)
     current_app.logger.info(target_filename)
-    return resp_hanlder(result={"filename":target_filename})
+    return resp_hanlder(result={"filename": target_filename})
 
-@file.route("/dlcomplete/",methods=["GET"],defaults={"desc":"文件下载完成"})
+
+@file.route("/dlcomplete/", methods=["GET"], defaults={"desc": "文件下载完成"})
 def dlcomplete(desc):
     result = {
         "status": 0,

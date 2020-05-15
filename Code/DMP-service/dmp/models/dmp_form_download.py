@@ -7,7 +7,8 @@ import datetime
 from dmp.extensions import db
 from dmp.models import DMPModel
 
-class FromDownload(db.Model,DMPModel):
+
+class FromDownload(db.Model, DMPModel):
     """数据下载表单表"""
     __tablename__ = 'dmp_from_download'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -30,6 +31,7 @@ class FromDownload(db.Model,DMPModel):
     submit_users = db.relationship('Users', foreign_keys=submit_dmp_user_id, backref='submitusers_from_download')
     approve_users = db.relationship('Users', foreign_keys=approve_dmp_user_id, backref='approveusers_from_migrate')
     datatable = db.relationship('DataTable', backref='datatable_from_download')
+
     # submit_users = db.relationship('Users', backref='submitusers_from_download')
     # approve_users = db.relationship('Users', backref='approveusers_from_migrate')
     # datatable = db.relationship('DataTable', backref='datatable_from_download')

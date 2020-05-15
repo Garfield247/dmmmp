@@ -9,11 +9,11 @@ from flask import Blueprint, jsonify, request, session
 from dmp.extensions import db
 from dmp.models import Groups, Permissions
 
+
 usergroup = Blueprint("usergroup", __name__)
 
-
-@usergroup.route("/info/", methods=["GET"])
-def info():
+@usergroup.route("/info/",methods=["GET"],defaults={"desc":"获取用户组信息"})
+def info(desc):
     # 获取所有用户组信息及用户组对应的权限
     groups_all = Groups.query.all()
     groups_list = []
@@ -132,8 +132,8 @@ def editgroup():
         })
 
 
-@usergroup.route("/post/", methods=["POST"], defaults={"desc":"修改添加用户组"})
-def post():
+@usergroup.route("/post/",methods=["POST"],defaults={"desc":"修改添加用户组"})
+def post(desc):
     # 添加用户组
     try:
         dmp_group_name = request.form.get('dmp_group_name')
@@ -195,8 +195,11 @@ def post():
         })
 
 
-@usergroup.route("/del/", methods=["POST"], defaults={"desc":"删除用户组"})
-def ugdel():
+
+
+@usergroup.route("/del/",methods=["DEL"], defaults={"desc":"删除用户组"})
+def ugdel(desc):
+
     # 删除用户组
     dmp_group_id = request.form.get('dmp_group_id')
     del_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
@@ -207,4 +210,3 @@ def ugdel():
         'msg': 'Group deletion successful',
         'results': {}
     })
-

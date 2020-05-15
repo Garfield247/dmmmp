@@ -3,6 +3,7 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD 
 
+
 import os
 from flask import jsonify
 from flask_script import Manager, Server
@@ -10,9 +11,14 @@ from flask_script import Manager, Server
 
 from flask_script import Manager,Server
 
+
+import os
+from flask import jsonify
+from flask_script import Manager, Server
+
+
 from flask_migrate import MigrateCommand
 from dmp import app
-from dmp.config import Config
 from dmp.extensions import db
 from dmp.utils.email import send_mail, EmailBody
 from dmp.utils.validation import ValidationEmail
@@ -26,7 +32,11 @@ manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 # 添加服务配置
 
+
 manager.add_command('runserver', Server(host='0.0.0.0', port=7789))
+
+
+# manager.add_command('runserver', Server(host='0.0.0.0', port=7789, use_debugger=True))
 
 
 
@@ -50,23 +60,28 @@ def create_db():
     app.logger.info("create db")
     db.create_all()
 
+
 # 生成数据表测试数据
 @manager.command
 def create_test_db_table_data():
     import random
-    from dmp.models import Users,Case,Database
+    from dmp.models import Users, Case, Database
     from dmp.api.dbtable import post
     count = 30
     for i in range(count):
         new_test_table = post(
-            dmp_data_table_name="dmp_test_dbtable_%d"%i,
-            db_table_name="dmp_test_db_table_name%d"%i,
+            dmp_data_table_name="dmp_test_dbtable_%d" % i,
+            db_table_name="dmp_test_db_table_name%d" % i,
             description="测试表",
             dmp_user_id=random.choice(Users.query.all()).id,
             dmp_database_id=random.choice(Database.query.all()).id,
             dmp_case_id=random.choice(Case.query.all()).id
         )
+
         app.logger.info("add test data :"+str(new_test_table))
+
+        app.logger.info("add test data :" + str(new_test_table))
+
 
 
 # 初始化
@@ -80,6 +95,7 @@ def sys_init():
     Groups.init_group()
     from dmp.models import Users
     Users.create_test_user()
+
 
 @manager.option('-n', '-dmp_username', dest='dmp_username')
 @manager.option('-r', '-real_name', dest='real_name')
