@@ -11,14 +11,9 @@ from dmp.extensions import config_extensions
 from dmp.api import config_blueprint
 from dmp.rbac.middlewares.rbac import rbac_middleware
 
-<<<<<<< HEAD
+
 # 封装一个方法，专门用于创建Flask实例
-=======
-#封装一个方法，专门用于创建Flask实例
 
-
-
->>>>>>> 86cec918be112616cf9c9d2bd61ae808ed8b2538
 def create_app(config_name):
     # 创建应用实例
     app = Flask(__name__)
@@ -32,19 +27,19 @@ def create_app(config_name):
     config_extensions(app)
     # 配置蓝本
     config_blueprint(app)
-<<<<<<< HEAD
+
     # 返回应用实例
-=======
 
     # RBAC权限拦截
     app.before_request(rbac_middleware)
 
-    #返回应用实例
->>>>>>> 86cec918be112616cf9c9d2bd61ae808ed8b2538
+    # 返回应用实例
+
     return app
 
-#获取配置
+
+# 获取配置
 config_name = os.environ.get('DMP_CONFIG') or 'default'
 
-#创建实例
+# 创建实例
 app = create_app(config_name)

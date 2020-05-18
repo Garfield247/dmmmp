@@ -9,12 +9,11 @@ from flask import jsonify
 from flask_script import Manager, Server
 
 from flask_migrate import MigrateCommand
+
 from dmp import app
 from dmp.extensions import db
 from dmp.utils.email import send_mail, EmailBody
 from dmp.utils.validation import ValidationEmail
-
-# 创建命令起动控制对象
 from dmp.models import Users, Groups, Permissions
 from dmp.utils.put_data import put_data
 
