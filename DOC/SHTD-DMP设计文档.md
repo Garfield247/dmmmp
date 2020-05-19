@@ -1984,7 +1984,7 @@ DMP( *Data Management Platform*)数据管理平台
 
 | 参数名         | 类型   | 是否必填 | 最大长度 | 参数说明                           |
 | -------------- | ------ | -------- | -------- | ---------------------------------- |
-| dmp_form_type      | int    | 是       |          | 表单格式                           |
+| dmp_form_type      | int    | 是       |          | 表单格式1,2,3,4                |
 | dmp_form_id        | int    | 是       |          | 表单ID                             |
 | approve_result | int    | 是       |          | 审批结果,默认为0，通过是1不通过是2 |
 | answer         | string | 是       |          | 审批答复                           |
