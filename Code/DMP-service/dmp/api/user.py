@@ -4,25 +4,27 @@
 # @Author  : SHTD
 import base64
 import os
+from operator import or_
 
 from flask import Blueprint, jsonify, request, session
 
-from dmp.config import Config
+from dmp.config import Config, config
 from dmp.extensions import db
 from dmp.models import Users, Groups
 from dmp.rbac.middlewares.rbac import rbac_middleware
-from dmp.rbac.service.init_permission import INIT_PERMISSION
 from dmp.utils.put_data import PuttingData
 from dmp.utils.validation import ValidationEmail
-from dmp.utils.verify import LoginVerify, UserVerify
+from dmp.utils.verify import LoginVerify
+from dmp.utils import resp_hanlder
+from dmp.utils.response_hanlder import RET
+from dmp.utils.verify import UserVerify
+from dmp.utils.uuid_str import uuid_str
+from dmp.utils.ep_data import EnvelopedData
 
 user = Blueprint("user", __name__, static_folder='Code/DMP-service/')
 
 
-
-
 @user.route("/register/", methods=["POST"], defaults={"desc": "用户注册"})
-
 def register(desc):
     try:
         user_obj = Users.query.all()
@@ -30,148 +32,92 @@ def register(desc):
         res = UserVerify.judge_superuser(user_obj)
         if res:
             return jsonify(res)
-
-        dmp_username = request.form.get('dmp_username')
-        real_name = request.form.get('real_name')
-        passwd = request.form.get('password')
-        email = request.form.get('email')
-        user = Users(dmp_username=dmp_username, real_name=real_name, passwd=passwd, email=email,leader_dmp_user_id=Config.LEADER_ROOT_ID)
+        data = request.json
+        dmp_username = data.get('dmp_username')
+        real_name = data.get('real_name')
+        passwd = data.get('password')
+        email = data.get('email')
+        user = Users(dmp_username=dmp_username, real_name=real_name, password=passwd,
+                     email=email, leader_dmp_user_id=Config.LEADER_ROOT_ID)
         res = PuttingData.root_add_user(user)
-        if res:
-            return jsonify(res)
+
+        # 返回字典-管理员单一添加成功
+        if isinstance(res, dict):
+            return resp_hanlder(code=0, msg=res)
+        # 返回元组-超出用户组最大容量
+        elif isinstance(res, tuple):
+            return resp_hanlder(code=999, msg=res[1])
+
         db.session.add(user)
         db.session.commit()
         ValidationEmail().activate_email(user, email)
-        result = {
-            "status": 0,
-            "msg": "The email has been sent. Please verify it",
-            "results": 'OK'
-        }
-
-        return jsonify(result)
-    except Exception:
+        return resp_hanlder(code=1001, msg=RET.alert_code[1001])
+    except Exception as err:
         db.session.rollback()
-        return jsonify({
-            'status': -1,
-            'msg': 'register error',
-            'results': {}
-        })
+        return resp_hanlder(code=101, err=err)
 
 
-# @user.route("/activate/", methods=["POST"], defaults={"desc": "用户激活"})
-# def activate(desc):
-#     pass
-
-
-@user.route("/activate/<token>",methods=["GET"],defaults={"desc":"用户激活"})
-def activate(desc, token):
-    if Users.check_activate_token(token) == True:
-        result = {
-            "status": 0,
-            "msg": "User activate successfully!",
-            "results": {}
-        }
-        return jsonify(result)
+@user.route("/activate/<token>", methods=["GET"], defaults={"desc": "用户激活"})
+def activate(token, desc):
+    # 激活邮箱--注册时激活、token失效或者忘记导致未激活
+    res = PuttingData.get_obj_data(Users, token)
+    if Users.check_activate_token(res) == True:
+        return resp_hanlder(code=1009, msg=RET.alert_code[1009])
     else:
-        result = {
-            "status": -1,
-            "msg": "User activate failed!",
-            "results": {}
-        }
-        return jsonify(result)
+        return resp_hanlder(code=2002, msg=RET.alert_code[2002])
 
 
-
-@user.route("/login/", methods=["POST"], defaults={"desc":"用户登录"})
+@user.route("/login/", methods=["POST"], defaults={"desc": "用户登录"})
 def login(desc):
-    try:
-        dmp_username = request.form.get('dmp_username')
-        email = request.form.get('email')
-        passwd = request.form.get('password')
-        remember_me = request.form.get('remember_me')
-        if dmp_username and not email:
-            user = Users.query.filter(Users.dmp_username == dmp_username, Users.passwd == passwd).first()
-            r = LoginVerify.login_username_verify_init(user, remember_me)
-            if r == True:
-                auth_token = user.encode_auth_token()
-                if auth_token:
-                    return jsonify({
-                        'status': 0,
-                        'msg': 'Successful user login',
-                        'results': auth_token.decode('utf-8')
-                    })
-                return jsonify({
-                    'status': -1,
-                    'msg': 'Token error.',
-                    'results': {}
-                })
-            else:return jsonify(r)
+    if request.method == 'POST':
+        try:
+            data = request.json
+            dmp_username = data.get('dmp_username')
+            email = data.get('email')
+            # passwd = data.get('password')
+            if dmp_username and not email:
+                user = Users.query.filter(Users.dmp_username == dmp_username).first()
+                r = LoginVerify.login_username_verify_init(user)
+                if r == True:
+                    auth_token = user.encode_auth_token()
+                    if auth_token:
+                        return resp_hanlder(code=1003, msg=RET.alert_code[1003], result=auth_token.decode('utf-8'))
+                    return resp_hanlder(code=201)
+                else:
+                    return resp_hanlder(code=999, msg=r)
 
-        elif email and not dmp_username:
-            user = Users.query.filter(Users.email == email, Users.passwd == passwd).first()
-            r = LoginVerify.login_email_verify_init(user, remember_me)
-            if r == True:
-                auth_token = user.encode_auth_token()
-                return jsonify({
-                    'status': 0,
-                    'msg': 'Successful user login',
-                    'results': auth_token.decode('utf-8')
-                })
-            else:return jsonify(r)
-
-    except Exception:
-        return jsonify({
-            'status': -1,
-            'msg': 'Login error',
-            'results': {}
-        })
+            elif email and not dmp_username:
+                user = Users.query.filter(Users.email == email).first()
+                r = LoginVerify.login_email_verify_init(user)
+                if r == True:
+                    auth_token = user.encode_auth_token()
+                    return resp_hanlder(code=1003, msg=RET.alert_code[1003], result=auth_token.decode('utf-8'))
+                else:
+                    return jsonify(r)
+            return resp_hanlder(code=999)
+        except Exception as err:
+            return resp_hanlder(code=1004, msg=RET.alert_code[1004], err=err)
 
 
-
-@user.route("/logout/", methods=["GET"], defaults={"desc":"用户退出"})
+@user.route("/logout/", methods=["GET"], defaults={"desc": "用户退出"})
 def logout(desc):
-    # 用户退出--1. 拿到token，则直接退出 2、拿不到token(失效)---则直接退出，并给出提示 3.如果token被修改或者到期的问题
-
-
-    # 使用seesion控制登录、退出状态保存，可设置session的过期时间
-    auth_token = request.form.get('auth_token')
-    if auth_token:
-        from dmp.utils.put_data import PuttingData
-        res = PuttingData.get_obj_data(Users, auth_token)
-        print('qqqq', res)
-        if res != False:
-            session.clear()
-            return jsonify({
-                'status': -1,
-                'msg': 'User has logged out',
-                'results': {}
-            })
-        return jsonify({
-            'status': -1,
-            'msg': 'Token error.',
-            'results': {}
-        })
-    else:
-        return jsonify({
-            'stauts': -1,
-            'msg': 'Provide a valid auth token.',
-            'results': {}
-        })
-
+    if request.method == 'GET':
+        # 清空session中所有保存的信息
+        session.clear()
+        return resp_hanlder(code=1005, msg=RET.alert_code[1005])
 
 
 @user.route("/forgetpwd/", methods=["POST"], defaults={"desc": "找回密码"})
 def forgetpwd(desc):
-    email = request.form.get('email')
-    user = Users.query.filter(Users.email == email).first()
-    ValidationEmail().change_pwd(user, email)
-    result = {
-        "status": 0,
-        "msg": "The password reset request has been sent to the mailbox. Please confirm the reset",
-        "results": {}
-    }
-    return jsonify(result)
-
+    if request.method == 'POST':
+        try:
+            data = request.json
+            email = data.get('email')
+            user = Users.query.filter(Users.email == email).first()
+            ValidationEmail().change_pwd(user, email)
+            return resp_hanlder(code=1002, msg=RET.alert_code[1002])
+        except Exception as err:
+            return resp_hanlder(code=999, err=err)
 
 
 @user.route('/gettoken/<token>', methods=['GET'])
@@ -183,380 +129,200 @@ def gettoken(token):
     })
 
 
-
-@user.route('/changepwd/', methods=['POST'], defaults={"desc":"重设密码"})
-
-def changepwd():
-    token = request.form.get('token')
-    newpassword = request.form.get('newpassword')
-    success = Users.reset_password(token, newpassword)
-    if success == True:
-        return jsonify({
-            'status': 0,
-            'msg': 'Reset password successfully, please login again',
-            'results': {}
-        })
-    else:
-        return jsonify({
-            'status': -1,
-            'msg': 'Reset password failed, please try again',
-            'results': {}
-        })
+@user.route('/changepwd/', methods=['POST'], defaults={"desc": "重设密码"})
+def changepwd(desc):
+    if request.method == 'POST':
+        data = request.json
+        token = request.headers.get('Authorization')
+        newpassword = data.get('newpassword')
+        res = Users.reset_password(token, newpassword)
+        if res == True:
+            session.clear()
+            return resp_hanlder(code=1006, msg=RET.alert_code[1006])
+        else:
+            return resp_hanlder(code=1007, msg=res)
 
 
 @user.route("/list/", methods=["GET"], defaults={"desc": "用户列表"})
 def ulist(desc):
-
-    current_obj_dict = session['user']
-    if current_obj_dict['dmp_group_id'] == 1:
-        all_user_obj_list = Users.query.all()
-        user_obj_dict_list = [u.user_to_dict() for u in all_user_obj_list]
-        new_user_obj_dict_list = []
-        for per_obj in user_obj_dict_list:
-            dmp_group_obj = Groups.query.filter(Groups.id == per_obj['dmp_group_id']).first()
-            if per_obj['leader_dmp_user_id'] == None:
-                per_obj['leader_name'] = None
-                dmp_group_name = dmp_group_obj.dmp_group_name
-                group_permissions_list = dmp_group_obj.permissions
-                p_list = []
-                for p in group_permissions_list:
-                    p_dict = {}
-                    p_dict['id'] = p.id
-                    p_dict['dmp_permission_name'] = p.dmp_permission_name
-                    p_dict['route'] = p.route
-                    p_list.append(p_dict)
-                per_obj['dmp_group_name'] = dmp_group_name
-                per_obj['u_group_permission'] = p_list
-                new_user_obj_dict_list.append(per_obj)
-                continue
-            leader_obj_name = Users.query.filter(Users.id == per_obj['leader_dmp_user_id']).first().dmp_username
-            dmp_group_name = dmp_group_obj.dmp_group_name
-            group_permissions_list = dmp_group_obj.permissions
-            p_list = []
-            for p in group_permissions_list:
-                p_dict = {}
-                p_dict['id'] = p.id
-                p_dict['dmp_permission_name'] = p.dmp_permission_name
-                p_dict['route'] = p.route
-                p_list.append(p_dict)
-
-            per_obj['leader_name'] = leader_obj_name
-            per_obj['dmp_group_name'] = dmp_group_name
-            per_obj['u_group_permission'] = p_list
-            new_user_obj_dict_list.append(per_obj)
-
-        return jsonify({
-            'status': 0,
-            'msg': 'Display all user information',
-            'results': new_user_obj_dict_list
-        })
-    # 管理员、教师登录，只需要显示用户的直属管理者是谁即可
-    else:
-        teacher_obj_dict = session.get('user')
-        all_students_list = Users.query.filter(Users.leader_dmp_user_id == teacher_obj_dict['id']).all()
-        stu_obj_dict_list = [u.user_to_dict() for u in all_students_list]
-        new_stu_obj_dict_list = []
-        for per_obj in stu_obj_dict_list:
-            dmp_group_obj = Groups.query.filter(Groups.id == per_obj['dmp_group_id']).first()
-            dmp_group_name = dmp_group_obj.dmp_group_name
-            leader_obj_name = Users.query.filter(
-                Users.leader_dmp_user_id == teacher_obj_dict['id']).first().dmp_username
-
-            group_permissions_list = dmp_group_obj.permissions
-            p_list = []
-            for p in group_permissions_list:
-                p_dict = {}
-                p_dict['id'] = p.id
-                p_dict['dmp_permission_name'] = p.dmp_permission_name
-                p_dict['route'] = p.route
-                p_list.append(p_dict)
-
-            per_obj['leader_name'] = leader_obj_name
-            per_obj['dmp_group_name'] = dmp_group_name
-            per_obj['u_group_permission'] = p_list
-            new_stu_obj_dict_list.append(per_obj)
-
-        return jsonify({
-            'status': 0,
-            'msg': 'Display all user information',
-            'results': new_stu_obj_dict_list
-        })
+    if request.method == 'GET':
+        # 获取用户列表
+        try:
+            auth_token = request.headers.get('Authorization')
+            res = PuttingData.get_obj_data(Users, auth_token)
+            if res.get('dmp_group_id') == 1:
+                all_user_obj_list = Users.query.all()
+                new_user_obj_dict_list = EnvelopedData.ulist(all_user_obj_list, res=None)
+                return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
+            # 管理员、教师登录，只需要显示用户的直属管理者是谁即可
+            else:
+                all_students_list = Users.query.filter(Users.leader_dmp_user_id == res['id']).all()
+                new_stu_obj_dict_list = EnvelopedData.ulist(all_students_list, res)
+                return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_stu_obj_dict_list)
+        except Exception as err:
+            return resp_hanlder(code=999, err=err)
 
 
-
-@user.route("/info/", methods=["get"], defaults={"desc": "用户资料"})
+@user.route("/info/", methods=["GET"], defaults={"desc": "用户资料"})
 def info(desc):
-    # 默认返回当前用户信息，若传dmp_user_id参数，则返回指定id的用户信息
-    # 返回json中包含当前用户的权限信息
-    id = request.form.get('dmp_user_id')
-    if not id:
-        current_user_dict = session.get('user')
-        current_obj = Users.query.filter(Users.id == current_user_dict['id']).first()
-        dmp_group_name = Groups.query.filter(Groups.id == current_user_dict['dmp_group_id']).first().dmp_group_name
-        u_group = current_obj.groups
-        u_group_permissions_list = u_group.permissions
-        u_list = []
-        for p in u_group_permissions_list:
-            p_dict = {}
-            p_dict['id'] = p.id
-            p_dict['dmp_permission_name'] = p.dmp_permission_name
-            p_dict['route'] = p.route
-            u_list.append(p_dict)
-        current_user_dict['dmp_group_name'] = dmp_group_name
-        current_user_dict['u_group_permission'] = u_list
-        # 如果是管理员登录，则直属管理者只显示管理员
-        if current_obj.dmp_group_id == 1:
-            root_list_obj = Users.query.filter(Users.dmp_group_id == 1).all()
-            r_list = []
-            for u in root_list_obj:
-                l_dict = {}
-                l_dict['id'] = u.id
-                l_dict['dmp_username'] = u.dmp_username
-                r_list.append(l_dict)
-            current_user_dict['leader_list'] = r_list
-        else:
-            # 教师及学生登录时，则展示所有管理员及教师--直属管理者
-            from operator import or_
+    if request.method == 'GET':
+        # 默认返回当前用户信息，若传dmp_user_id参数，则返回指定id的用户信息
+        # 返回json中包含当前用户的权限信息
+        try:
+            data = request.json
+            dmp_user_id = data.get('dmp_user_id')
+            auth_token = request.headers.get('Authorization')
+            res = PuttingData.get_obj_data(Users, auth_token)
+            # 没有dmp_user_id:表示当前用户信息
+            if not dmp_user_id:
+                current_obj = Users.query.filter(Users.id == res['id']).first()
+                dmp_group_name = Groups.query.filter(Groups.id == res['dmp_group_id']).first().dmp_group_name
+                u_group = current_obj.groups
+                ret = EnvelopedData.info_s2_data(u_group, res, dmp_group_name)
+
+                # 如果是管理员登录，则直属管理者只显示管理员
+                if current_obj.dmp_group_id == 1:
+                    root_list_obj = Users.query.filter(Users.dmp_group_id == 1).all()
+                    new_res = EnvelopedData.info_s1_data(root_list_obj, ret)
+                else:
+                    # 教师及学生登录时，则展示所有管理员及教师--直属管理者
+                    user_obj_list = Users.query.filter(or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
+                    new_res = EnvelopedData.info_s1_data(user_obj_list, ret)
+                return resp_hanlder(code=3002, msg=RET.alert_code[3002], result=new_res)
+
+            get_user_info_obj = Users.query.filter(Users.id == dmp_user_id).first()
+            get_user_info_dict = get_user_info_obj.__json__()
+            u_group = get_user_info_obj.groups
+            dmp_group_name = Groups.query.filter(Groups.id == get_user_info_dict['dmp_group_id']).first().dmp_group_name
+            ret = EnvelopedData.info_s2_data(u_group, get_user_info_dict, dmp_group_name)
+
+            # 展示所有管理员及教师
             user_obj_list = Users.query.filter(or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
-            l_list = []
-            for u in user_obj_list:
-                l_dict = {}
-                l_dict['id'] = u.id
-                l_dict['dmp_username'] = u.dmp_username
-                l_list.append(l_dict)
-            current_user_dict['leader_list'] = l_list
-        return jsonify({
-            'status': 0,
-            'msg': 'Returns the current user object information by default',
-            'results': current_user_dict
-        })
-    get_user_info_obj = Users.query.filter(Users.id == id).first()
-    get_user_info_dict = get_user_info_obj.user_to_dict()
-    u_group = get_user_info_obj.groups
-    u_group_permissions_list = u_group.permissions
-    u_list = []
-    for p in u_group_permissions_list:
-        p_dict = {}
-        p_dict['id'] = p.id
-        p_dict['dmp_permission_name'] = p.dmp_permission_name
-        p_dict['route'] = p.route
-        u_list.append(p_dict)
-    get_user_info_dict['u_group_permission'] = u_list
+            new_ret = EnvelopedData.info_s1_data(user_obj_list, ret)
+            return resp_hanlder(code=3003, msg=RET.alert_code[3003], result=new_ret)
 
-    # 展示所有管理员及教师
-    from operator import or_
-    user_obj_list = Users.query.filter(or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
-    l_list = []
-    for u in user_obj_list:
-        l_dict = {}
-        l_dict['id'] = u.id
-        l_dict['dmp_username'] = u.dmp_username
-        l_list.append(l_dict)
-    get_user_info_dict['leader_list'] = l_list
-
+        except Exception as err:
+            return resp_hanlder(code=999, err=err)
 
 
 @user.route("/icon/", methods=["POST"], defaults={"desc": "修改头像"})
 def icon(desc):
-    from dmp.utils.uuid_str import uuid_str
-    current_obj_dict = session.get('user')
-    current_obj = Users.query.filter(Users.id == current_obj_dict['id']).first()
+    if request.method == 'POST':
+        try:
+            auth_token = request.headers.get('Authorization')
+            res = PuttingData.get_obj_data(Users, auth_token)
+            data = request.json
+            icon_obj_str = data.get('bin')
+            current_obj = Users.query.filter(Users.id == res['id']).first()
+            icon_data = base64.b64decode(icon_obj_str)
+            icon_name = uuid_str() + '.jpg'
+            save_url = config['default'].SAVE_URL
+            icon = open(save_url + icon_name, 'wb')
+            icon.write(icon_data)
+            icon.close()
+            icon_obj = os.path.join(config['default'].ICON_URL, icon_name)
+            if os.path.exists(save_url + icon_name):
+                origin_icon = current_obj.icon
+                if origin_icon == None or origin_icon == '':
+                    pass
+                elif origin_icon != None or origin_icon != '':
+                    # 在linux下路径分隔符需要改变
+                    origin_icon_name = origin_icon.split('/')[-1]
+                    os.remove(os.path.join(save_url, origin_icon_name))
+            current_obj.icon = icon_obj
+            db.session.add(current_obj)
+            db.session.commit()
+            icon_url = current_obj.__json__().get('icon')
+            return resp_hanlder(code=4001, msg=RET.alert_code[4001], result=icon_url)
+        except Exception as err:
+            db.session.rollback()
+            return resp_hanlder(code=999, err=err)
 
-    icon_obj_str = request.form.get('bin')
-    icon_data = base64.b64decode(icon_obj_str)
-    icon_name = uuid_str() + '.jpg'
-    save_url = 'dmp/static/icon/'
-
-    icon = open(save_url + icon_name, 'wb')
-    icon.write(icon_data)
-    icon.close()
-    icon_obj = 'http://localhost:7789/static/icon/' + icon_name
-
-    if os.path.exists(save_url + icon_name):
-        origin_icon = current_obj.icon
-        origin_icon_name = origin_icon.split('/')[-1]
-        if origin_icon == None or origin_icon == '':
-            pass
-        elif origin_icon != None or origin_icon != '':
-            os.remove(os.path.join(save_url, origin_icon_name))
-
-    current_obj.icon = icon_obj
-    db.session.add(current_obj)
-    db.session.commit()
-
-    icon_url = current_obj.user_to_dict()['icon']
-    return jsonify({
-        'status': 0,
-        'msg': 'User profile photo uploaded successfully',
-        'results': icon_url
-    })
-
-
-# 问题1：管理员单一添加默认的所属组是学生，直属管理者归为root1
-# 添加所属组(相当于给用户分配权限)、直属管理者参数(默认不修改权限，修改权限到修改用户组那一栏修改)
 
 @user.route("/changeprofile/", methods=["PUT"], defaults={"desc": "修改资料"})
 def changeprofile(desc):
+    if request.method == 'PUT':
+        # 修改信息-不允许修改权限信息(与用户组关联),展示的时候默认阴影，不能勾选；要是想修改权限，只能修改用户组权限
+        dmp_user_id = request.form.get('dmp_user_id')
+        passwd = request.form.get('password')
+        email = request.form.get('email')
+        confirmed = request.form.get('confirmed')
+        dmp_group_id = request.form.get('dmp_group_id')
+        leader_dmp_user_id = request.form.get('leader_dmp_user_id')
+        auth_token = request.headers.get('Authorization')
+        res = PuttingData.get_obj_data(Users, auth_token)
+        if not dmp_user_id:
+            try:
+                current_obj = Users.query.filter(Users.id == res['id']).first()
+                EnvelopedData.changeprofile(current_obj, email, passwd, dmp_group_id,
+                                            confirmed, leader_dmp_user_id)
+                # 构建返回数据:包括用户对应的用户组及用户组权限
+                select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
+                ret_obj = Users.query.filter(Users.id == res['id']).first()
+                ret_obj_dict = ret_obj.__json__()
+                ret_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, ret_obj_dict)
 
-    dmp_user_id = request.form.get('dmp_user_id')
-    # dmp_username = request.form.get('dmp_username')
-    # real_name = request.form.get('real_name')
-    passwd = request.form.get('password')
-    email = request.form.get('email')
-    confirmed = request.form.get('confirmed')
-
-    dmp_group_id = request.form.get('dmp_group_id')
-    leader_dmp_user_id = request.form.get('leader_dmp_user_id')
-
-    if not dmp_user_id:
+                return resp_hanlder(code=3004, msg=RET.alert_code[3004], result=ret_obj_dict)
+            except:
+                db.session.rollback()
+                return resp_hanlder(code=3005, msg=RET.alert_code[3005])
         try:
-            current_user_dict = session.get('user')
-            current_obj = Users.query.filter(Users.id == current_user_dict['id']).first()
-            current_obj.email = email
-            current_obj.passwd = passwd
-            current_obj.dmp_group_id = dmp_group_id
-
-            # 如果leader_dmp_user_id为空，表示的是超级管理员，不直属与任何一个用户
-            if current_obj.leader_dmp_user_id == None:
-                return jsonify({
-                    'status': -1,
-                    'msg': 'The super administrator is not directly affiliated with anyone',
-                    'results': {}
-                })
-
-            # 当前用户的直属管理者 改为 选择对象的id  ---自关联
-            choose_leader_obj = Users.query.filter(Users.id == leader_dmp_user_id).first()
-            current_obj.leader_dmp_user_id = choose_leader_obj.id
-
-            current_obj.leader_dmp_user_id = leader_dmp_user_id
-            current_obj.confirmed = True if confirmed else False
-            db.session.commit()
-            # 构建返回数据:包括用户对应的用户组及用户组权限
+            choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
+            choose_user_obj_dict = choose_user_obj.__json__()
+            EnvelopedData.changeprofile(choose_user_obj, email, passwd, dmp_group_id, confirmed, leader_dmp_user_id)
             select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
-            select_obj_permissions_list = select_group_obj.permissions
-            s_list = []
-            for p in select_obj_permissions_list:
-                p_dict = {}
-                p_dict['id'] = p.id
-                p_dict['dmp_permission_name'] = p.dmp_permission_name
-                p_dict['route'] = p.route
-                s_list.append(p_dict)
+            choose_user_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, choose_user_obj_dict)
 
-            ret_obj = Users.query.filter(Users.id == current_user_dict['id']).first()
-            ret_obj_dict = ret_obj.user_to_dict()
-            ret_obj_dict['group_permission'] = s_list
-
-            return jsonify({
-                'status': 0,
-                'msg': 'The default user information has been changed',
-                'results': ret_obj_dict
-            })
-        except:
+            return resp_hanlder(code=3006, msg=RET.alert_code[3006], result=choose_user_obj_dict)
+        except Exception as err:
             db.session.rollback()
-            return jsonify({
-                'status': -1,
-                'msg': 'User information modification failed',
-                'results': {}
-            })
-    try:
-        choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
-        choose_user_obj_dict = choose_user_obj.user_to_dict()
-        choose_user_obj.email = email
-        choose_user_obj.passwd = passwd
-        choose_user_obj.dmp_group_id = dmp_group_id
-        # 构建返回数据:包括用户所属的直属管理者
-        # 如果leader_dmp_user_id为空，表示的是超级管理员，不直属与任何一个用户
-        if leader_dmp_user_id == None:
-            return jsonify({
-                'status': -1,
-                'msg': 'The super administrator is not directly affiliated with anyone',
-                'results': {}
-            })
-
-        choose_leader_obj = Users.query.filter(Users.id == leader_dmp_user_id).first()
-        choose_user_obj.leader_dmp_user_id = choose_leader_obj.id
-
-        choose_user_obj.leader_dmp_user_id = leader_dmp_user_id
-        choose_user_obj.confirmed = True if confirmed else False
-        db.session.commit()
-
-        select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
-        select_obj_permissions_list = select_group_obj.permissions
-        s_list = []
-        for p in select_obj_permissions_list:
-            p_dict = {}
-            p_dict['id'] = p.id
-            p_dict['dmp_permission_name'] = p.dmp_permission_name
-            p_dict['route'] = p.route
-            s_list.append(p_dict)
-        choose_user_obj_dict['group_permission'] = s_list
-
-        ret_obj = Users.query.filter(Users.id == dmp_user_id).first()
-        ret_obj_dict = ret_obj.user_to_dict()
-        ret_obj_dict['group_permission'] = s_list
-
-        result = {
-            'status': 0,
-            'msg': 'The currently selected user information has changed',
-            'results': ret_obj_dict
-        }
-        return jsonify(result)
-
-    except Exception:
-        db.session.rollback()
-        return jsonify({
-            'status': -1,
-            'msg': 'User information modification failed',
-            'results': {}
-        })
+            return resp_hanlder(code=3005, msg=RET.alert_code[3005], err=err)
 
 
-
-@user.route("/frozen/", methods=["POST"], defaults={"desc":"冻结用户"})
+@user.route("/frozen/", methods=["POST"], defaults={"desc": "冻结用户"})
 def frozen_user():
-    dmp_user_id = request.form.get('dmp_user_id')
-    if not dmp_user_id:
-        current_obj_dict = session.get('user')
-        frozen_user_obj = Users.query.filter(Users.id == current_obj_dict['id'])
-    else:
-        frozen_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
-    if frozen_user_obj.dmp_group_id == 1 and frozen_user_obj.leader_dmp_user_id == None:
-        return jsonify({
-            'status': -1,
-            'msg': 'The super administrator cannot freeze, please select another action',
-            'results': {}
-        })
-    frozen_user_obj.confirmed = False
-    db.session.commit()
-    return jsonify({
-        'status': 0,
-        'msg': 'This user has been frozen. Please contact the administrator if you need to defrost',
-        'results': {}
-    })
+    if request.method == 'POST':
+        data = request.json
+        dmp_user_id = data.get('dmp_user_id')
+
+        auth_token = request.headers.get('Authorization')
+        res = PuttingData.get_obj_data(Users, auth_token)
+        try:
+            # 没有dmp_user_id，默认冻结自己
+            if not dmp_user_id:
+                frozen_user_obj = Users.query.filter(Users.id == res['id'])
+            else:
+                frozen_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
+            # 超级管理员不可以冻结
+            if frozen_user_obj.dmp_group_id == 1 and frozen_user_obj.leader_dmp_user_id == None:
+                return resp_hanlder(code=4003, msg=RET.alert_code[4003])
+            frozen_user_obj.confirmed = False
+            db.session.commit()
+            return resp_hanlder(code=4004, msg=RET.alert_code[4004])
+        except Exception as err:
+            return resp_hanlder(code=999, err=err)
 
 
 @user.route("/del/", methods=["DELETE"], defaults={"desc": "删除用户"})
 def udel(desc):
-
-    dmp_user_id = request.form.get('dmp_user_id')
-    # 超级管理员无法删除
-    if dmp_user_id == "1":
-        return jsonify({
-            'status': -1,
-            'msg': 'The super administrator could not delete',
-            'results': {}
-        })
-    del_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
-    db.session.delete(del_user_obj)
-    db.session.commit()
-    return jsonify({
-        'status': 0,
-        'msg': 'User deletion successful',
-        'results': {}
-    })
+    if request.method == 'DELETE':
+        dmp_user_id = request.form.get('dmp_user_id')
+        del_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
+        # 超级管理员无法删除
+        if del_user_obj.dmp_group_id == 1 and del_user_obj.leader_dmp_user_id == None:
+            return resp_hanlder(code=4005, msg=RET.alert_code[4005])
+        # 删除管理员-用户组列表的管理员数量减一
+        elif del_user_obj.dmp_group_id == 1 and del_user_obj.leader_dmp_user_id != None:
+            root_obj_group = Groups.query.filter(Groups.id == del_user_obj.dmp_group_id).first()
+            root_obj_group.max_count -= 1
+            db.session.delete(del_user_obj)
+            db.session.commit()
+        else:
+            db.session.delete(del_user_obj)
+            db.session.commit()
+            return resp_hanlder(code=4006, msg=RET.alert_code[4006])
 
 
 @user.before_request
 def before_request():
     rbac_middleware()
-

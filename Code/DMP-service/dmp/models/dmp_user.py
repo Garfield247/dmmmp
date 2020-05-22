@@ -20,6 +20,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 from dmp.models import DMPModel
 from dmp.extensions import db
+from dmp.utils.response_hanlder import resp_hanlder, RET
 
 
 class Users(db.Model, DMPModel):
@@ -73,7 +74,7 @@ class Users(db.Model, DMPModel):
         '''用户登录后，发放有效的 JWT'''
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=1800),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=3600),
                 'iat': datetime.datetime.utcnow(),
                 'user_id': self.id
             }
@@ -101,81 +102,68 @@ class Users(db.Model, DMPModel):
             return 'Invalid token. Please log in again.'
 
 
-
-
-
-    def generate_activate_token(self, expires_in=3600):   #到期时间为3600秒
-        s = Serializer(current_app.config['SECRET_KEY'], expires_in)
-        return s.dumps({'id': self.id})
-
-    # 账户激活，因为激活时还不知道是哪个用户
     @staticmethod
-    def check_activate_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        try:
-            data = s.loads(token)
-        except BadSignature:
-            return jsonify({
-                'status': 201,
-                'msg': 'Useless token, please resend it again',
-                'results': {}
-            })
-        except SignatureExpired:
-            return jsonify({
-                'status': 201,
-                'msg': 'Token have lost effectiveness, please resend it again',
-                'results': {}
-            })
-        user = Users.query.get(data.get('id'))
+    def check_activate_token(res):
+        # 激活邮箱
+        user = Users.query.get(res.get('id'))
         if not user:
-            return jsonify({
-                'status': -1,
-                'msg': 'The activated account does not exist',
-                'results': {}
-            })
+            return resp_hanlder(code=1008, msg=RET.alert_code[1008], result={})
         if not user.confirmed:
             user.confirmed = True
             db.session.add(user)
         return True
 
-    @staticmethod
-    def reset_password(token, new_password):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        try:
-            data = s.loads(token.encode('utf-8'))
-        except BadSignature:
-            return jsonify({
-                'status': 201,
-                'msg': 'Useless token, please resend it again',
-                'results': {}
-            })
-        except SignatureExpired:
-            return jsonify({
-                'status': 201,
-                'msg': 'Token have lost effectiveness, please resend it again',
-                'results': {}
-            })
-        user = Users.query.get(data.get('id'))  # 当查询条件为模型的主键时，可以直接用get进行查询，拿到对应的User模型
-        user.passwd = new_password
-        db.session.add(user)
-        return True
+    @classmethod
+    def reset_password(cls, token, new_password):
+        res = cls.decode_auth_token(token)
+        if not isinstance(res, str):
+            user = Users.query.filter(Users.id == res).first()
+            user.password = new_password
+            db.session.add(user)
+            return True
+        else:
+            return res
 
-    # groups = db.relationship('Groups', backref='users')
-    # leader = db.relationship('Users', backref='leader')
+
+
+    # def generate_activate_token(self, expires_in=3600):   #到期时间为3600秒
+    #     s = Serializer(current_app.config['SECRET_KEY'], expires_in)
+    #     return s.dumps({'id': self.id})
+
+
+    # @staticmethod
+    # def reset_password(token, new_password):
+    #     s = Serializer(current_app.config['SECRET_KEY'])
+    #     try:
+    #         data = s.loads(token.encode('utf-8'))
+    #     except BadSignature:
+    #         return jsonify({
+    #             'status': 201,
+    #             'msg': 'Useless token, please resend it again',
+    #             'results': {}
+    #         })
+    #     except SignatureExpired:
+    #         return jsonify({
+    #             'status': 201,
+    #             'msg': 'Token have lost effectiveness, please resend it again',
+    #             'results': {}
+    #         })
+    #     user = Users.query.get(data.get('id'))  # 当查询条件为模型的主键时，可以直接用get进行查询，拿到对应的User模型
+    #     user.passwd = new_password
+    #     db.session.add(user)
+    #     return True
 
     @property
     def password(self):
-        """密码保护"""
-        raise AttributeError('密码是不可读属性')
+        raise AttributeError("password is not a readable attribute!")
 
     @password.setter
     def password(self, password):
-        """设置密码，加密存储"""
-        self.password_hash = generate_password_hash(password)
+        self.passwd = generate_password_hash(password)
 
     def verify_password(self, password):
-        """密码校验"""
-        return check_password_hash(self.password_hash, password)
+        """验证密码"""
+        return check_password_hash(self.passwd, password)
 
 
     # def generate_activate_token(self, expires_in=3600):
@@ -285,24 +273,24 @@ class Users(db.Model, DMPModel):
     #     db.session.commit()
     #     current_app.logger.info("create test user complete!")
 
-    @classmethod
-    def create_test_user(cls):
-        test_user = {
-            "admin_test": 1,
-            "teacher_test": 2,
-            "student_test": 3
-        }
-        for k, v in test_user.items():
-            user = Users()
-            user.dmp_username = k
-            user.real_name = k
-            user.email = "%s@test.com" % k
-            user.passwd = "123456"
-            user.confirmed = True
-            user.dmp_group_id = k
-            db.session.add(user)
-        db.session.commit()
-        current_app.logger.info("create test user complete!")
+    # @classmethod
+    # def create_test_user(cls):
+    #     test_user = {
+    #         "admin_test": 1,
+    #         "teacher_test": 2,
+    #         "student_test": 3
+    #     }
+    #     for k, v in test_user.items():
+    #         user = Users()
+    #         user.dmp_username = k
+    #         user.real_name = k
+    #         user.email = "%s@test.com" % k
+    #         user.passwd = "123456"
+    #         user.confirmed = True
+    #         user.dmp_group_id = k
+    #         db.session.add(user)
+    #     db.session.commit()
+    #     current_app.logger.info("create test user complete!")
 
 
     # def __init__(self, **kwargs):

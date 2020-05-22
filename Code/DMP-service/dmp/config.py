@@ -44,15 +44,22 @@ class DevelopmentConfig(Config):
     # UPLOADED
     UPLOADED_PATH = os.path.join(base_dir, "static/upload")
 
+    # ICON_URL
+    SAVE_URL = 'dmp/static/icon/'
+    ICON_URL = 'http://localhost:7789/static/icon/'
+
     DEBUG = True
     # White_list
     WHITE_LIST = [
         r"^/user/login/",
-        r"^/static/",
+        r"^/static/.*",
         r"^/user/register/$",
-        r"^/user/logout/$",
+        # r"^/user/logout/$",
         r"^/user/icon/$",
         r"^/user/activate/.*",
+        r"^/user/changepwd/",
+        r"^/user/forgetpwd/",
+        r"^/user/gettoken/.*",
         r"^/verifier/email/",
         r"^/verifier/username/",
     ]

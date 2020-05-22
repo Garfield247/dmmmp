@@ -5,6 +5,7 @@
 
 from flask import Blueprint, jsonify, request
 from dmp.models import Users
+from dmp.utils.response_hanlder import resp_hanlder, RET
 
 verifier = Blueprint("verifier", __name__)
 
@@ -14,22 +15,8 @@ def email(desc):
     email = request.form.get('email')
     user_email_obj = Users.query.filter(Users.email == email).first()
     if user_email_obj:
-        result = {
-            "status": -1,
-            "msg": "Mailbox has been used, you should change the mailbox!",
-            "results": {
-                "exist": True,
-            }
-        }
-        return jsonify(result)
-    result = {
-        "status": 0,
-        "msg": "Mailbox can be used, you can use it!",
-        "results": {
-            "exist": False,
-        }
-    }
-    return jsonify(result)
+        return resp_hanlder(code=1010, msg=RET.alert_code[1010], result={"exist": True})
+    return resp_hanlder(code=1011, msg=RET.alert_code[1011], result={"exist": False})
 
 
 @verifier.route("/username/", methods=["POST"], defaults={"desc": "验证用户名占用"})
@@ -37,19 +24,5 @@ def username(desc):
     username = request.form.get('username')
     user_obj = Users.query.filter(Users.dmp_username == username).first()
     if user_obj:
-        result = {
-            "status": -1,
-            "msg": "Username has been used, you should change the username!",
-            "results": {
-                "exist": True,
-            }
-        }
-        return jsonify(result)
-    result = {
-        "status": 0,
-        "msg": "Username can be used, you can use it!",
-        "results": {
-            "exist": False,
-        }
-    }
-    return jsonify(result)
+        return resp_hanlder(code=1012, msg=RET.alert_code[1012], result={"exist": True})
+    return resp_hanlder(code=1013, msg=RET.alert_code[1013], result={"exist": False})
