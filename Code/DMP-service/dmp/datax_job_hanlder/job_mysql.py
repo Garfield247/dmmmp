@@ -22,7 +22,7 @@ def mysql_reader(username,password,column,host,port,db,table,where,querySql):
     """
 
     mysql_reader_josn = {
-        "name": "mysql_reader",
+        "name": "mysqlreader",
         "parameter": {
             "username": username,
             "password": password,
@@ -61,7 +61,7 @@ def mysql_writer(model,username,password,column,host,port,db,table,preSql,postSq
         3:"update",
     }
     mysql_writer_json = {
-        "name":"mysql_writer",
+        "name":"mysqlwriter",
         "parameter":{
             "writeMode": model_dict.get(model),
             "username": username,
