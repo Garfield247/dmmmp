@@ -5,6 +5,7 @@
 
 
 import os
+from flask import current_app
 from dmp.datax_job_hanlder import *
 def test():
     r = mongodb_reader(host="192.168.3.119",port=27017,db_name="case01",collection_name="yingcai_data",username=None,password=None)

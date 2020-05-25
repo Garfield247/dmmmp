@@ -14,7 +14,7 @@ def mongodb_reader(host,port,username,password,db_name,collection_name):
                       "collectionName": collection_name,
                       "column": []
                   }}
-    pass
+    return mongodb_reader_json
 
 
 def mongodb_writer(host,port,username,password,db_name,collection_name,column):
@@ -42,3 +42,4 @@ def mongodb_writer(host,port,username,password,db_name,collection_name,column):
                   "column": column,
               }
           }
+    return mongodb_writer_json
