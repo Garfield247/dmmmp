@@ -17,8 +17,8 @@ def job_hanlder(reader, writer):
                 }
             },
             "content": {
-                reader: reader,
-                writer: writer
+                "reader": reader,
+                "writer": writer
             }
         }
     }
