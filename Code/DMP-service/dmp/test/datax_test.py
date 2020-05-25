@@ -11,4 +11,4 @@ def test():
     w = mysql_writer(host="192.168.3.87",port=3306,db="database",table="test_yc")
     job_jsonpath = job_hanlder(reader=r,writer=w)
 
-    os.system("python /root/datax/bin/datax.py %s"%job_jsonpath)
+    os.system("/usr/bin/python2.7 /home/dmp/datax/bin/datax.py %s"%job_jsonpath)

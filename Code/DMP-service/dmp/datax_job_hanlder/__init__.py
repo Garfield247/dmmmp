@@ -22,7 +22,7 @@ def job_hanlder(reader, writer):
             }
         }
     }
-    filename = "/root/job/test_job.json"
+    filename = "/home/dmp/job/test_job.json"
     with open(filename,"w",encoding="utf-8") as fp:
         fp.write(json.dumps(job_json,ensure_ascii=False))
     return filename
