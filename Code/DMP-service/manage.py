@@ -76,7 +76,10 @@ def sys_init():
     Groups.init_group()
     from dmp.models import Users
     Users.create_test_user()
-
+@manager.command
+def test_datax():
+    from dmp.test.datax_test import test
+    test()
 
 @manager.option('-n', '-dmp_username', dest='dmp_username')
 @manager.option('-r', '-real_name', dest='real_name')
