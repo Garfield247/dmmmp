@@ -176,15 +176,7 @@ def forgetpwd(desc):
     return jsonify(result)
 
 
-@user.route("/changepwd/", methods=["PUT"], defaults={"desc": "重设密码"})
-def changepwd(desc):
-    result = {
-        "status": 0,
-        "msg": "success",
-        "results": {
-        }
-    }
-    return jsonify(result)
+
 
 
 @user.route('/gettoken/<token>', methods=['GET'])
@@ -196,8 +188,8 @@ def gettoken(token):
     })
 
 
-@user.route('/changepwd/', methods=['POST'])
-def changepwd():
+@user.route("/changepwd/", methods=["PUT"], defaults={"desc": "重设密码"})
+def changepwd(desc):
     token = request.form.get('token')
     newpassword = request.form.get('newpassword')
     success = Users.reset_password(token, newpassword)
