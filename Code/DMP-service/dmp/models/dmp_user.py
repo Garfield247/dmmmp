@@ -95,13 +95,13 @@ class Users(db.Model, DMPModel):
             user = Users()
             user.dmp_username = k
             user.real_name = k
-            user.email = "%s@test.com" % k
+            user.email = "%s@test_html.com" % k
             user.passwd = "123456"
             user.confirmed = True
             user.dmp_group_id = k
             db.session.add(user)
         db.session.commit()
-        current_app.logger.info("create test user complete!")
+        current_app.logger.info("create test_html user complete!")
 
     def __init__(self, **kwargs):
         super(Users, self).__init__(**kwargs)

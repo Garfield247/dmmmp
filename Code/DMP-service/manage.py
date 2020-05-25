@@ -62,7 +62,7 @@ def create_test_db_table_data():
             dmp_database_id=random.choice(Database.query.all()).id,
             dmp_case_id=random.choice(Case.query.all()).id
         )
-        app.logger.info("add test data :" + str(new_test_table))
+        app.logger.info("add test_html data :" + str(new_test_table))
 
 
 # 初始化
