@@ -30,7 +30,7 @@ def test():
                                                              "company_addr", "salary", "edu", "experience", "job_info",
                                                              "job_location", "source"
                                                              ]
-    w = mysql_writer(model=1,host="192.168.3.87",port=3306,username="root",password="shtd123.",column=mysql_column,db="database",table="test_yc",preSql=None,postSql=None)
-    job_jsonpath = job_hanlder(reader=r,writer=w)
+    w = mysql_writer(model=1,host="192.168.3.87",port=3306,username="root",password="shtd123.",column=mysql_column,db="dmo_test",table="test_yc",preSql=None,postSql=None)
 
-    os.system("/usr/bin/python2.7 /home/dmp/datax/bin/datax.py %s"%job_jsonpath)
+    job_hanlder.delay(reader=r,writer=w)
+

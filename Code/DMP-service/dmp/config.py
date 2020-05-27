@@ -42,6 +42,11 @@ class DevelopmentConfig(Config):
     # UPLOADED
     UPLOADED_PATH = os.path.join(base_dir, "static/upload")
 
+    # DataX
+    DATAX_PATH = os.environ.get("DATAX_HOME") or ""
+    DATAX_JOB_PATH = os.environ.get("DATAX_JOB_PATH") or ""
+    DATAX_LOG_PATH = os.environ.get("DATAX_LOG_PATH") or ""
+
     DEBUG = True
     # White_list
     WHITE_LIST = [
@@ -74,6 +79,10 @@ class TestingConfig(Config):
     # UPLOADED
     UPLOADED_PATH = os.path.join(base_dir, "static/upload")
 
+    # DataX
+    DATAX_PATH = os.environ.get("DATAX_HOME") or ""
+    DATAX_JOB_PATH = os.environ.get("DATAX_JOB_PATH") or ""
+    DATAX_LOG_PATH = os.environ.get("DATAX_LOG_PATH") or ""
 
 # 生产环境
 class ProductionConfig(Config):
@@ -86,6 +95,7 @@ class ProductionConfig(Config):
     CELERY_BROKER_URL = "redis://localhost:6379/2"
     # DB
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir, 'dmp.sqlite')
+
 
 
 # 配置字典
