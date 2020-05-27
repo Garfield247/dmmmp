@@ -3,16 +3,16 @@
 # @Date    : 2020/5/25
 # @Author  : SHTD 
 
-def mongodb_reader(host,port,username,password,db_name,collection_name):
+def mongodb_reader(host,port,db_name,collection_name,column,username=None,password=None):
     mongodb_reader_json = {
                   "name": "mongodbreader",
                   "parameter": {
                       "address": ["%s:%d"%(host,port)],
-                      "userName": "",
-                      "userPassword": "",
+                      "userName": username,
+                      "userPassword": password,
                       "dbName": db_name,
                       "collectionName": collection_name,
-                      "column": []
+                      "column": column,
                   }}
     return mongodb_reader_json
 

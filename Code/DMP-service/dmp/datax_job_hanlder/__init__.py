@@ -16,10 +16,10 @@ def job_hanlder(reader, writer):
                     "channel": 3
                 }
             },
-            "content": {
+            "content": [{
                 "reader": reader,
                 "writer": writer
-            }
+            }]
         }
     }
     filename = "/home/dmp/job/test_job.json"
