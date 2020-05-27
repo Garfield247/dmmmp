@@ -75,7 +75,7 @@ class TestingConfig(Config):
     CELERY_RESULT_BACKEND = "redis://192.168.3.87:6379/1"
     CELERY_BROKER_URL = "amqp://dmp:dmp123.@192.168.3.87:5672/dmpvhost"
     # db
-    SQLALCHEMY_DATABASE_URI = "mysql://root:shtd123.@192.168.3.87/3306/dmpdb?charset=utf-8"
+    SQLALCHEMY_DATABASE_URI = "mysql:pymysql//root:shtd123.@192.168.3.87/3306/dmpdb?charset=utf-8"
     # UPLOADED
     UPLOADED_PATH = os.path.join(base_dir, "static/upload")
 
