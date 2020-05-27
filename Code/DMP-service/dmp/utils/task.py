@@ -7,4 +7,4 @@ from dmp.extensions import celery
 
 @celery.task
 def add(x, y):
-    return x + yce
+    return x + y

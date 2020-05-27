@@ -15,7 +15,7 @@ from .job_hive import hive_reader, hive_writer
 
 
 
-@celery.task()
+@celery.task
 def job_hanlder(reader, writer):
     job_file_name = "dmp_data_job_" + str(uuid.uuid1())
     job_file_path = os.path.join(current_app.config.get("DATAX_JOB_PATH"),job_file_name)
