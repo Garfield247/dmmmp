@@ -4,9 +4,8 @@
 # @Author  : SHTD 
 
 
-import os
 from flask import current_app
-from dmp.datax_job_hanlder import *
+from dmp.utils.datax_job_hanlder import mongodb_reader,mysql_writer,job_hanlder
 def test():
     mongo_cloumn = [{"index": 1, "name": "job_name", "type": "string"},
                                                        {"index": 2, "name": "tag", "type": "string"},
@@ -32,5 +31,6 @@ def test():
                                                              ]
     w = mysql_writer(model=1,host="192.168.3.87",port=3306,username="root",password="shtd123.",column=mysql_column,db="dmo_test",table="test_yc",preSql=None,postSql=None)
 
-    job_hanlder.delay(reader=r,writer=w)
+    res = job_hanlder.delay(reader=r,writer=w)
+    current_app.logger.info(res)
 
