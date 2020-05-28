@@ -1,9 +1,14 @@
-from operator import or_
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Date    : 2020/5/6
+# @Author  : SHTD
 
 from flask import session
 
 from dmp.extensions import db
 from dmp.models import Groups, Users, Permissions
+from dmp.utils.put_data import PuttingData
+from dmp.utils.validation import ValidationEmail
 
 
 class EnvelopedData():
@@ -24,6 +29,16 @@ class EnvelopedData():
         per_obj['u_group_permission'] = p_list
         dict_list.append(per_obj)
         return dict_list
+
+    @staticmethod
+    def __user_profile(current_obj, email, passwd, dmp_group_id, confirmed, dmp_username, real_name):
+        current_obj.email = email
+        current_obj.password = passwd
+        current_obj.dmp_group_id = dmp_group_id
+        current_obj.confirmed = True if confirmed else False
+        current_obj.dmp_username = dmp_username
+        current_obj.real_name = real_name
+        return
 
     @staticmethod
     def info_s1_data(list_obj, res):
@@ -54,14 +69,6 @@ class EnvelopedData():
         new_ret_obj_dict['group_permission'] = u_list
         return new_ret_obj_dict
 
-    @staticmethod
-    def __user_profile(current_obj, email, passwd, dmp_group_id, confirmed):
-        current_obj.email = email
-        current_obj.password = passwd
-        current_obj.dmp_group_id = dmp_group_id
-        current_obj.confirmed = True if confirmed else False
-        return
-
     @classmethod
     def ulist(cls, all_obj_list, res):
         obj_dict_list = [u.__json__() for u in all_obj_list]
@@ -82,8 +89,8 @@ class EnvelopedData():
         return new_obj_dict_list
 
     @classmethod
-    def changeprofile(cls, current_obj, email, passwd, dmp_group_id, confirmed, leader_dmp_user_id):
-        cls.__user_profile(current_obj, email, passwd, dmp_group_id, confirmed)
+    def changeprofile(cls, current_obj, email, passwd, dmp_group_id, confirmed, leader_dmp_user_id, dmp_username, real_name):
+        cls.__user_profile(current_obj, email, passwd, dmp_group_id, confirmed, dmp_username, real_name)
 
         # 如果leader_dmp_user_id为空，表示的是超级管理员，不直属与任何一个用户
         if current_obj.leader_dmp_user_id == None:
@@ -166,14 +173,16 @@ class EnvelopedData():
         return ret_data
 
     @classmethod
-    def total_users(cls):
-        teachers_list = Users.query.filter(Users.dmp_group_id == 2).all()
-        students_list = Users.query.filter(Users.dmp_group_id == 3).all()
-        teachers_max_count = Groups.query.filter(Groups.id == 2).first().max_count
-        students_max_count = Groups.query.filter(Groups.id == 3).first().max_count
-        if len(teachers_list) >= teachers_max_count:
-            return 'The number of teachers exceeds the maximum capacity of the teacher group. Please operate again'
-        if len(students_list) >= students_max_count:
-            return 'The number of students exceeds the maximum capacity of the student group. Please operate again'
-        else:
-            return True
+    def create_root(cls, rootgroup, user, email):
+        '''创建管理员用户'''
+        ret = PuttingData.put_data(rootgroup, user)
+        if isinstance(ret, str):
+            return ret
+        # 给Group用户组的管理员添加权限
+        rootgroup_permissions_list = rootgroup.permissions
+        rootgroup_permissions_list.clear()
+        permissions_list = Permissions.query.all()
+        for p in permissions_list:
+            rootgroup_permissions_list.append(p)
+        ValidationEmail().activate_email(user, email)
+        return

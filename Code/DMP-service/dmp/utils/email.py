@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
+# @Author  : SHTD
 
-from flask import current_app, render_template
+from flask import current_app
 from flask_mail import Message
+
 from dmp.extensions import mail
 from dmp.extensions import celery
 

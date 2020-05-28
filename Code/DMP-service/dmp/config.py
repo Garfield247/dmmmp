@@ -55,7 +55,7 @@ class DevelopmentConfig(Config):
         r"^/static/.*",
         r"^/user/register/$",
         # r"^/user/logout/$",
-        r"^/user/icon/$",
+        # r"^/user/icon/$",
         r"^/user/activate/.*",
         r"^/user/changepwd/",
         r"^/user/forgetpwd/",

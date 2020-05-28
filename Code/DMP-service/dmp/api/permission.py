@@ -4,6 +4,7 @@
 # @Author  : SHTD
 
 from flask import Blueprint, request
+
 from dmp.models import Permissions
 from dmp.utils.response_hanlder import resp_hanlder, RET
 

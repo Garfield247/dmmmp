@@ -4,16 +4,16 @@
 # @Author  : SHTD 
 
 import datetime
+
 from flask import current_app
+
 from dmp.extensions import db
 from .dmp_group_permission import group_permission
 from .dmp_group_rights import group_rights
 from dmp.models import DMPModel
 
 
-
 class Groups(db.Model, DMPModel):
-
     """用户组表"""
     __tablename__ = 'dmp_group'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='用户组ID')
@@ -37,7 +37,6 @@ class Groups(db.Model, DMPModel):
             'changed_on': self.changed_on,
         }
         return group_dict
-
 
     @classmethod
     def init_group(cls):
@@ -76,4 +75,3 @@ class Groups(db.Model, DMPModel):
 
         except Exception as err:
             current_app.logger.error(err)
-
