@@ -21,7 +21,7 @@ def job_hanlder(reader, writer):
     job_json = {
         "job": {
             "setting": {
-                "speend": {
+                "speed": {
                     "channel": 3
                 }
             },
