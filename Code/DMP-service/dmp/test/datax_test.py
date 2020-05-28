@@ -5,7 +5,8 @@
 
 
 from flask import current_app
-from dmp.utils.datax_job_hanlder import mongodb_reader,mysql_writer,job_hanlder
+from dmp.utils.datax_job_hanlder import mongodb_reader,mysql_writer
+from dmp.utils.task import job_hanlder
 def test():
     mongo_cloumn = [{"index": 1, "name": "job_name", "type": "string"},
                                                        {"index": 2, "name": "tag", "type": "string"},
