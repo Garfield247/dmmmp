@@ -80,7 +80,7 @@ class TestingConfig(Config):
     UPLOADED_PATH = os.path.join(base_dir, "static/upload")
 
     # DataX
-    DATAX_PATH = os.environ.get("DATAX_HOME") or ""
+    DATAX_HOME = os.environ.get("DATAX_HOME") or ""
     DATAX_JOB_PATH = os.environ.get("DATAX_JOB_PATH") or ""
     DATAX_LOG_PATH = os.environ.get("DATAX_LOG_PATH") or ""
 
