@@ -35,7 +35,7 @@ def job_hanlder(reader, writer):
     with open(job_file_path,"w",encoding="utf-8") as fp:
         fp.write(json.dumps(job_json,ensure_ascii=False,indent=4))
 
-    task_commit_commamd = "python {Datax_path}/bin/datax.py {Datax_Job_path}"
+    task_commit_commamd = "python {Datax_path}/bin3/datax.py {Datax_Job_path}"
     os.system(task_commit_commamd.format(Datax_path = current_app.config.get("DATAX_HOME"),Datax_Job_path=job_file_path))
 
 
