@@ -26,7 +26,7 @@ def mysql_reader(username,password,column,host,port,db,table,where,querySql):
         "parameter": {
             "username": username,
             "password": password,
-            "column": column if column else ["*"],
+            "column": column,
             "connection": [
                 {
                 "querySql": [querySql],
@@ -66,7 +66,7 @@ def mysql_writer(model,username,password,column,host,port,db,table,preSql,postSq
             "writeMode": model_dict.get(model),
             "username": username,
             "password": password,
-            "column": column if column else [""],
+            "column": column,
             "preSql": preSql,
             "postSql":postSql,
             "connection": [

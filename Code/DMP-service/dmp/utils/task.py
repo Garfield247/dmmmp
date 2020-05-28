@@ -7,7 +7,7 @@ import os
 import uuid
 
 from flask import current_app
-
+from dmp.extensions import mail
 from dmp.extensions import celery
 
 @celery.task

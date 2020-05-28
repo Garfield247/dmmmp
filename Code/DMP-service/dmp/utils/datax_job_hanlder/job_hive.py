@@ -4,7 +4,7 @@
 # @Author  : SHTD 
 
 
-def hive_reader(host,port,path,column,fileType,fieldDelimiter,encoding,haveKerberos,kerberosKeytabFilePath,kerberosPrincipal):
+def hive_reader(host,port,path,fileType,haveKerberos,kerberosKeytabFilePath,kerberosPrincipal,column,fieldDelimiter=",",encoding="UTF-8",):
     """
 
     :param host:
@@ -24,10 +24,10 @@ def hive_reader(host,port,path,column,fileType,fieldDelimiter,encoding,haveKerbe
         "parameter": {
             "path": path,
             "defaultFS": "hdfs://%s:%d"%(host,port),
-            "column": column if column else ["*"],
+            "column": column ,
             "fileType": fileType,
             "encoding": encoding or "UTF-8",
-            "fieldDelimiter": fieldDelimiter or ",",
+            "fieldDelimiter": fieldDelimiter,
             "csvReaderConfig": {
                 "safetySwitch": False,
                 "skipEmptyRecords": False,
@@ -39,18 +39,17 @@ def hive_reader(host,port,path,column,fileType,fieldDelimiter,encoding,haveKerbe
 
 
 
-def hive_writer(host,port):
+def hive_writer(host,port,path,filename,column,fieldDelimiter=","):
     hive_writer_json = {
         "name": "hdfs_writer",
         "parameter": {
             "defaultFS": "hdfs://%s:%d"%(host,port),
-            "fileType": "orc",
-            "path": "/user/hive/warehouse/writerorc.db/orcfull",
-            "fileName": "xxxx",
-            "column": [],
+            "fileType": "text",
+            "path": path,
+            "fileName": filename,
+            "column": column,
             "writeMode": "append",
-            "fieldDelimiter": "\t",
-            "compress": "NONE"
+            "fieldDelimiter":fieldDelimiter,
         }
     }
-
+    return hive_writer_json
