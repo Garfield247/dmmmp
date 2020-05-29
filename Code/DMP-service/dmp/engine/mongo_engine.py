@@ -28,8 +28,10 @@ class MongodbEngine():
     def count(self,collection):
         return int(self.database[collection].count())
 
-    def retrieve(self):
-        pass
+    def retrieve(self,collection,query):
+        collection_ = self.database[collection]
+        res_= collection_.find(query,{"_id":0}).limit(100)
+        return  res_
 
     def close_conn(self):
         self.connect.close()
