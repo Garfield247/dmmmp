@@ -16,7 +16,15 @@ class MysqlEngine():
         except Exception:
             current_app.logger.error('发生异常')
 
-
+    def columns(self,table_name):
+        cursor = self.conn.cursor()
+        sql = """
+        Select COLUMN_NAME column, DATA_TYPE type from INFORMATION_SCHEMA.COLUMNS Where table_name = '{table_name}';
+        """
+        cursor.execute(sql.format(table_name=table_name))
+        _d = cursor.fetchall()
+        columns_type_list = [ {"column":column,"type":type} for column,type in _d]
+        return columns_type_list
 
 
 

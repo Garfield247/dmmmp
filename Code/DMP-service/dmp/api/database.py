@@ -73,6 +73,7 @@ def connect(desc):
                 current_app.logger.info(db_host)
                 conn = pymysql.connect(db_host, db_port, db_user, db_password, db_name, charset='utf8mb4')
                 current_app.logger.info(conn.server_version)
+                conn.close()
                 res = {"connect": "ok!"}
             except Exception as err:
                 return resp_hanlder(code=303, err=err)
@@ -81,6 +82,7 @@ def connect(desc):
                 from pymongo import MongoClient
                 conn = MongoClient(host=db_host, port=db_port, username=db_user, password=db_password)
                 current_app.logger.info(conn.server_info())
+                conn.close()
                 res = {"connect": "ok!"}
             except Exception as err:
                 return resp_hanlder(code=303, err=err)
@@ -90,6 +92,7 @@ def connect(desc):
                 conn = hive.Connection(host=db_host, port=db_port, username=db_user, password=db_password,
                                        database=db_name)
                 current_app.logger.info(conn.__dict__)
+                conn.close()
             except Exception as err:
                 return resp_hanlder(code=303, err=err)
         return resp_hanlder(result=res)
