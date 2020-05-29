@@ -26,7 +26,25 @@ class MysqlEngine():
         columns_type_list = [ {"column":column,"type":type} for column,type in _d]
         return columns_type_list
 
+    def count(self,table_name):
+        cursor = self.conn.cursor()
+        sql = """
+        Select count(*) form {table_name};
+        """
+        cursor.execute(sql.format(table_name=table_name))
+        _count = cursor.fetchall()
+        return int(_count[0][0])
 
+
+
+    def retrieve(self,table_name,where = "id > 0",limit=100):
+        cursor = self.conn.cursor()
+        sql = """
+        Select * from {table_name } where {where } limit {limit};
+        """
+        cursor.execute(sql.format(table_name=table_name,where=where,limit=limit))
+        res = cursor.fetchall()
+        return res
 
     def close_conn(self):
         self.conn.close()
