@@ -9,9 +9,9 @@ from flask import current_app
 
 class MongodbEngine():
 
-    def __init__(self, host, port, user, password, db):
+    def __init__(self, host, port, user, passwd, db):
         try:
-            self.connect = pymongo.MongoClient(host=host, port=port, username=user, password=password)
+            self.connect = pymongo.MongoClient(host=host, port=port, username=user, password=passwd)
             current_app.logger.info(self.connect.server_info())
             self.database = self.connect[db]
         except Exception as e:

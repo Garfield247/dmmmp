@@ -12,6 +12,7 @@ class DataTableColumn(db.Model, DMPModel):
     __tablename__ = 'dmp_data_table_column'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     dmp_data_table_column_name = db.Column(db.String(32), nullable=False, comment='列名')
+    dmp_data_table_column_type = db.Column(db.String(32), comment='数据类型')
     groupby = db.Column(db.Boolean, default=False, comment='可以进行分组')
     wherein = db.Column(db.Boolean, default=False, comment='可以区间筛选')
     isdate = db.Column(db.Boolean, default=False, comment='是否为时间日期字段')

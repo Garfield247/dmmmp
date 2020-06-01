@@ -113,7 +113,7 @@ DMP( *Data Management Platform*)数据管理平台
 | id             | int      | Primay Key |                                   |
 | dmp_datebase_name  | string   | Unique     | 数据显示名称                      |
 | dmp_user_id | Int      | 非空       | 所属用户ID                        |
-| db_type        | int      | 非空       | 数据库类型,hive:0,mysql:1,mongo:2 |
+| db_type        | int      | 非空       | 数据库类型,hive:1,mysql:2,mongo:3 |
 | db_host        | string   | 非空       | 数据库主机地址                    |
 | db_port        | int      | 非空       | 数据库端口号                      |
 | db_name        | string   |            | 数据库名称                        |
