@@ -1,4 +1,4 @@
-# SHTD-DMP-SERVER设计文档
+#  SHTD-DMP-SERVER设计文档
 
 DMP( *Data Management Platform*)数据管理平台
 
@@ -162,7 +162,7 @@ DMP( *Data Management Platform*)数据管理平台
 | dmp_data_table_id | int      | 非空               | 数据ID             |
 | dmp_data_table_column_name       | string   | 非空               | 列名               |
 | groupby           | boolearn | 默认FALSE          | 可以进行分组       |
-| Wherein           | boolearn | 默认FALSE          | 可以区间筛选       |
+| wherein          | boolearn | 默认FALSE          | 可以区间筛选       |
 | Isdate            | boolearn | 默认FALSE          | 是否为时间日期字段 |
 | description       | string   |                    | 字段说明           |
 ### 数据列区间
@@ -1592,13 +1592,27 @@ DMP( *Data Management Platform*)数据管理平台
 | http 请求方式 | POST                   |
 | 登陆保护      | 是                     |
 
- **请求参数**
+**请求数据**
+
+```
+{
+"dmp_data_table_id":2,
+columns:[
+{}
+]
+}
+```
+
+ 
+
+**请求参数**
 
 | 参数名 | 类型 | 是否必填 | 最大长度 | 参数说明 |
 | ------ | ---- | -------- | -------- | -------- |
 | id                | int      | 是||                    |
 | dmp_data_table_id | int      | 是||              |
 | dmp_data_table_column_name       | string   | 是||               列名               |
+| dmp_data_table_column_name | string | || 数据类型 |
 | groupby           | boolearn | 是||          可以进行分组       |
 | Wherein           | boolearn | 是||          可以区间筛选       |
 | Isdate            | boolearn | 是||          是否为时间日期字段 |

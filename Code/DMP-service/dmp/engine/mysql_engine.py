@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/11
-# @Author  : SHTD 
+# @Author  : SHTD
 
 import pymysql
 from flask import current_app
 
 class MysqlEngine():
 
-    def __int__(self,host,port,user,passwd,db):
+    def __init__(self,host,port,user,passwd,db):
 
         try:
             self.conn = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db=db)
@@ -19,11 +19,14 @@ class MysqlEngine():
     def columns(self,table_name):
         cursor = self.conn.cursor()
         sql = """
-        Select COLUMN_NAME column, DATA_TYPE type from INFORMATION_SCHEMA.COLUMNS Where table_name = '{table_name}';
+
+        Select COLUMN_NAME , DATA_TYPE  from INFORMATION_SCHEMA.COLUMNS Where table_name = '{table_name}';
+
         """
         cursor.execute(sql.format(table_name=table_name))
         _d = cursor.fetchall()
-        columns_type_list = [ {"column":column,"type":type} for column,type in _d]
+        columns_type_list = [
+            {"dmp_data_table_column_name": column, "dmp_data_table_column_type": dtype} for column, dtype in _d]
         return columns_type_list
 
     def count(self,table_name):

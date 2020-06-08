@@ -54,37 +54,40 @@ def column(desc):
         try:
             dmp_data_table_id = request.json.get("dmp_data_table_id")
             data_table_info = DataTable.get(dmp_data_table_id)
-            db_table_name = data_table_info.get("db_table_name")
+            current_app.logger.info(data_table_info.__json__())
+            db_table_name = data_table_info.db_table_name
             database_info = Database.get(data_table_info.dmp_database_id)
-            db_type = database_info.get("db_type")
-            db_host = database_info.get("db_host")
-            db_port = database_info.get("db_port")
-            db_name = database_info.get("db_name")
-            db_username = database_info.get("db_username")
-            db_passwd = database_info.get("db_passwd")
+            current_app.logger.info(database_info.__json__())
+            db_type = database_info.db_type
+            db_host = database_info.db_host
+            db_port = database_info.db_port
+            db_name = database_info.db_name
+            db_username = database_info.db_username
+            db_passwd = database_info.db_passwd
 
             colums4sdb = DataTableColumn.query.filter_by(dmp_data_table_id=dmp_data_table_id)
+            column4sdb_array = []
+            current_app.logger.info(colums4sdb.count())
             if colums4sdb.count()>0:
-                column4sdb_array = [col.__json__() for col in colums4db.all()]
-
-
+                column4sdb_array = [col.__json__() for col in colums4sdb.all()]
+            columns4db = []
             if db_type == 1:
                 # hive
                 pass
             elif db_type == 2:
                 # mysql
                 db = MysqlEngine(host=db_host,port=db_port,user=db_username,passwd=db_passwd,db=db_name)
-
+                columns4db = db.columns(db_table_name)
             elif db_type == 3:
                 # mongo
                 db = MongodbEngine(host=db_host,port=db_port,user=db_username,passwd=db_passwd,db=db_name)
-            columns4db = db.columns(db_table_name)
+                columns4db = db.columns(db_table_name)
             # dmp_data_table_column_name
-
+            current_app.logger.info(column4sdb_array)
             columns = []
             for i in columns4db:
                 mark=True
-                for j in colums4sdb:
+                for j in column4sdb_array:
                     if j.get("dmp_data_table_column_name") == i.get("dmp_data_table_column_name"):
                         columns.append(j)
                         mark = False
@@ -92,21 +95,50 @@ def column(desc):
                     columns.append(i)
             return resp_hanlder(result=columns)
         except Exception as err:
+            current_app.logger.error(err)
             return  resp_hanlder(code=999,err=err)
 
 
 @dbtable.route("/columnsetting/", methods=["POST"], defaults={"desc": "数据表的数据列设置"})
 def columnsetting(desc):
-    result = {
-        "status": 0,
-        "msg": "ok",
-        "results": {
-        }
-    }
-    return jsonify(result)
+    if request.method == "POST":
+        columns_info = request.json
+        dmp_data_table_id  = columns_info.get("dmp_data_table_id")
+        columns = columns_info.get("columns")
+        for col in columns:
+            column_id = col.get("id")
+            dmp_data_table_column_name = col.get("dmp_data_table_column_name")
+            dmp_data_table_column_type = col.get("dmp_data_table_column_type")
+            groupby = col.get("groupby")
+            wherein = col.get("wherein")
+            isdate = col.get("isdate")
+            description = col.get("description")
+
+            if column_id:
+                col_ = DataTableColumn.get(column_id)
+                col_.dmp_data_table_column_name = dmp_data_table_column_name
+                col_.dmp_data_table_column_type = dmp_data_table_column_type
+                col_.groupby = groupby
+                col_.wherein = wherein
+                col_.isdate = isdate
+                col_.description = description
+                col_.dmp_data_table_id = dmp_data_table_id
+                col_.put()
+            else:
+                col_ = DataTableColumn(
+                    dmp_data_table_column_name = dmp_data_table_column_name,
+                    dmp_data_table_column_type = dmp_data_table_column_type,
+                    groupby = groupby,
+                    wherein = wherein,
+                    isdate = isdate,
+                    description = description,
+                    dmp_data_table_id=dmp_data_table_id
+                )
+                col_.save()
+        return resp_hanlder(result="OK!")
 
 
-@dbtable.route("/del/", methods=["DEL"], defaults={"desc": "删除数据表"})
+@dbtable.route("/del/", methods=["DELETE"], defaults={"desc": "删除数据表"})
 def dbtdel(desc):
     if request.method == "DELETE":
         try:

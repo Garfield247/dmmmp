@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
+# @Author  : SHTD
 
 
 import os
@@ -52,17 +52,18 @@ def create_test_db_table_data():
     import random
     from dmp.models import Users, Case, Database
     from dmp.api.dbtable import post
-    count = 30
-    for i in range(count):
-        new_test_table = post(
-            dmp_data_table_name="dmp_test_dbtable_%d" % i,
-            db_table_name="dmp_test_db_table_name%d" % i,
-            description="测试表",
-            dmp_user_id=random.choice(Users.query.all()).id,
-            dmp_database_id=random.choice(Database.query.all()).id,
-            dmp_case_id=random.choice(Case.query.all()).id
-        )
-        app.logger.info("add test_html data :" + str(new_test_table))
+    # count = 30
+    # for i in range(count):
+    #     new_test_table = post(
+    #         dmp_data_table_name="dmp_test_dbtable_%d" % i,
+    #         db_table_name="dmp_test_db_table_name%d" % i,
+    #         description="测试表",
+    #         dmp_user_id=random.choice(Users.query.all()).id,
+    #         dmp_database_id=random.choice(Database.query.all()).id,
+    #         dmp_case_id=random.choice(Case.query.all()).id
+    #     )
+    #     app.logger.info("add test_html data :" + str(new_test_table))
+    
 
 
 # 初始化

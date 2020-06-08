@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
+# @Author  : SHTD
 
 import datetime
 from dmp.extensions import db
@@ -30,6 +30,7 @@ class FromMigrate(db.Model, DMPModel):
                                             comment='目标数据库ID')
     approve_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), comment='审批人')
 
+    form_type = db.Column(db.Integer, default=3, comment='表单类型')
     # submit_users = db.relationship('Users', backref='submitusers_from_migrate')
     # approve_users = db.relationship('Users', backref='approveusers_from_migrate')
     # datatable = db.relationship('DataTable', backref='datatable_from_migrate')

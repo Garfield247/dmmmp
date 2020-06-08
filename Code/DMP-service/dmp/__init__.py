@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
+# @Author  : SHTD
 
 import os
 import logging
@@ -31,7 +31,7 @@ def create_app(config_name):
     # 返回应用实例
 
     # RBAC权限拦截
-    app.before_request(rbac_middleware)
+    # app.before_request(rbac_middleware)
 
     # 返回应用实例
 

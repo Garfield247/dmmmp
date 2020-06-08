@@ -6,6 +6,7 @@
 from flask import Blueprint, jsonify, request, current_app
 from dmp.models import FromUpload,FromMigrate,FromDownload,FromAddDataTable,Users
 from dmp.utils import resp_hanlder
+from dmp.api.dbtable import post
 
 form = Blueprint("form",__name__)
 
@@ -28,7 +29,7 @@ def from_db(desc):
                 description = description,
                 submit_dmp_user_id = submit_dmp_user_id,
                 )
-            new_form.add()
+            new_form.save()
             current_app.logger.info(new_form.id)
             return resp_hanlder(result="OK")
         except Exception as err:
@@ -123,33 +124,37 @@ def download(desc):
             return resp_hanlder(code=999,err=err)
 
 def form_permission(user_id):
-    pass
+    if user_id:
+        return 3
 
 @form.route("/info/",methods=["GET"],defaults={"desc":"获取表单信息"})
 def info(desc):
     if request.method == "GET":
-        forms = [FromAddDataTable,FromUpload,FromMigrate,FromDownload,]
-        user_id = 1
+        forms = [FromAddDataTable,
+                FromUpload,
+                FromMigrate,
+                FromDownload,]
+        user_id = 2
         try:
             committed,pending,complete = [],[],[]
             if form_permission(user_id) == 1:
                 for _form in forms:
-                    committed.append([f.__json__() for f in _form.query.filter_by(submit_dmp_user_id=user_id,approve_result=0).all()])
-                    complete.append([f.__json__() for f in _form.query.filter(_form.submit_dmp_user_id==user_id,_form.approve_result!=0).all()])
-                resp_hanlder(result={"comiitted":committed,"complete":complete})
-            if form_permission(user_id) == 2:
+                    committed.extend([f.__json__() for f in _form.query.filter_by(submit_dmp_user_id=user_id,approve_result=0).all()])
+                    complete.extend([f.__json__() for f in _form.query.filter(_form.submit_dmp_user_id==user_id,_form.approve_result!=0).all()])
+                return resp_hanlder(result={"comiitted":committed,"complete":complete})
+            elif form_permission(user_id) == 2:
                 for _form in forms:
-                    committed.append([f.__json__() for f in _form.query.filter_by(submit_dmp_user_id=user_id,approve_result=0).all()])
-                    pending.append([f.__json__()  for f in _form.query.filter_by(submit_dmp_user_id=u.id,approve_result=0).all() for u in Users.query.filter_by(leader_dmp_user_id=user_id).all()] )
-                    complete.append([f.__json__() for f in _form.query.filter(_form.submit_dmp_user_id==user_id or _form.approve_dmp_user_id==user_id,_form.approve_result!=0).all()])
-                resp_hanlder(result={"comiitted":committed,"pending":pending,"complete":complete})
-            if form_permission(user_id) == 3:
+                    committed.extend([f.__json__() for f in _form.query.filter_by(submit_dmp_user_id=user_id,approve_result=0).all()])
+                    pending.extend([f.__json__()  for f in _form.query.filter_by(submit_dmp_user_id=u.id,approve_result=0).all() for u in Users.query.filter_by(leader_dmp_user_id=user_id).all()] )
+                    complete.extend([f.__json__() for f in _form.query.filter(_form.submit_dmp_user_id==user_id or _form.approve_dmp_user_id==user_id,_form.approve_result!=0).all()])
+                return resp_hanlder(result={"comiitted":committed,"pending":pending,"complete":complete})
+            elif form_permission(user_id) == 3:
                 for _form in forms:
-                    pending.append([f.__json__()  for f in _form.query.filter_by(approve_result=0).all() ] )
-                    complete.append([f.__json__() for f in _form.query.filter(_form.approve_result!=0).all()])
-                resp_hanlder(result={"pending":p,"complete":complete})
+                    pending.extend([f.__json__()  for f in _form.query.filter_by(approve_result=0).all() ] )
+                    complete.extend([f.__json__() for f in _form.query.filter(_form.approve_result!=0).all()])
+                return resp_hanlder(result={"pending":pending,"complete":complete})
         except Exception as err:
-            resp_hanlder(code=999,err=err)
+            return resp_hanlder(code=999,err=err)
 
 
 
@@ -158,10 +163,28 @@ def approve(desc):
     if request.method == "PUT":
         try:
             approve_form_info = request.json
-            form_type = approve_form_info.get("dmp_form_type")
+
+            form_type = approve_form_info.get("dmp_form_type",None)
+            form_id = approve_form_info.get("dmp_form_id",None)
+            approve_result = approve_form_info.get("approve_result",None)
+            answer = approve_form_info.get("answer",None)
+            approve_user_id =1
             if form_type == 1:
                 # 从数据库添加数据表单
-                pass
+                approve_form = FromAddDataTable.get(form_id)
+                approve_form.approve_result=approve_result
+                approve_form.answer = answer
+                if approve_result == 1:
+                    post(
+                        dmp_data_table_name=approve_form.dmp_data_table_name,
+                        db_table_name=approve_form.db_table_name,
+                        dmp_user_id=approve_form.submit_dmp_user_id,
+                        dmp_database_id=approve_form.dmp_database_id,
+                        dmp_case_id=approve_form.dmp_case_id,
+                        description=approve_form.description
+                        )
+                approve_form.put()
+                return resp_hanlder(result="OK!")
             elif form_type == 2:
                 # 文件上传添加数据表单
                 pass

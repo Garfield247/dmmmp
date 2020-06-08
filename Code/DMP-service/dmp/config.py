@@ -62,6 +62,7 @@ class DevelopmentConfig(Config):
     # 免认证
     NO_PERMISSION_LIST = [
         r'^/user/index/$',
+        r'^.*$',
     ]
 
 

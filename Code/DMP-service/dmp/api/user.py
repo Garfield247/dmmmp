@@ -589,6 +589,6 @@ def udel(desc):
     })
 
 
-@user.before_request
-def before_request():
-    rbac_middleware()
+# @user.before_request
+# def before_request():
+#     rbac_middleware()

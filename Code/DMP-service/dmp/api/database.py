@@ -67,17 +67,17 @@ def connect(desc):
         db_user = db_info.get("db_user")
         db_password = db_info.get("db_password")
         db_name = db_info.get("db_name")
-        if int(db_type) == 1:
+        if int(db_type) == 2:
             try:
                 import pymysql
                 current_app.logger.info(db_host)
-                conn = pymysql.connect(db_host, db_port, db_user, db_password, db_name, charset='utf8mb4')
+                conn = pymysql.connect(host=db_host, port=db_port, user=db_user, passwd=db_password, db=db_name, charset='utf8mb4')
                 current_app.logger.info(conn.server_version)
                 conn.close()
                 res = {"connect": "ok!"}
             except Exception as err:
                 return resp_hanlder(code=303, err=err)
-        elif int(db_type) == 2:
+        elif int(db_type) == 3:
             try:
                 from pymongo import MongoClient
                 conn = MongoClient(host=db_host, port=db_port, username=db_user, password=db_password)
@@ -86,7 +86,7 @@ def connect(desc):
                 res = {"connect": "ok!"}
             except Exception as err:
                 return resp_hanlder(code=303, err=err)
-        elif int(db_type) == 3:
+        elif int(db_type) == 1:
             try:
                 from pyhive import hive
                 conn = hive.Connection(host=db_host, port=db_port, username=db_user, password=db_password,

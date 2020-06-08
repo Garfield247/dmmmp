@@ -19,7 +19,7 @@ class MongodbEngine():
 
     def columns(self, collection):
         collection_ = self.database[collection]
-        column_list = [{"column": k, "type": "Array" if type(v) == list else "string"} for k, v in
+        column_list = [{"dmp_data_table_column_name": k, "dmp_data_table_column_type": "Array" if type(v) == list else "string"} for k, v in
                        collection_.find().limit(1)[0].items() if
                        k != "_id"]
         return column_list
