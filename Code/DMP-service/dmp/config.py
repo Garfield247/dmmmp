@@ -15,7 +15,6 @@ class Config:
     # DB
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-    # LEADER_ROOT_ID = 1
 
     # White_list
     WHITE_LIST = [
@@ -53,8 +52,7 @@ class DevelopmentConfig(Config):
     CELERY_BROKER_URL = "redis://localhost:6379/2"
     # DB
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir,'dmp-dev.sqlite')
-
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir, 'dmp-dev.sqlite')
 
     # UPLOADED
     UPLOADED_PATH = os.path.join(base_dir, "static/upload")

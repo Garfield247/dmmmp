@@ -7,9 +7,7 @@ import datetime
 import jwt
 
 from flask import current_app
-from itsdangerous import Serializer, BadSignature, SignatureExpired
 from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 from dmp.models import DMPModel
 from dmp.extensions import db

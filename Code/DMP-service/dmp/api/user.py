@@ -63,8 +63,6 @@ def register(desc):
         db.session.add(user)
         db.session.commit()
         ValidationEmail().activate_email(user, email)
-        # if isinstance(ret, dict):
-        #     return resp_hanlder(code=999, msg=ret)
         return resp_hanlder(code=1001, msg=RET.alert_code[1001])
     except Exception as err:
         db.session.rollback()
@@ -107,7 +105,6 @@ def login(desc):
             data = request.json
             dmp_username = data.get('dmp_username')
             email = data.get('email')
-            # passwd = data.get('password')
             if dmp_username and not email:
                 user = Users.query.filter(Users.dmp_username == dmp_username).first()
                 r = LoginVerify.login_username_verify_init(user)
@@ -143,7 +140,6 @@ def logout(desc):
      返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
      '''
     if request.method == 'GET':
-        # 清空session中所有保存的信息
         session.clear()
         return resp_hanlder(code=1005, msg=RET.alert_code[1005])
 
@@ -231,12 +227,6 @@ def info(desc):
                 u_group = current_obj.groups
                 ret = EnvelopedData.info_s2_data(u_group, res, dmp_group_name)
 
-                # 展示leader_list信息
-                # # 如果是管理员登录，则直属管理者只显示管理员
-                # if current_obj.dmp_group_id == 1:
-                #     root_list_obj = Users.query.filter(Users.dmp_group_id == 1).all()
-                #     new_res = EnvelopedData.info_s1_data(root_list_obj, ret)
-                # else:
                 # 教师及管理员登录时，则展示所有管理员及教师--直属管理者
                 user_obj_list = Users.query.filter(or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
                 new_res = EnvelopedData.info_s1_data(user_obj_list, ret)
@@ -387,14 +377,12 @@ def frozen_user(desc):
         res = PuttingData.get_obj_data(Users, auth_token)
         try:
             # 没有dmp_user_id，默认冻结自己
-            # if not dmp_user_id:
             if data == None:
                 frozen_user_obj = Users.query.filter(Users.id == res['id']).first()
             else:
                 dmp_user_id = data.get('dmp_user_id')
                 frozen_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
             # 超级管理员不可以冻结
-            # if frozen_user_obj.dmp_group_id == 1 and frozen_user_obj.leader_dmp_user_id == None:
             if frozen_user_obj.id == 1:
                 return resp_hanlder(code=4003, msg=RET.alert_code[4003])
             frozen_user_obj.confirmed = False
@@ -419,7 +407,6 @@ def udel(desc):
             dmp_user_id = data.get('dmp_user_id')
             del_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
             # 超级管理员无法删除
-            # if del_user_obj.dmp_group_id == 1 and del_user_obj.leader_dmp_user_id == None:
             if del_user_obj.id == 1:
                 return resp_hanlder(code=4005, msg=RET.alert_code[4005])
             else:

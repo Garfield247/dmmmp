@@ -101,47 +101,6 @@ def createsuperuser(dmp_username, real_name, passwd, email):
         return {'msg': 'The email of the register root has been sent, please click activate.'}
     else:
         return {'msg': 'The super administrator already exists in the database, please do not add it again.'}
-    # except Exception:
-    #     return {'msg': 'Other error.'}
-
-    # try:
-    #     user = Users(dmp_username=dmp_username, real_name=real_name, password=passwd, email=email)
-    #     user.dmp_group_id = 1
-    #     user_root_list = Users.query.filter(Users.dmp_group_id == 1).all()
-    #     rootgroup = Groups.query.filter(Groups.dmp_group_name == "root").first()
-    #
-    #     # 管理员数量达到最大容量
-    #     if len(user_root_list) == rootgroup.max_count == 3:
-    #         return {'msg': 'The maximum number of administrators has been reached'}
-    #
-    #     # 第一个创建的管理员为超级管理员--leader_dmp_user_id = None
-    #     elif len(user_root_list) == 0 and rootgroup.max_count == None:
-    #         try:
-    #             user.leader_dmp_user_id = None
-    #             res = EnvelopedData.create_root(rootgroup, user, email)
-    #             if isinstance(res, str):
-    #                 return {'msg': res}
-    #             return {'msg': 'The email of the register root has been sent, please click activate'}
-    #         except Exception:
-    #             return {'msg': 'Other error.'}
-    #
-    #     # 创建管理员--最多创建2个
-    #     elif len(user_root_list) == rootgroup.max_count and rootgroup.max_count <= 3 and rootgroup.max_count != None:
-    #         try:
-    #             user.leader_dmp_user_id = 1
-    #             res = EnvelopedData.create_root(rootgroup, user, email)
-    #             if isinstance(res, str):
-    #                 return {'msg': res}
-    #             return {'msg': 'The email of the register root has been sent, please click activate'}
-    #         except Exception:
-    #             return {'msg': 'Other error.'}
-    #
-    #     # 管理员数量和管理员用户组容量数不对应
-    #     elif len(user_root_list) != rootgroup.max_count:
-    #         return {'msg': 'The data has been tampered with, please contact the administrator to view and fix it'}
-    # # 其他错误
-    # except Exception as err:
-    #     return {'msg': err}
 
 
 if __name__ == '__main__':
