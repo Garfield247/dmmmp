@@ -72,8 +72,8 @@ def sys_init():
     Permissions.init_permission()
     from dmp.models import Groups
     Groups.init_group()
-    from dmp.models import Users
-    Users.create_test_user()
+    # from dmp.models import Users
+    # Users.create_test_user()
 
 
 @manager.option('-n', '-dmp_username', dest='dmp_username')
@@ -85,26 +85,22 @@ def createsuperuser(dmp_username, real_name, passwd, email):
     from dmp.models import Users, Groups
     from dmp.utils.ep_data import EnvelopedData
     if not all([dmp_username, real_name, passwd, email]):
-        return jsonify({
-            'status': -1,
-            'msg': 'Insufficient parameter, please recreate superuser',
-            'results': {}
-        })
+        return 'Insufficient parameter, please recreate superuser.'
 
     db_user_count = Users.query.count()
-    print('00---', db_user_count)
-    # user_root_list = Users.query.filter(Users.dmp_group_id == 1).all()
     if db_user_count == 0:
         user = Users(dmp_username=dmp_username, real_name=real_name, password=passwd, email=email)
         rootgroup = Groups.query.filter(Groups.id == 1).first()
         user.dmp_group_id = 1
         user.leader_dmp_user_id = None
+        db.session.add(user)
+        db.session.commit()
         res = EnvelopedData.create_root(rootgroup, user, email)
         if isinstance(res, str):
             return {'msg': res}
-        return {'msg': 'The email of the register root has been sent, please click activate'}
+        return {'msg': 'The email of the register root has been sent, please click activate.'}
     else:
-        return {'msg': 'The super administrator already exists in the database, please do not add it again'}
+        return {'msg': 'The super administrator already exists in the database, please do not add it again.'}
     # except Exception:
     #     return {'msg': 'Other error.'}
 

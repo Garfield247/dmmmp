@@ -15,8 +15,23 @@ class Config:
     # DB
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+    # LEADER_ROOT_ID = 1
 
-    LEADER_ROOT_ID = 1
+    # White_list
+    WHITE_LIST = [
+        r"^/user/login/",
+        r"^/static/.*",
+        r"^/user/register/$",
+        r"^/user/activate/.*",
+        r"^/user/changepwd/",
+        r"^/user/forgetpwd/",
+        r"^/verifier/email/",
+        r"^/verifier/username/",
+    ]
+    # 免认证
+    NO_PERMISSION_LIST = [
+        r'^/user/index/$',
+    ]
 
     @staticmethod
     def init_app(app):
@@ -46,28 +61,9 @@ class DevelopmentConfig(Config):
 
     # ICON_URL
     SAVE_URL = 'dmp/static/icon/'
-    ICON_URL = 'http://localhost:7789/static/icon/'
+    ICON_URL = 'http://192.168.26.1:7789/static/icon/'
 
     DEBUG = True
-    # White_list
-    WHITE_LIST = [
-        r"^/user/login/",
-        r"^/static/.*",
-        r"^/user/register/$",
-        # r"^/user/logout/$",
-        # r"^/user/icon/$",
-        r"^/user/activate/.*",
-        r"^/user/changepwd/",
-        r"^/user/forgetpwd/",
-        r"^/user/gettoken/.*",
-        r"^/verifier/email/",
-        r"^/verifier/username/",
-    ]
-    # 免认证
-    NO_PERMISSION_LIST = [
-        r'^/user/index/$',
-    ]
-
 
 
 # 测试环境

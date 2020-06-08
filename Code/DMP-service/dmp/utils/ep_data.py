@@ -7,7 +7,6 @@ from flask import session
 
 from dmp.extensions import db
 from dmp.models import Groups, Users, Permissions
-from dmp.utils.put_data import PuttingData
 from dmp.utils.validation import ValidationEmail
 
 
@@ -41,6 +40,21 @@ class EnvelopedData():
         return
 
     @staticmethod
+    def __private_info(current_obj, email, passwd, dmp_username, real_name):
+        current_obj.password = passwd
+        current_obj.dmp_username = dmp_username
+        current_obj.real_name = real_name
+        # current_obj.dmp_user_info = dmp_user_info
+        if current_obj.email == email:
+            current_obj.confirmed = True
+        else:
+            # 将数据库中邮箱修改为新邮箱，并将状态修改为未激活状态
+            current_obj.email = email
+            current_obj.confirmed = False
+        db.session.commit()
+        return
+
+    @staticmethod
     def info_s1_data(list_obj, res):
         lr_list = []
         for u in list_obj:
@@ -65,6 +79,13 @@ class EnvelopedData():
 
         ret_obj = Users.query.filter(Users.id == ret_obj_dict['id']).first()
         new_ret_obj_dict = ret_obj.user_to_dict()
+        leader_dmp_user_id = new_ret_obj_dict.get('leader_dmp_user_id')
+        if leader_dmp_user_id:
+            leader_name = Users.query.filter(Users.id == leader_dmp_user_id).first().dmp_username
+            new_ret_obj_dict['leader_name'] = leader_name
+        else:
+            new_ret_obj_dict['leader_name'] = None
+
         new_ret_obj_dict['dmp_group_name'] = dmp_group_name
         new_ret_obj_dict['group_permission'] = u_list
         return new_ret_obj_dict
@@ -103,9 +124,25 @@ class EnvelopedData():
         return
 
     @classmethod
+    def edit_private_info(cls, current_obj, email, passwd, dmp_username, real_name):
+        try:
+            if current_obj.email == email:
+                cls.__private_info(current_obj, current_obj.email, passwd, dmp_username, real_name)
+                return 'User information has been modified successfully.'
+            else:
+                cls.__private_info(current_obj, email, passwd, dmp_username, real_name)
+                ValidationEmail().activate_email(current_obj, email)
+                return 'The user information has been updated, and the new mailbox needs to be activated.' \
+                       ' The activation email has been sent, please click activate.'
+        except Exception as err:
+            return (-1, err)
+
+    @classmethod
     def p_changeprofile(cls, u_group, ret_obj_dict):
         dmp_group_name = Groups.query.filter(Groups.id == ret_obj_dict['dmp_group_id']).first().dmp_group_name
         new_ret_obj_dict = cls.info_s2_data(u_group, ret_obj_dict, dmp_group_name)
+        update_group_name = Groups.query.filter(Groups.id == new_ret_obj_dict.get('dmp_group_id')).first().dmp_group_name
+        new_ret_obj_dict['dmp_group_name'] = update_group_name
         return new_ret_obj_dict
 
     @classmethod
@@ -175,14 +212,17 @@ class EnvelopedData():
     @classmethod
     def create_root(cls, rootgroup, user, email):
         '''创建管理员用户'''
-        ret = PuttingData.put_data(rootgroup, user)
-        if isinstance(ret, str):
-            return ret
+        # ret = PuttingData.put_data(rootgroup, user)
+        # if isinstance(ret, str):
+        #     return ret
         # 给Group用户组的管理员添加权限
-        rootgroup_permissions_list = rootgroup.permissions
-        rootgroup_permissions_list.clear()
-        permissions_list = Permissions.query.all()
-        for p in permissions_list:
-            rootgroup_permissions_list.append(p)
-        ValidationEmail().activate_email(user, email)
-        return
+        try:
+            rootgroup_permissions_list = rootgroup.permissions
+            rootgroup_permissions_list.clear()
+            permissions_list = Permissions.query.all()
+            for p in permissions_list:
+                rootgroup_permissions_list.append(p)
+            ValidationEmail().activate_email(user, email)
+            return
+        except Exception as err:
+            return err

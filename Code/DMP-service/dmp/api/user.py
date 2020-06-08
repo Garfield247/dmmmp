@@ -6,10 +6,10 @@
 import base64
 import os
 
-from flask import Blueprint, jsonify, request, session, current_app
+from flask import Blueprint, request, session
 from operator import or_
 
-from dmp.config import Config, config
+from dmp.config import config
 from dmp.extensions import db
 from dmp.models import Users, Groups
 from dmp.rbac.middlewares.rbac import rbac_middleware
@@ -35,26 +35,29 @@ def register(desc):
     try:
         user_obj = Users.query.all()
         # 判断初始状态有没有超级用管理员，没有则不能创建用户，必须要先创建一个超级管理员
-        res = UserVerify.judge_superuser(user_obj)
-        if res:
-            return jsonify(res)
+        ret = UserVerify.judge_superuser(user_obj)
+        if ret:
+            return resp_hanlder(code=999, msg=ret)
         data = request.json
         dmp_username = data.get('dmp_username')
         real_name = data.get('real_name')
         passwd = data.get('password')
         email = data.get('email')
         user = Users(dmp_username=dmp_username, real_name=real_name, password=passwd,
-                     email=email, leader_dmp_user_id=Config.LEADER_ROOT_ID)
-        res = PuttingData.root_add_user(user)
+                     email=email, leader_dmp_user_id=1)
+        res = PuttingData.root_add_user(user, dmp_username, real_name)
 
         # 返回字典-管理员单一添加成功
         if isinstance(res, dict):
             return resp_hanlder(code=0, msg=res)
-        # 返回元组-超出用户组最大容量
+
+        # 返回元组-管理员/教师单一添加缺少参数
         elif isinstance(res, tuple):
             return resp_hanlder(code=999, msg=res[1])
+
+        # 普通管理员和教师无法添加管理员角色，需要超级管理员添加
         elif res == False:
-            return resp_hanlder(code=999, msg='Could not add an administrator user')
+            return resp_hanlder(code=999, msg='Could not add an administrator user.')
 
         # 返回token错误的字符串-注册成功(注册时无token)
         db.session.add(user)
@@ -114,7 +117,7 @@ def login(desc):
                         return resp_hanlder(code=1003, msg=RET.alert_code[1003], result=auth_token.decode('utf-8'))
                     return resp_hanlder(code=201)
                 else:
-                    return resp_hanlder(code=999, msg=r)
+                    return resp_hanlder(code=999, msg=r[-1])
 
             elif email and not dmp_username:
                 user = Users.query.filter(Users.email == email).first()
@@ -125,7 +128,7 @@ def login(desc):
                         return resp_hanlder(code=1003, msg=RET.alert_code[1003], result=auth_token.decode('utf-8'))
                     return resp_hanlder(code=201)
                 else:
-                    return resp_hanlder(code=999, msg=r)
+                    return resp_hanlder(code=999, msg=r[-1])
             else:
                 return resp_hanlder(code=999)
         except Exception as err:
@@ -198,7 +201,7 @@ def ulist(desc):
                 all_user_obj_list = Users.query.all()
                 new_user_obj_dict_list = EnvelopedData.ulist(all_user_obj_list, res=None)
                 return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
-            # 管理员、教师登录，只需要显示用户的直属管理者是谁即可
+            # 教师登录，只需要显示用户的直属管理者是谁即可
             else:
                 all_students_list = Users.query.filter(Users.leader_dmp_user_id == res['id']).all()
                 new_stu_obj_dict_list = EnvelopedData.ulist(all_students_list, res)
@@ -229,14 +232,14 @@ def info(desc):
                 ret = EnvelopedData.info_s2_data(u_group, res, dmp_group_name)
 
                 # 展示leader_list信息
-                # 如果是管理员登录，则直属管理者只显示管理员
-                if current_obj.dmp_group_id == 1:
-                    root_list_obj = Users.query.filter(Users.dmp_group_id == 1).all()
-                    new_res = EnvelopedData.info_s1_data(root_list_obj, ret)
-                else:
-                    # 教师及学生登录时，则展示所有管理员及教师--直属管理者
-                    user_obj_list = Users.query.filter(or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
-                    new_res = EnvelopedData.info_s1_data(user_obj_list, ret)
+                # # 如果是管理员登录，则直属管理者只显示管理员
+                # if current_obj.dmp_group_id == 1:
+                #     root_list_obj = Users.query.filter(Users.dmp_group_id == 1).all()
+                #     new_res = EnvelopedData.info_s1_data(root_list_obj, ret)
+                # else:
+                # 教师及管理员登录时，则展示所有管理员及教师--直属管理者
+                user_obj_list = Users.query.filter(or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
+                new_res = EnvelopedData.info_s1_data(user_obj_list, ret)
                 return resp_hanlder(code=3002, msg=RET.alert_code[3002], result=new_res)
 
             dmp_user_id = data.get('dmp_user_id')
@@ -270,6 +273,7 @@ def icon(desc):
             if data == None:
                 return resp_hanlder(code=999)
             icon_obj_str = data.get('bin')
+            icon_obj_str = icon_obj_str.split(',')[-1]
             current_obj = Users.query.filter(Users.id == res['id']).first()
             icon_data = base64.b64decode(icon_obj_str)
             icon_name = uuid_str() + '.jpg'
@@ -318,10 +322,32 @@ def changeprofile(desc):
         leader_dmp_user_id = data.get('leader_dmp_user_id')
         dmp_username = data.get('dmp_username')
         real_name = data.get('real_name')
+        dmp_user_info = data.get('dmp_user_info')
         auth_token = request.headers.get('Authorization')
         res = PuttingData.get_obj_data(Users, auth_token)
+        current_obj = Users.query.filter(Users.id == res['id']).first()
         if not dmp_user_id:
             try:
+                # 管理员、教师、学生--只修改dmp_username、real_name、password和email四个字段信息
+                # 修改邮箱时，发送邮件进行验证
+                if confirmed == None and dmp_group_id == None and leader_dmp_user_id == None:
+                    # 单独修改用户简介的信息
+                    if dmp_user_info != None and not dmp_username and not real_name and not passwd and not email:
+                        current_obj.dmp_user_info = dmp_user_info
+                        db.session.commit()
+                        return resp_hanlder(code=1015, msg=RET.alert_code[1015])
+                    # 单独修改密码的信息
+                    elif passwd and not dmp_username and not real_name and not email and not dmp_user_info:
+                        current_obj.password = passwd
+                        db.session.commit()
+                        return resp_hanlder(code=1015, msg=RET.alert_code[1015])
+                    # 获取当前登录用户信息(同时修改4个参数信息-新邮箱需要重新发送邮箱校验)，并进行修改--root、teacher、student都可
+                    else:
+                        ret = EnvelopedData.edit_private_info(current_obj, email, passwd, dmp_username, real_name)
+                        if isinstance(ret, str):
+                            return resp_hanlder(code=0, msg=ret)
+                        else:
+                            return resp_hanlder(code=999, msg=ret)
                 current_obj = Users.query.filter(Users.id == res['id']).first()
                 EnvelopedData.changeprofile(current_obj, email, passwd, dmp_group_id,
                                             confirmed, leader_dmp_user_id, dmp_username, real_name)
@@ -349,7 +375,7 @@ def changeprofile(desc):
 
 
 @user.route("/frozen/", methods=["POST"], defaults={"desc": "冻结用户"})
-def frozen_user():
+def frozen_user(desc):
     '''
      说明:冻结用户接口
      参数:Authorization,dmp_user_id,说明:指定用户标识token,没有dmp_user_id默认指定冻结自己,有dmp_user_id冻结指定id的用户,将confirmed改为false,数据类型:JSON
@@ -357,21 +383,19 @@ def frozen_user():
      '''
     if request.method == 'POST':
         data = request.json
-        # if data == None:
-        #     return resp_hanlder(code=999)
-        # dmp_user_id = data.get('dmp_user_id')
         auth_token = request.headers.get('Authorization')
         res = PuttingData.get_obj_data(Users, auth_token)
         try:
             # 没有dmp_user_id，默认冻结自己
             # if not dmp_user_id:
             if data == None:
-                frozen_user_obj = Users.query.filter(Users.id == res['id'])
+                frozen_user_obj = Users.query.filter(Users.id == res['id']).first()
             else:
                 dmp_user_id = data.get('dmp_user_id')
                 frozen_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
             # 超级管理员不可以冻结
-            if frozen_user_obj.dmp_group_id == 1 and frozen_user_obj.leader_dmp_user_id == None:
+            # if frozen_user_obj.dmp_group_id == 1 and frozen_user_obj.leader_dmp_user_id == None:
+            if frozen_user_obj.id == 1:
                 return resp_hanlder(code=4003, msg=RET.alert_code[4003])
             frozen_user_obj.confirmed = False
             db.session.commit()
@@ -388,25 +412,22 @@ def udel(desc):
     返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
     '''
     if request.method == 'DELETE':
-        data = request.json
-        if data == None:
-            return resp_hanlder(code=999)
-        dmp_user_id = data.get('dmp_user_id')
-        del_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
-        # 超级管理员无法删除
-        if del_user_obj.dmp_group_id == 1 and del_user_obj.leader_dmp_user_id == None:
-            return resp_hanlder(code=4005, msg=RET.alert_code[4005])
-        # 删除管理员-用户组列表的管理员数量减一
-        elif del_user_obj.dmp_group_id == 1 and del_user_obj.leader_dmp_user_id != None:
-            root_obj_group = Groups.query.filter(Groups.id == del_user_obj.dmp_group_id).first()
-            root_obj_group.max_count -= 1
-            db.session.delete(del_user_obj)
-            db.session.commit()
-            return resp_hanlder(code=4007, msg=RET.alert_code[4007])
-        else:
-            db.session.delete(del_user_obj)
-            db.session.commit()
-            return resp_hanlder(code=4006, msg=RET.alert_code[4006])
+        try:
+            data = request.json
+            if data == None:
+                return resp_hanlder(code=999)
+            dmp_user_id = data.get('dmp_user_id')
+            del_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
+            # 超级管理员无法删除
+            # if del_user_obj.dmp_group_id == 1 and del_user_obj.leader_dmp_user_id == None:
+            if del_user_obj.id == 1:
+                return resp_hanlder(code=4005, msg=RET.alert_code[4005])
+            else:
+                db.session.delete(del_user_obj)
+                db.session.commit()
+                return resp_hanlder(code=4006, msg=RET.alert_code[4006])
+        except Exception as err:
+            return resp_hanlder(code=999, err=err)
 
 
 @user.before_request

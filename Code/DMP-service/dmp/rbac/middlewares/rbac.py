@@ -7,7 +7,7 @@ import re
 
 from flask import session, request
 
-from dmp.config import config
+from dmp.config import Config
 from dmp.models import Users
 from dmp.utils.response_hanlder import resp_hanlder
 from dmp.utils.verify import UserVerify
@@ -20,7 +20,8 @@ def rbac_middleware():
     print('vvv', url_rule)
 
     # 白名单
-    for i in config['default'].WHITE_LIST:
+    # for i in config['default'].WHITE_LIST:
+    for i in Config.WHITE_LIST:
         if re.match(i, url_rule):
             return
 
@@ -51,17 +52,21 @@ def rbac_middleware():
             return resp_hanlder(code=201, msg=res)
 
     # 免认证的校验
-    for i in config['default'].NO_PERMISSION_LIST:
+    # for i in config['default'].NO_PERMISSION_LIST:
+    for i in Config.NO_PERMISSION_LIST:
         if re.match(i, url_rule):
             return
 
     # 管理员拥有所有权限
-    res = PuttingData.get_obj_data(Users, auth_token)
-    if isinstance(res, dict):
-        if res.get('dmp_group_id') == 1:
-            return
-    else:
-        return resp_hanlder(code=999, msg=res)
+    try:
+        res = PuttingData.get_obj_data(Users, auth_token)
+        if isinstance(res, dict):
+            if res.get('dmp_group_id') == 1:
+                return
+        else:
+            return resp_hanlder(code=999, msg=res)
+    except Exception as err:
+        return resp_hanlder(code=999, err=err)
 
     # 权限校验
     # permissions = session.get('SESSION_PERMISSION_URL')
