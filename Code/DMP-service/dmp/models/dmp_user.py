@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
+# @Author  : SHTD
 
 import time
 import datetime
@@ -98,9 +98,8 @@ class Users(db.Model, DMPModel):
             user.email = "%s@test_html.com" % k
             user.passwd = "123456"
             user.confirmed = True
-            user.dmp_group_id = k
-            db.session.add(user)
-        db.session.commit()
+            user.dmp_group_id = v
+            user.save()
         current_app.logger.info("create test_html user complete!")
 
     def __init__(self, **kwargs):
