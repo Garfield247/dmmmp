@@ -35,11 +35,12 @@ def success(desc):
     target_filename = request.args.get('filename')
     task = request.args.get('task_id')
     chunk = 0
-    with open(os.path.join(current_app.config.get("UPLOADED_PATH"), target_filename), 'wb') as target_file:
+    upload_path = current_app.config.get("UPLOADED_PATH")
+    current_app.logger.info("%s%s%s"%(target_filename,task,upload_path))
+    with open(os.path.join(upload_path, target_filename), 'wb') as target_file:
         while True:
             try:
-                filename = os.path.join(current_app.config.get("UPLOADED_PATH"), '%s%d' % (
-                    task, chunk))
+                filename = os.path.join(upload_path, '%s%d'%(task, chunk))
                 # 按序打开每个分片
                 source_file = open(filename, 'rb')
                 # 读取分片内容写入新文件

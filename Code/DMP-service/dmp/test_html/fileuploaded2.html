@@ -47,7 +47,7 @@
         uploader.on('uploadSuccess', function(file) { //整个文件的所有分片都上传成功，调用该方法
             //上传的信息（文件唯一标识符，文件名）
             var data = {'task_id': task_id, 'filename': file.source['name'] };
-            $.get('http://127.0.0.1:7789/file/success', data);          //ajax携带data向该url发请求
+            $.get('http://127.0.0.1:7789/file/success/', data);          //ajax携带data向该url发请求
             $('.progress-bar').css('width', '100%');
             $('.progress-bar').text('上传完成');
         });

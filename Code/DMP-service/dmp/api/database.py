@@ -71,7 +71,7 @@ def connect(desc):
             try:
                 import pymysql
                 current_app.logger.info(db_host)
-                conn = pymysql.connect(host=db_host, port=db_port, user=db_user, passwd=db_password, db=db_name, charset='utf8mb4')
+                conn = pymysql.connect( port=db_port, host=db_host,user=db_user, passwd=db_password, db=db_name, charset='utf8mb4')
                 current_app.logger.info(conn.server_version)
                 conn.close()
                 res = {"connect": "ok!"}

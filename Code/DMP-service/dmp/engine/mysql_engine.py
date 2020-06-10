@@ -11,10 +11,12 @@ class MysqlEngine():
     def __init__(self,host,port,user,passwd,db):
 
         try:
-            self.conn = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db=db)
+            print(host)
+            current_app.logger.info(host, port, user, passwd, db)
+            self.conn = pymysql.Connect(host=host, port=port, user=user, passwd=passwd, db=db)
             current_app.logger.info(self.conn.server_version)
-        except Exception:
-            current_app.logger.error('发生异常')
+        except Exception as e :
+            current_app.logger.error(e)
 
     def columns(self,table_name):
         cursor = self.conn.cursor()

@@ -4,8 +4,10 @@
 # @Author  : SHTD
 
 from flask import Blueprint, jsonify, request, current_app
-from dmp.models import FromUpload,FromMigrate,FromDownload,FromAddDataTable,Users
+from dmp.models import FromUpload,FromMigrate,FromDownload,FromAddDataTable,Users,DataTable,Database
 from dmp.utils import resp_hanlder
+from dmp.utils.datax_job_hanlder import mysql_reader,mysql_writer,mongodb_reader,mongodb_writer,hive_reader,hive_writer
+from dmp.utils.task import job_hanlder
 from dmp.api.dbtable import post
 
 form = Blueprint("form",__name__)
@@ -190,6 +192,109 @@ def approve(desc):
                 pass
             elif form_type == 3:
                 # 数据迁移表单
+                approve_form = FromMigrate.get(form_id)
+                approve_form.approve_result=approve_result
+                approve_form.answer = answer
+                if approve_result == 1:
+                    origin_data_table = DataTable.get(approve_form.origin_dmp_table_id)
+                    origin_database = Database.get(origin_data_table.dmp_database_id)
+                    origin_database_type = origin_database.db_type
+                    origin_db_host = origin_database.db_host
+                    origin_db_port = origin_database.db_port
+                    origin_db_username = origin_database.db_username
+                    origin_db_passwd = origin_database.db_passwd
+                    origin_db_name = origin_database.db_name
+                    origin_db_table_name = origin_data_table.db_table_name
+
+                    destination_database = Database.get(approve_form.destination_dmp_datebase_id)
+                    destination_database_type = destination_database.db_type
+                    destination_db_host =  destination_database.db_host
+                    destination_db_port =  destination_database.db_port
+                    destination_db_username =  destination_database.db_username
+                    destination_db_passwd =  destination_database.db_passwd
+                    destination_db_name =  destination_database.db_name
+                    destination_db_table_name =  approve_form.new_table_name
+
+                    rule = approve_form.rule
+                    method = approve_form.method
+
+                    reader= []
+                    if origin_database_type == 1:
+                        # hive_reader
+                        reader = hive_reader(host=origin_db_host,
+                        port = origin_db_port,
+                        path = None,
+                        fileType=None,
+                        haveKerberos=None,
+                        kerberosKeytabFilePath=None,
+                        kerberosPrincipal=None,
+                        column=[],
+                        fieldDelimiter=',',
+                        encoding="utf-8"
+                        )
+                        pass
+                    elif origin_database_type == 2:
+                        # mysql_reader
+                        reader = mysql_reader(username=origin_db_username,
+                        password=origin_db_passwd,
+                        column=[],
+                        host=origin_db_host,
+                        port=origin_db_port,
+                        db=origin_db_name,
+                        table=origin_db_table_name,
+                        where=None,querySql=None
+                        )
+                        pass
+                    elif origin_database_type == 3:
+                        # mongodb
+                        reader = mongodb_reader(host=origin_db_host,
+                        port=origin_db_port,
+                        db_name=origin_db_name,
+                        collection_name=origin_db_table_name,
+                        column=[],
+                        username=origin_db_username,
+                        password=origin_db_passwd
+                        )
+                        pass
+                    writer = []
+                    if destination_database_type == 1:
+                        # hive_writer
+                        writer = hive_writer(host=destination_db_host,
+                        port=destination_db_port,
+                        path=None,
+                        filename=None,
+                        column=[],
+                        fieldDelimiter=",",
+                        )
+                        pass
+                    elif destination_database_type == 2:
+                        # myqsl_writer
+                        writer = mysql_writer(model=method,
+                        username=destination_db_username,
+                        password=destination_db_passwd,
+                        column=[],
+                        host=destination_db_host,
+                        port=destination_db_port,
+                        db=destination_db_name,
+                        table=destination_db_table_name,
+                        preSql=None,
+                        postSql=None,
+                        )
+                        pass
+                    elif destination_database_type == 3:
+                        # mongo_writer
+                        writer = mongodb_writer(host=destination_db_host,
+                        port=destination_db_port,
+                        username=destination_db_username,
+                        password=destination_db_passwd,
+                        db_name=destination_db_name,
+                        collection_name=destination_db_table_name,
+                        column=[],
+                        )
+                        pass
+                    job_hanlder.delay(reader= reader,writer=writer)
+                approve_form.put()
+                return resp_hanlder(result="OK!")
                 pass
             elif form_type == 4:
                 # 数据下载表单
