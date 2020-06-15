@@ -16,7 +16,21 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
-    LEADER_ROOT_ID = 1
+    # White_list
+    WHITE_LIST = [
+        r"^/user/login/",
+        r"^/static/.*",
+        r"^/user/register/$",
+        r"^/user/activate/.*",
+        r"^/user/changepwd/",
+        r"^/user/forgetpwd/",
+        r"^/verifier/email/",
+        r"^/verifier/username/",
+    ]
+    # 免认证
+    NO_PERMISSION_LIST = [
+        r'^/user/index/$',
+    ]
 
     @staticmethod
     def init_app(app):
@@ -25,7 +39,7 @@ class Config:
 
 # 开发环境
 class DevelopmentConfig(Config):
-    TESTING = True
+    # TESTING = True
     LOG_LEVE = "info"
     # Mail
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.163.com'
@@ -37,6 +51,7 @@ class DevelopmentConfig(Config):
     CELERY_RESULT_BACKEND = "redis://localhost:6379/1/"
     CELERY_BROKER_URL = "redis://localhost:6379/2"
     # DB
+
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir, 'dmp-dev.sqlite')
 
     # UPLOADED
@@ -65,6 +80,10 @@ class DevelopmentConfig(Config):
         r'^.*$',
     ]
 
+    # ICON_URL
+    SAVE_URL = 'dmp/static/icon/'
+    ICON_URL = 'http://192.168.26.1:7789/static/icon/'
+
 
 # 测试环境
 class TestingConfig(Config):
@@ -85,6 +104,7 @@ class TestingConfig(Config):
     DATAX_JOB_PATH = os.environ.get("DATAX_JOB_PATH") or ""
     DATAX_LOG_PATH = os.environ.get("DATAX_LOG_PATH") or ""
 
+
 # 生产环境
 class ProductionConfig(Config):
     # Mail
@@ -96,7 +116,6 @@ class ProductionConfig(Config):
     CELERY_BROKER_URL = "redis://localhost:6379/2"
     # DB
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir, 'dmp.sqlite')
-
 
 
 # 配置字典

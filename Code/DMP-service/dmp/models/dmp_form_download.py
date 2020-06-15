@@ -29,7 +29,8 @@ class FromDownload(db.Model, DMPModel):
     dmp_data_table_id = db.Column(db.Integer, db.ForeignKey('dmp_data_table.id'), nullable=False, comment='源数据表ID')
     approve_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), comment='审批人')
 
-    form_type = db.Column(db.Integer,default=4, comment='表单类型')
-    # submit_users = db.relationship('Users', backref='submitusers_from_download')
-    # approve_users = db.relationship('Users', backref='approveusers_from_migrate')
-    # datatable = db.relationship('DataTable', backref='datatable_from_download')
+    form_type = db.Column(db.Integer, default=4, comment='表单类型')
+
+    submit_users = db.relationship('Users', foreign_keys=submit_dmp_user_id, backref='submitusers_from_download')
+    approve_users = db.relationship('Users', foreign_keys=approve_dmp_user_id, backref='approveusers_from_migrate')
+    datatable = db.relationship('DataTable', backref='datatable_from_download')

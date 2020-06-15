@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
+# @Author  : SHTD
 
-from flask import current_app, render_template
+from flask import current_app
 from flask_mail import Message
+
 from dmp.extensions import mail
 from dmp.extensions import celery
 
@@ -13,7 +14,6 @@ class EmailBody():
 
     @staticmethod
     def email_body(name, url):
-
         text_body = '''
             Dear {},
             To confirm your account please click on the following link: {}
@@ -40,13 +40,10 @@ class EmailBody():
             <p>Dear {0} email user,</p>
             <p>Click here to reactivate your email <a href="{1}">click here</a>.</p>
             '''.format(email, url)
-        return  text_body, html_body
-
-
+        return text_body, html_body
 
     @staticmethod
     def change_pwd(email, url):
-
         text_body = '''
             Dear {} email user,
             Click here to reset your new password: {}

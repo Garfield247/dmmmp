@@ -14,6 +14,7 @@ from dmp.rbac.middlewares.rbac import rbac_middleware
 
 # 封装一个方法，专门用于创建Flask实例
 
+
 def create_app(config_name):
     # 创建应用实例
     app = Flask(__name__)
@@ -28,13 +29,10 @@ def create_app(config_name):
     # 配置蓝本
     config_blueprint(app)
 
-    # 返回应用实例
-
     # RBAC权限拦截
     # app.before_request(rbac_middleware)
 
     # 返回应用实例
-
     return app
 
 

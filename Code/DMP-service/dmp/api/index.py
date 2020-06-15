@@ -4,11 +4,7 @@
 # @Author  : SHTD
 import time
 from datetime import datetime
-from flask import (Blueprint,
-                   jsonify,
-                   current_app,
-                   request
-                   )
+from flask import Blueprint,current_app,request
 from dmp.utils.task import add
 from dmp.models import *
 from dmp.extensions import db

@@ -29,9 +29,9 @@ class FromMigrate(db.Model, DMPModel):
     destination_dmp_database_id = db.Column(db.Integer, db.ForeignKey('dmp_database.id'), nullable=False,
                                             comment='目标数据库ID')
     approve_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), comment='审批人')
-
     form_type = db.Column(db.Integer, default=3, comment='表单类型')
-    # submit_users = db.relationship('Users', backref='submitusers_from_migrate')
-    # approve_users = db.relationship('Users', backref='approveusers_from_migrate')
-    # datatable = db.relationship('DataTable', backref='datatable_from_migrate')
-    # database = db.relationship('Database', backref='database_from_migrate')
+
+    submit_users = db.relationship('Users', foreign_keys=submit_dmp_user_id, backref='submit_users_from_migrate')
+    approve_users = db.relationship('Users', foreign_keys=approve_dmp_user_id, backref='approve_users_from_migrate')
+    datatable = db.relationship('DataTable', backref='datatable_from_migrate')
+    database = db.relationship('Database', backref='database_from_migrate')

@@ -4,7 +4,7 @@
 # @Author  : SHTD
 
 
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, request, current_app
 from dmp.models import Case, DataTable, Users, Database,DataTableColumn
 from dmp.utils import resp_hanlder
 from dmp.engine import MongodbEngine,MysqlEngine,HiveEngone

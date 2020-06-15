@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
+# @Author  : SHTD
 
 from flask import current_app
+
 from dmp.extensions import db
 from dmp.models import DMPModel
 
@@ -14,6 +15,17 @@ class Permissions(db.Model, DMPModel):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='权限ID')
     route = db.Column(db.String(64), nullable=False, comment='权限路由')
     dmp_permission_name = db.Column(db.String(32), nullable=False, comment='路由功能名称')
+
+    def __repr__(self):
+        return self.dmp_permission_name
+
+    def permission_to_dict(self):
+        permission_dict = {
+            'id': self.id,
+            'route': self.route,
+            'dmp_permission_name': self.dmp_permission_name
+        }
+        return permission_dict
 
     @classmethod
     def init_permission(cls):

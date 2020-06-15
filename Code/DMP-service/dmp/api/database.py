@@ -67,7 +67,16 @@ def connect(desc):
         db_user = db_info.get("db_user")
         db_password = db_info.get("db_password")
         db_name = db_info.get("db_name")
-        if int(db_type) == 2:
+        if int(db_type) == 1:
+            try:
+                from pyhive import hive
+                conn = hive.Connection(host=db_host, port=db_port, username=db_user, password=db_password,
+                                       database=db_name)
+                current_app.logger.info(conn.__dict__)
+                conn.close()
+            except Exception as err:
+                return resp_hanlder(code=303, err=err)
+        elif int(db_type) == 2:
             try:
                 import pymysql
                 current_app.logger.info(db_host)
@@ -86,15 +95,7 @@ def connect(desc):
                 res = {"connect": "ok!"}
             except Exception as err:
                 return resp_hanlder(code=303, err=err)
-        elif int(db_type) == 1:
-            try:
-                from pyhive import hive
-                conn = hive.Connection(host=db_host, port=db_port, username=db_user, password=db_password,
-                                       database=db_name)
-                current_app.logger.info(conn.__dict__)
-                conn.close()
-            except Exception as err:
-                return resp_hanlder(code=303, err=err)
+
         return resp_hanlder(result=res)
 
 
