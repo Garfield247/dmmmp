@@ -91,7 +91,7 @@ def table_name(desc):
         try:
             table_name_ = request.json.get("dmp_table_name")
             from dmp.models import DataTable
-            table = DataTable.query.filter_by(dmp_data_table_name=table_name_).first
+            table = DataTable.query.filter_by(dmp_data_table_name=table_name_).first()
             if table:
                 return resp_hanlder(result={"exist": True, })
             else:

@@ -17,6 +17,16 @@ class HiveEngone():
         except Exception as e:
             current_app.logger.error("Connect Failed! Error Message：%s"%str(e))
 
+    def tables_list(self):
+        cursor = self.conn.cursor()
+        sql = """
+        show tables
+        """
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        result = [i[0] for i in res]
+        return result
+        
     def columns(self,table_name):
         cursor = self.connect.cursor()
         sql = """

@@ -15,6 +15,7 @@ from .rights import rights
 from .user import user
 from .usergroup import usergroup
 from .verifier import verifier
+from .index import index
 
 # 蓝本配置
 DEFAULT_BLUEPRINT = (
@@ -29,6 +30,7 @@ DEFAULT_BLUEPRINT = (
     (user, '/user'),
     (usergroup, '/usergroup'),
     (verifier, '/verifier'),
+    (index, "/index")
 )
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
+# @Author  : SHTD
 
 # 导入类库
 from flask_sqlalchemy import SQLAlchemy
