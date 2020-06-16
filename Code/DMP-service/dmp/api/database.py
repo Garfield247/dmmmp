@@ -13,12 +13,21 @@ database = Blueprint("database", __name__)
 @database.route("/info/", methods=["GET"], defaults={"desc": "数据库信息"})
 def info(desc):
     if request.method == "GET":
+        auth_token = request.headers.get('Authorization')
+        current_user_id = Users.decode_auth_token(auth_token)
         try:
             database_id = request.json.get("dmp_database_id") if request.json else None
             if database_id:
                 data = Database.query.get(database_id).__json__()
             else:
-                data = [d.__json__() for d in Database.query.all()]
+                data = []
+                if Users.get(current_user_id).dmp_group_id == 1:
+                    data = [d.__json__() for d in Database.query.all()]
+                else:
+                    user_ids = [u.id for u in Users.query.filter_by(leader_dmp_user_id=current_user_id).all()]
+                    user_ids.append(current_user_id)
+                    current_app.logger.info(user_ids)
+                    data = [d.__json__() for d in Database.query.filter(Database.dmp_user_id.in_(user_ids)).all()]
             return resp_hanlder(result=data)
         except Exception as err:
             return resp_hanlder(code=999, err=err)
@@ -28,8 +37,8 @@ def info(desc):
 def dbdel(desc):
     if request.method == "DELETE":
         try:
-            current_user_id = 3
-            # current_user_id = get_current_user().id
+            auth_token = request.headers.get('Authorization')
+            current_user_id = Users.decode_auth_token(auth_token)
             del_database_id = request.json.get("dmp_database_id")
             if del_database_id:
                 del_database = Database.get(del_database_id)
@@ -102,8 +111,8 @@ def connect(desc):
 @database.route("/post/", methods=["POST", "PUT"], defaults={"desc": "添加/修改数据库信息"})
 def post(desc):
     db_info = request.json
-    current_user_id = 3
-    # current_user_id = get_current_user().id
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
     if request.method == "POST":
         try:
             new_db = Database(

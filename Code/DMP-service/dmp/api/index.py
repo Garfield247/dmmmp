@@ -5,11 +5,11 @@
 import time
 from datetime import datetime
 from flask import Blueprint,current_app,request
-from dmp.utils.task import add
+from dmp.utils.job_task import add
 from dmp.models import *
 from dmp.extensions import db
 from dmp.utils import CM_tools,resp_hanlder
-from dmp.utils.task import test_cm
+
 
 index = Blueprint("index", __name__)
 

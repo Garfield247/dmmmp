@@ -9,7 +9,7 @@ from pyhive import hive
 
 class HiveEngone():
 
-    def __init__(self,host,port,user,password,db):
+    def __init__(self,host,port,user,passwd,db):
         try:
             self.connect = hive.Connection(host=host, port=port, username=user, password=password,
                                    database=db)

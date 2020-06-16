@@ -7,7 +7,7 @@ from flask import (Blueprint,
                    jsonify,
                    current_app
                    )
-from dmp.utils.task import add
+from dmp.utils.job_task import add
 from dmp.models import *
 from dmp.extensions import db
 

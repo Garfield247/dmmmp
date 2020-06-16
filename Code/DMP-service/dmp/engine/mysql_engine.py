@@ -12,7 +12,7 @@ class MysqlEngine():
 
         try:
             print(host)
-            current_app.logger.info(host, port, user, passwd, db)
+            # current_app.logger.info(host, port, user, passwd, db)
             self.conn = pymysql.Connect(host=host, port=port, user=user, passwd=passwd, db=db)
             current_app.logger.info(self.conn.server_version)
         except Exception as e :

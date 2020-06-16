@@ -7,8 +7,9 @@ from flask import Blueprint, jsonify, request, current_app
 from dmp.models import FromUpload,FromMigrate,FromDownload,FromAddDataTable,Users,DataTable,Database
 from dmp.utils import resp_hanlder
 from dmp.utils.datax_job_hanlder import mysql_reader,mysql_writer,mongodb_reader,mongodb_writer,hive_reader,hive_writer
-from dmp.utils.task import job_hanlder
+from dmp.utils.job_task import job_hanlder
 from dmp.api.dbtable import post
+from dmp.engine import auto_connect
 
 form = Blueprint("form",__name__)
 
@@ -81,7 +82,7 @@ def migration(desc):
             form_info = request.json
             origin_dmp_table_id = form_info.get("origin_dmp_table_id")
             rule = form_info.get("rule")
-            destination_dmp_datebase_id = form_info.get("destination_dmp_datebase_id")
+            destination_dmp_database_id = form_info.get("destination_dmp_database_id")
             new_table_name = form_info.get("new_table_name")
             method = form_info.get("method")
             description = form_info.get("description")
@@ -89,13 +90,14 @@ def migration(desc):
             new_form = FromMigrate(
                 origin_dmp_table_id = origin_dmp_table_id,
                 rule = rule,
-                destination_dmp_datebase_id = destination_dmp_datebase_id,
+                destination_dmp_database_id = destination_dmp_database_id,
                 new_table_name = new_table_name,
                 method = method,
                 description = description,
                 submit_dmp_user_id = submit_dmp_user_id,
                 )
-            new_form.add()
+            current_app.logger.info(new_form.__json__())
+            new_form.save()
             current_app.logger.info(new_form.id)
             return resp_hanlder(result="OK")
         except Exception as err:
@@ -165,15 +167,17 @@ def approve(desc):
     if request.method == "PUT":
         try:
             approve_form_info = request.json
-
+            auth_token = request.headers.get('Authorization')
+            approve_user_id = Users.decode_auth_token(auth_token)
             form_type = approve_form_info.get("dmp_form_type",None)
             form_id = approve_form_info.get("dmp_form_id",None)
             approve_result = approve_form_info.get("approve_result",None)
             answer = approve_form_info.get("answer",None)
-            approve_user_id =1
+
             if form_type == 1:
                 # 从数据库添加数据表单
                 approve_form = FromAddDataTable.get(form_id)
+                approve_form.approve_dmp_user_id = approve_user_id
                 approve_form.approve_result=approve_result
                 approve_form.answer = answer
                 if approve_result == 1:
@@ -193,6 +197,7 @@ def approve(desc):
             elif form_type == 3:
                 # 数据迁移表单
                 approve_form = FromMigrate.get(form_id)
+                approve_form.approve_dmp_user_id = approve_user_id
                 approve_form.approve_result=approve_result
                 approve_form.answer = answer
                 if approve_result == 1:
@@ -206,7 +211,7 @@ def approve(desc):
                     origin_db_name = origin_database.db_name
                     origin_db_table_name = origin_data_table.db_table_name
 
-                    destination_database = Database.get(approve_form.destination_dmp_datebase_id)
+                    destination_database = Database.get(approve_form.destination_dmp_database_id)
                     destination_database_type = destination_database.db_type
                     destination_db_host =  destination_database.db_host
                     destination_db_port =  destination_database.db_port
@@ -217,7 +222,8 @@ def approve(desc):
 
                     rule = approve_form.rule
                     method = approve_form.method
-
+                    base_column = auto_connect(origin_data_table.dmp_database_id).columns(origin_data_table.db_table_name)
+                    # current_app.logger.info(base_column)
                     reader= []
                     if origin_database_type == 1:
                         # hive_reader
@@ -232,26 +238,27 @@ def approve(desc):
                         fieldDelimiter=',',
                         encoding="utf-8"
                         )
-                        pass
                     elif origin_database_type == 2:
                         # mysql_reader
+                        column = [col.get("dmp_data_table_column_name") for col in base_column]
                         reader = mysql_reader(username=origin_db_username,
                         password=origin_db_passwd,
-                        column=[],
+                        column=column,
                         host=origin_db_host,
                         port=origin_db_port,
                         db=origin_db_name,
                         table=origin_db_table_name,
                         where=None,querySql=None
                         )
-                        pass
+
                     elif origin_database_type == 3:
                         # mongodb
+                        column = [{"name":col.get("dmp_data_table_column_name")} for col in base_column]
                         reader = mongodb_reader(host=origin_db_host,
                         port=origin_db_port,
                         db_name=origin_db_name,
                         collection_name=origin_db_table_name,
-                        column=[],
+                        column=column,
                         username=origin_db_username,
                         password=origin_db_passwd
                         )
@@ -269,10 +276,11 @@ def approve(desc):
                         pass
                     elif destination_database_type == 2:
                         # myqsl_writer
+                        column = [col.get("dmp_data_table_column_name") for col in base_column]
                         writer = mysql_writer(model=method,
                         username=destination_db_username,
                         password=destination_db_passwd,
-                        column=[],
+                        column=column,
                         host=destination_db_host,
                         port=destination_db_port,
                         db=destination_db_name,
@@ -280,18 +288,18 @@ def approve(desc):
                         preSql=None,
                         postSql=None,
                         )
-                        pass
                     elif destination_database_type == 3:
                         # mongo_writer
+                        column = [{"name": col.get("dmp_data_table_column_name")} for col in base_column]
                         writer = mongodb_writer(host=destination_db_host,
                         port=destination_db_port,
                         username=destination_db_username,
                         password=destination_db_passwd,
                         db_name=destination_db_name,
                         collection_name=destination_db_table_name,
-                        column=[],
+                        column=column,
                         )
-                        pass
+
                     job_hanlder.delay(reader= reader,writer=writer)
                 approve_form.put()
                 return resp_hanlder(result="OK!")

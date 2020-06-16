@@ -136,6 +136,7 @@ def columnsetting(desc):
                     dmp_data_table_id=dmp_data_table_id
                 )
                 col_.save()
+
         return resp_hanlder(result="OK!")
 
 

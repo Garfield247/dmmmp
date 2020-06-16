@@ -7,7 +7,7 @@ from flask import jsonify
 
 
 class RET():
-    response_code = {
+    alert_code = {
         0: "success",
         # 参数类错误
         # 101: "required_parameter_missing",
@@ -22,9 +22,7 @@ class RET():
         502: "Database_Occupied",
         # 其他错误
         999: "Other_Error",
-    }
 
-    alert_code = {
         1001: "The email has been sent. Please verify it.",  # 邮件已发送，请激活
         1002: "The password reset request has been sent to the mailbox. Please confirm the reset.",  # 重置密码邮件已发送，请确认重置
         1003: "Successful user login.",  # 用户登陆成功
@@ -82,7 +80,7 @@ def resp_hanlder(**option):
     else:
         response_body = {
             "status": code,
-            "msg": RET.response_code.get(code),
+            "msg": RET.alert_code.get(code),
             "results": result if not err else {"error_msg": str(err)}
         }
     return jsonify(response_body)

@@ -74,8 +74,8 @@ def sys_init():
     Permissions.init_permission()
     from dmp.models import Groups
     Groups.init_group()
-    from dmp.models import Users
-    Users.create_test_user()
+    # from dmp.models import Users
+    # Users.create_test_user()
 
 
 @manager.command

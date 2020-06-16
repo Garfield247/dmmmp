@@ -61,7 +61,7 @@ class Users(db.Model, DMPModel):
         '''用户登录后，发放有效的 JWT'''
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=3600),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=60*60*24),
                 'iat': datetime.datetime.utcnow(),
                 'user_id': self.id
             }
