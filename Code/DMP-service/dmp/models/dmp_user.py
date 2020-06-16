@@ -21,7 +21,7 @@ class Users(db.Model, DMPModel):
     dmp_username = db.Column(db.String(32), unique=True, nullable=False, comment='用户名')
     real_name = db.Column(db.String(32), nullable=False, comment='真实姓名')
     email = db.Column(db.String(32), unique=True, nullable=False, comment='用户邮箱')
-    passwd = db.Column(db.String(64), nullable=False, comment='用户密码，加密储存')
+    passwd = db.Column(db.String(512), nullable=False, comment='用户密码，加密储存')
     confirmed = db.Column(db.Boolean, default=False, comment='用户激活状态')
     icon = db.Column(db.String(128), default=None, comment='用户头像')
     dmp_user_info = db.Column(db.String(256), default=None, comment='个人简介')
