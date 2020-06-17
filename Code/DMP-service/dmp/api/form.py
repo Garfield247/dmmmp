@@ -254,7 +254,7 @@ def approve(desc):
 
                     elif origin_database_type == 3:
                         # mongodb
-                        column = [{"name":col.get("dmp_data_table_column_name")} for col in base_column]
+                        column = [{"index":i+1,"name":col.get("dmp_data_table_column_name"),"type":col.get("dmp_data_table_column_type")} for i,col in enumerate(base_column)]
                         reader = mongodb_reader(host=origin_db_host,
                         port=origin_db_port,
                         db_name=origin_db_name,
