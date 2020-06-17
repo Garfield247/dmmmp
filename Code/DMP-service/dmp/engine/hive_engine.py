@@ -11,9 +11,9 @@ class HiveEngone():
 
     def __init__(self,host,port,user,passwd,db):
         try:
-            self.connect = hive.Connection(host=host, port=port, username=user, password=password,
+            self.connect = hive.Connection(host=host, port=port, username=user, password=passwd,
                                    database=db)
-            current_app.logger.info(self.connect.__dict__)
+            current_app.logger.info(self.client)
         except Exception as e:
             current_app.logger.error("Connect Failed! Error Message：%s"%str(e))
 
@@ -30,17 +30,17 @@ class HiveEngone():
     def columns(self,table_name):
         cursor = self.connect.cursor()
         sql = """
-        Select COLUMN_NAME column, DATA_TYPE type from INFORMATION_SCHEMA.COLUMNS Where table_name = '{table_name}';
+        desc '{table_name}'
         """
         cursor.execute(sql.format(table_name=table_name))
         _d = cursor.fetchall()
-        columns_type_list = [ {"column":column,"type":type} for column,type in _d]
+        columns_type_list = [ {"dmp_data_table_column_name":column,"dmp_data_table_column_type":type} for column,type,comment in _d]
         return columns_type_list
 
     def count(self,table_name):
         cursor = self.connect.cursor()
         sql = """
-        Select count(*) form {table_name};
+        select count(1) from {table_name}
         """
         cursor.execute(sql.format(table_name=table_name))
         _count = cursor.fetchall()
@@ -48,12 +48,12 @@ class HiveEngone():
 
 
 
-    def retrieve(self,table_name,where = "id > 0",limit=100):
+    def retrieve(self,table_name,limit=100):
         cursor = self.connect.cursor()
         sql = """
-        Select * from {table_name } where {where } limit {limit};
+        Select * from {table_name }  limit {limit}
         """
-        cursor.execute(sql.format(table_name=table_name,where=where,limit=limit))
+        cursor.execute(sql.format(table_name=table_name,limit=limit))
         res = cursor.fetchall()
         return res
 

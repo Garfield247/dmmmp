@@ -52,12 +52,12 @@ class MysqlEngine():
 
 
 
-    def retrieve(self,table_name,where = "id > 0",limit=100):
+    def retrieve(self,table_name,limit=100):
         cursor = self.conn.cursor()
         sql = """
-        Select * from {table_name } where {where } limit {limit};
+        Select * from {table_name } limit {limit};
         """
-        cursor.execute(sql.format(table_name=table_name,where=where,limit=limit))
+        cursor.execute(sql.format(table_name=table_name,limit=limit))
         res = cursor.fetchall()
         return res
 

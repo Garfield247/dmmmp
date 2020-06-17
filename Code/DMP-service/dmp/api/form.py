@@ -248,7 +248,8 @@ def approve(desc):
                         port=origin_db_port,
                         db=origin_db_name,
                         table=origin_db_table_name,
-                        where=None,querySql=None
+                        where=None,
+                        # querySql=None
                         )
 
                     elif origin_database_type == 3:

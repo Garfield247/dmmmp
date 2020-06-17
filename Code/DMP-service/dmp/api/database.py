@@ -83,6 +83,7 @@ def connect(desc):
                                        database=db_name)
                 current_app.logger.info(conn.__dict__)
                 conn.close()
+                res = {"connect": "ok!"}
             except Exception as err:
                 return resp_hanlder(code=303, err=err)
         elif int(db_type) == 2:
@@ -102,10 +103,11 @@ def connect(desc):
                 current_app.logger.info(conn.server_info())
                 conn.close()
                 res = {"connect": "ok!"}
+
             except Exception as err:
                 return resp_hanlder(code=303, err=err)
-
         return resp_hanlder(result=res)
+
 
 
 @database.route("/post/", methods=["POST", "PUT"], defaults={"desc": "添加/修改数据库信息"})
