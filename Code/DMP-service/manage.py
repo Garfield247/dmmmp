@@ -68,8 +68,8 @@ def create_test_db_table_data():
 # 初始化
 @manager.command
 def sys_init():
-    db.drop_all()
-    db.create_all()
+    # db.drop_all()
+    # db.create_all()
     from dmp.models import Permissions
     Permissions.init_permission()
     from dmp.models import Groups
