@@ -30,6 +30,7 @@ def info(desc):
             return resp_hanlder(err=err)
 
 
+
 def post(dmp_data_table_name,
          db_table_name,
          description,
@@ -47,6 +48,31 @@ def post(dmp_data_table_name,
     new_db_table.save()
     new_db_table.data_count()
     return new_db_table.__json__()
+
+
+@dbtable.route("/put/",methods=["PUT"],default={"desc":"修改数据表信息"})
+def put(desc):
+    if request.method =="PUT":
+        auth_token = request.headers.get('Authorization')
+        current_user_id = Users.decode_auth_token(auth_token)
+        dbt_info = request.json
+        dbt_id = dbt_info.get("dmp_data_table_id")
+        dbt_name = dbt_info.get("dmp_data_table_name")
+        description = dbt_info.get("description")
+        dbt = DataTable.get(dbt_id)
+        if dbt:
+            dmp_user_id = dbt.dmp_user_id
+            if current_user_id ==1 or current_user_id == dmp_user_id or Users.get(dmp_user_id).leader_dmp_user_id == current_user_id:
+                if dbt_name:
+                    dbt.dmp_data_table_name = dbt_name
+                if description:
+                    dbt.description = description
+                dbt.put()
+                return  resp_hanlder(result="OK!")
+            else:
+                return  resp_hanlder(code=301)
+        else:
+            return  resp_hanlder(code=404)
 
 
 @dbtable.route("/column/", methods=["GET"], defaults={"desc": "获取数据表的列信息"})

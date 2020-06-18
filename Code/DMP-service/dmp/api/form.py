@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
 # @Author  : SHTD
+import os
 
 from flask import Blueprint, jsonify, request, current_app
 from dmp.models import FromUpload,FromMigrate,FromDownload,FromAddDataTable,Users,DataTable,Database
@@ -193,7 +194,33 @@ def approve(desc):
                 return resp_hanlder(result="OK!")
             elif form_type == 2:
                 # 文件上传添加数据表单
-                pass
+                approve_form = FromUpload.get(form_id)
+                approve_form.approve_dmp_user_id = approve_user_id
+                approve_form.approve_result=approve_result
+                approve_form.answer = answer
+
+                file_path = os.path.join(current_app.config.get("UPLOADED_PATH"),approve_form.file_path)
+                filetype = approve_form.get("filetype")
+                filepath = approve_form.get("filepath")
+                column_line = approve_form.get("column_line")
+                column = approve_form.get("column")
+                json_dimension_reduction = approve_form.get("json_dimension_reduction")
+                destination_dmp_datebase_id = approve_form.get("destination_dmp_datebase_id")
+                tablename = approve_form.get("tablename")
+                method = approve_form.get("method")
+                dmp_data_case_id = approve_form.get("dmp_data_case_id")
+                if approve_form.file_type == 1:
+                    # csv
+
+                    pass
+                elif approve_form.file_type == 2:
+                    # json
+                    pass
+                elif approve_form.file_type == 3:
+                    #excel
+                    pass
+                else:
+                    return resp_hanlder(code=999)
             elif form_type == 3:
                 # 数据迁移表单
                 approve_form = FromMigrate.get(form_id)

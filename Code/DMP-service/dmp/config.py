@@ -97,7 +97,7 @@ class TestingConfig(Config):
     # db
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:shtd123.@192.168.3.87:3306/dmpdb?charset=utf8mb4"
     # UPLOADED
-    UPLOADED_PATH = os.path.join(base_dir, "static/upload")
+    UPLOADED_PATH = os.environ.get("DMP_UPLOAD_PATH") or os.path.join(base_dir, "static/upload")
 
     # DataX
     DATAX_HOME = os.environ.get("DATAX_HOME") or ""

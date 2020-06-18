@@ -204,7 +204,7 @@ DMP( *Data Management Platform*)数据管理平台
 | id                          | int      | Primay Key、Unique |                                    |
 | submit_on                   | date     | 非空               | 提交时间                           |
 | submit_dmp_user_id       | int      | 非空               | 提交人                             |
-| filetype                    | Int      | 非空               | 文件类型                           |
+| filetype                    | Int      | 非空               | 文件类型csv1,json2,excel3          |
 | filepath                    | string   | 非空               | 文件路径                           |
 | column_line                 | Int      |                    | 列名行号                           |
 | column                      | string   |                    | 自定义列名                         |
