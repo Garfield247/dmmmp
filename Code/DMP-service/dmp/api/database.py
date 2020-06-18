@@ -134,6 +134,7 @@ def post(desc):
                 db_username=db_info.get("db_username"),
                 db_passwd=db_info.get("db_passwd"),
                 db_name=db_info.get("db_name"),
+                ispublic=db_info.get("ispublic"),
                 description=db_info.get("description"),
                 dmp_user_id=current_user_id,
             )
@@ -159,6 +160,8 @@ def post(desc):
                 modify_db.db_passwd = db_info.get("db_passwd")
             if db_info.get("db_name"):
                 modify_db.db_name = db_info.get("db_name")
+            if db_info.get("ispublic"):
+                modify_db.ispublic = db_info.get("ispublic"),
             if db_info.get("description"):
                 modify_db.description = db_info.get("description")
             modify_db.put()
