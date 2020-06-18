@@ -205,8 +205,9 @@ def approve(desc):
                 column_line = approve_form.get("column_line")
                 column = approve_form.get("column")
                 json_dimension_reduction = approve_form.get("json_dimension_reduction")
-                destination_dmp_datebase_id = approve_form.get("destination_dmp_datebase_id")
-                tablename = approve_form.get("tablename")
+                destination_dmp_database_id = approve_form.get("destination_dmp_database_id")
+                destination_db_table_name = approve_form.get("destination_db_table_name")
+                dmp_data_table_name = approve_form.get("dmp_data_table_name")
                 method = approve_form.get("method")
                 dmp_data_case_id = approve_form.get("dmp_data_case_id")
                 if approve_form.file_type == 1:

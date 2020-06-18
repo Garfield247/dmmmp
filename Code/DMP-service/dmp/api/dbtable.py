@@ -8,6 +8,7 @@ from flask import Blueprint, request, current_app
 from dmp.models import Case, DataTable, Users, Database,DataTableColumn
 from dmp.utils import resp_hanlder
 from dmp.engine import MongodbEngine,MysqlEngine,HiveEngone
+from dmp.engine import auto_connect
 
 dbtable = Blueprint("dbtable", __name__)
 
@@ -50,7 +51,7 @@ def post(dmp_data_table_name,
     return new_db_table.__json__()
 
 
-@dbtable.route("/put/",methods=["PUT"],default={"desc":"修改数据表信息"})
+@dbtable.route("/put/",methods=["PUT"],defaults={"desc":"修改数据表信息"})
 def put(desc):
     if request.method =="PUT":
         auth_token = request.headers.get('Authorization')
@@ -164,6 +165,19 @@ def columnsetting(desc):
                 col_.save()
 
         return resp_hanlder(result="OK!")
+
+
+@dbtable.route("/retrieve/",methods=["GET"],defaults={"desc":"数据查询"})
+def retrieve(desc):
+    if request.method == "GET":
+        retrieve_info = request.json
+        dmp_data_table_id = retrieve_info.get("dmp_data_table_id")
+        dmp_data_table = DataTable.get(dmp_data_table_id)
+        database_id = dmp_data_table.dmp_database_id
+        db_table_name = dmp_data_table.db_table_name
+        conn = auto_connect(db_id=database_id)
+        data = conn.retrieve(db_table_name)
+        return  resp_hanlder(result=data)
 
 
 @dbtable.route("/del/", methods=["DELETE"], defaults={"desc": "删除数据表"})

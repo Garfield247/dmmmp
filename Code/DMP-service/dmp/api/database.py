@@ -109,7 +109,7 @@ def connect(desc):
                 return resp_hanlder(code=303, err=err)
         return resp_hanlder(result=res)
 
-@database.route("/table_list/",methods=["GET"],default={"desc":"获取数据库的数据表"})
+@database.route("/table_list/",methods=["GET"],defaults={"desc":"获取数据库的数据表"})
 def table_list(desc):
     if request.method == "GET":
         db_id= request.json.get("dmp_database_id")

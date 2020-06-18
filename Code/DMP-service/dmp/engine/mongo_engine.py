@@ -32,9 +32,9 @@ class MongodbEngine():
     def count(self,collection):
         return int(self.database[collection].count())
 
-    def retrieve(self,collection,query={}):
+    def retrieve(self,collection,limit=100):
         collection_ = self.database[collection]
-        res_= collection_.find(query,{"_id":0}).limit(100)
+        res_= collection_.find({"_id":0}).limit(100)
         return  res_
 
     def close_conn(self):
