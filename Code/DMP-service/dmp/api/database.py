@@ -6,6 +6,7 @@
 from flask import Blueprint, jsonify, request, current_app
 from dmp.models import Database, Users, DataTable
 from dmp.utils import resp_hanlder
+from dmp.engine import auto_connect
 
 database = Blueprint("database", __name__)
 
@@ -106,6 +107,14 @@ def connect(desc):
 
             except Exception as err:
                 return resp_hanlder(code=303, err=err)
+        return resp_hanlder(result=res)
+
+@database.route("/table_list/",methods=["GET"],default={"desc":"获取数据库的数据表"})
+def table_list(desc):
+    if request.method == "GET":
+        db_id= request.json.get("dmp_database_id")
+        conn = auto_connect(db_id=db_id)
+        res = conn.tables_list()
         return resp_hanlder(result=res)
 
 
