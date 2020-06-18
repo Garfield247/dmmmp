@@ -31,7 +31,7 @@ class FromUpload(db.Model, DMPModel):
     submit_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), nullable=False, comment='提交人')
     destination_dmp_database_id = db.Column(db.Integer, db.ForeignKey('dmp_database.id'), nullable=False,
                                             comment='目标数据库ID')
-    destination_db_table_name =  db_table_name = db.Column(db.String(32), nullable=False, comment='数据库内数据表名称')
+    destination_db_table_name  = db.Column(db.String(32), nullable=False, comment='数据库内数据表名称')
 
     dmp_case_id = db.Column(db.Integer, db.ForeignKey('dmp_case.id'), nullable=False, comment='所属案例')
     dmp_data_table_name = db.Column(db.String(32), unique=True, nullable=False, comment='数据名称')
