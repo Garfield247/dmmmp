@@ -28,7 +28,7 @@ def info(desc):
                     user_ids = [u.id for u in Users.query.filter_by(leader_dmp_user_id=current_user_id).all()]
                     user_ids.append(current_user_id)
                     current_app.logger.info(user_ids)
-                    data = [d.__json__() for d in Database.query.filter(Database.dmp_user_id.in_(user_ids)).all()]
+                    data = [d.__json__() for d in Database.query.filter(Database.dmp_user_id.in_(user_ids) or Database.ispublic==True).all()]
             return resp_hanlder(result=data)
         except Exception as err:
             return resp_hanlder(code=999, err=err)
