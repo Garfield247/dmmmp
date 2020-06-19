@@ -34,8 +34,9 @@ class MongodbEngine():
 
     def retrieve(self,collection,limit=100):
         collection_ = self.database[collection]
-        res_= collection_.find({"_id":0}).limit(100)
-        return  res_
+        res_= collection_.find({},{"_id":0}).limit(100)
+        data = [r for r in res_]
+        return  data
 
     def close_conn(self):
         self.connect.close()
