@@ -107,6 +107,8 @@ venv.bak/
 *.json
 *.pyc
 
+*.sqlite
+*.db
 # IDE
 .idea/
 .vscode/

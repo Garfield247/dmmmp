@@ -125,19 +125,3 @@ class Users(db.Model, DMPModel):
     def verify_password(self, password):
         """验证密码"""
         return check_password_hash(self.passwd, password)
-
-    # # 邮箱修改确认
-    # @staticmethod
-    # def check_newmailactivate_token(token):
-    #     s = Serializer(current_app.config['SECRET_KEY'])
-    #     try:
-    #         data = s.loads(token)  # 解析token
-    #     except BadSignature:
-    #         return False
-    #     except SignatureExpired:
-    #         return False
-    #     user = Users.query.get(data.get('id'))
-    #     if not user:
-    #         return False
-    #     user.email = data.get('newmail')
-    #     return True
