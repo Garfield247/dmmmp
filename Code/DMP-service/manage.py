@@ -93,12 +93,13 @@ def createsuperuser(dmp_username, real_name, passwd, email):
         rootgroup = Groups.query.filter(Groups.id == 1).first()
         user.dmp_group_id = 1
         user.leader_dmp_user_id = None
+        user.confirmed = True
         db.session.add(user)
         db.session.commit()
-        res = EnvelopedData.create_root(rootgroup, user, email)
+        res = EnvelopedData.create_root(rootgroup)
         if isinstance(res, str):
             return {'msg': res}
-        return {'msg': 'The email of the register root has been sent, please click activate.'}
+        return {'msg': 'Super administrator has been created successfully.'}
     else:
         return {'msg': 'The super administrator already exists in the database, please do not add it again.'}
 

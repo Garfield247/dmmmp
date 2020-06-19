@@ -57,12 +57,19 @@ class EnvelopedData():
     @staticmethod
     def info_s1_data(list_obj, res):
         lr_list = []
+        # 判断用户是否显示  --用户管理或者用户组管理tag(可根据给用户组分配权限决定，有/user/list/权限的用户组则显示)
+        is_show = False
+        for p in res['group_permission']:
+            if p.get('route') == '/user/list/':
+                is_show = True
+                break
         for u in list_obj:
             l_dict = {}
             l_dict['id'] = u.id
             l_dict['dmp_username'] = u.dmp_username
             lr_list.append(l_dict)
         res['leader_list'] = lr_list
+        res['is_show'] = is_show
         return res
 
     @staticmethod
@@ -110,7 +117,8 @@ class EnvelopedData():
         return new_obj_dict_list
 
     @classmethod
-    def changeprofile(cls, current_obj, email, passwd, dmp_group_id, confirmed, leader_dmp_user_id, dmp_username, real_name):
+    def changeprofile(cls, current_obj, email, passwd, dmp_group_id, confirmed, leader_dmp_user_id, dmp_username,
+                      real_name):
         cls.__user_profile(current_obj, email, passwd, dmp_group_id, confirmed, dmp_username, real_name)
 
         # 如果leader_dmp_user_id为空，表示的是超级管理员，不直属与任何一个用户
@@ -141,7 +149,8 @@ class EnvelopedData():
     def p_changeprofile(cls, u_group, ret_obj_dict):
         dmp_group_name = Groups.query.filter(Groups.id == ret_obj_dict['dmp_group_id']).first().dmp_group_name
         new_ret_obj_dict = cls.info_s2_data(u_group, ret_obj_dict, dmp_group_name)
-        update_group_name = Groups.query.filter(Groups.id == new_ret_obj_dict.get('dmp_group_id')).first().dmp_group_name
+        update_group_name = Groups.query.filter(
+            Groups.id == new_ret_obj_dict.get('dmp_group_id')).first().dmp_group_name
         new_ret_obj_dict['dmp_group_name'] = update_group_name
         return new_ret_obj_dict
 
@@ -210,11 +219,8 @@ class EnvelopedData():
         return ret_data
 
     @classmethod
-    def create_root(cls, rootgroup, user, email):
+    def create_root(cls, rootgroup):
         '''创建管理员用户'''
-        # ret = PuttingData.put_data(rootgroup, user)
-        # if isinstance(ret, str):
-        #     return ret
         # 给Group用户组的管理员添加权限
         try:
             rootgroup_permissions_list = rootgroup.permissions
@@ -222,7 +228,7 @@ class EnvelopedData():
             permissions_list = Permissions.query.all()
             for p in permissions_list:
                 rootgroup_permissions_list.append(p)
-            ValidationEmail().activate_email(user, email)
+            # ValidationEmail().activate_email(user, email)
             return
         except Exception as err:
             return err
