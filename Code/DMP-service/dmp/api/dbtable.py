@@ -171,7 +171,7 @@ def columnsetting(desc):
 def retrieve(desc):
     if request.method == "GET":
         retrieve_info = request.json
-        dmp_data_table_id = retrieve_info.get("dmp_data_table_id")
+        dmp_data_table_id = retrieve_info.get("dmp_data_t   able_id")
         dmp_data_table = DataTable.get(dmp_data_table_id)
         database_id = dmp_data_table.dmp_database_id
         db_table_name = dmp_data_table.db_table_name
