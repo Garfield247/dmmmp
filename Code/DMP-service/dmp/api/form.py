@@ -3,11 +3,11 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 import os
-
+import pandas as pd
 from flask import Blueprint, jsonify, request, current_app
 from dmp.models import FromUpload,FromMigrate,FromDownload,FromAddDataTable,Users,DataTable,Database
 from dmp.utils import resp_hanlder
-from dmp.utils.datax_job_hanlder import mysql_reader,mysql_writer,mongodb_reader,mongodb_writer,hive_reader,hive_writer
+from dmp.utils.datax_job_hanlder import mysql_reader,mysql_writer,mongodb_reader,mongodb_writer,hive_reader,hive_writer,textfile_reader,textfile_writer
 from dmp.utils.job_task import job_hanlder
 from dmp.api.dbtable import post
 from dmp.engine import auto_connect
@@ -210,8 +210,15 @@ def approve(desc):
                 dmp_data_table_name = approve_form.get("dmp_data_table_name")
                 method = approve_form.get("method")
                 dmp_data_case_id = approve_form.get("dmp_data_case_id")
+                reader = []
                 if approve_form.file_type == 1:
                     # csv
+                    csv_column = list(pd.read_csv(os.path.join(current_app.config.get("DMP_UPLOAD_PATH"),filepath),header=column_line)\
+                    .colums)
+                    reader = textfile_reader(
+                        filepath = filepath,
+                        column = csv_column if not column else column,
+                    )
 
                     pass
                 elif approve_form.file_type == 2:
