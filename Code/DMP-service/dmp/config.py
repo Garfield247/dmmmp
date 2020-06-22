@@ -63,22 +63,6 @@ class DevelopmentConfig(Config):
     DATAX_LOG_PATH = os.environ.get("DATAX_LOG_PATH") or ""
 
     DEBUG = True
-    # White_list
-    WHITE_LIST = [
-        r"^/user/login/",
-        r"^/static/",
-        r"^/user/register/$",
-        r"^/user/logout/$",
-        r"^/user/icon/$",
-        r"^/user/activate/.*",
-        r"^/verifier/email/",
-        r"^/verifier/username/",
-    ]
-    # 免认证
-    NO_PERMISSION_LIST = [
-        r'^/user/index/$',
-        r'^.*$',
-    ]
 
     # ICON_URL
     SAVE_URL = 'dmp/static/icon/'
@@ -88,9 +72,14 @@ class DevelopmentConfig(Config):
 # 测试环境
 class TestingConfig(Config):
     # Mail
-    MAIL_SERVER = os.environ.get('MAIL_SERVER') or ''
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or ''
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or ''
+    # TESTING = True
+    LOG_LEVE = "info"
+    # Mail
+    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.163.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or '15010080053@163.com'
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'KPIKDLKPCQSQELTF'
     # Celery
     CELERY_RESULT_BACKEND = "redis://192.168.3.87:6379/1"
     CELERY_BROKER_URL = "amqp://dmp:dmp123.@192.168.3.87:5672/dmpvhost"
@@ -103,6 +92,10 @@ class TestingConfig(Config):
     DATAX_HOME = os.environ.get("DATAX_HOME") or ""
     DATAX_JOB_PATH = os.environ.get("DATAX_JOB_PATH") or ""
     DATAX_LOG_PATH = os.environ.get("DATAX_LOG_PATH") or ""
+
+    # ICON_URL
+    SAVE_URL = 'dmp/static/icon/'
+    ICON_URL = 'http://192.168.26.1:7789/static/icon/'
 
 
 # 生产环境

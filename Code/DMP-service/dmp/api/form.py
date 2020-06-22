@@ -204,12 +204,21 @@ def approve(desc):
                 filepath = approve_form.get("filepath")
                 column_line = approve_form.get("column_line")
                 column = approve_form.get("column")
-                json_dimension_reduction = approve_form.get("json_dimension_reduction")
-                destination_dmp_database_id = approve_form.get("destination_dmp_database_id")
-                destination_db_table_name = approve_form.get("destination_db_table_name")
-                dmp_data_table_name = approve_form.get("dmp_data_table_name")
-                method = approve_form.get("method")
+                json_dimension_reduction = approve_form.json_dimension_reduction
+                destination_dmp_database_id = approve_form.destination_dmp_database_id
+                destination_db_table_name = approve_form.destination_db_table_name
+                dmp_data_table_name = approve_form.dmp_data_table_name
+                method = approve_form.method
                 dmp_data_case_id = approve_form.get("dmp_data_case_id")
+
+                destination_database = Database.get(destination_dmp_database_id)
+                destination_database_type = destination_database.db_type
+                destination_db_host = destination_database.db_host
+                destination_db_port = destination_database.db_port
+                destination_db_username = destination_database.db_username
+                destination_db_passwd = destination_database.db_passwd
+                destination_db_name = destination_database.db_name
+                destination_db_table_name = approve_form.new_table_name
                 reader = []
                 if approve_form.file_type == 1:
                     # csv
@@ -227,8 +236,46 @@ def approve(desc):
                 elif approve_form.file_type == 3:
                     #excel
                     pass
-                else:
-                    return resp_hanlder(code=999)
+                writer = []
+                if destination_database_type == 1:
+                    # hive_writer
+                    writer = hive_writer(host=destination_db_host,
+                                         port=destination_db_port,
+                                         path=None,
+                                         filename=None,
+                                         column=[],
+                                         fieldDelimiter=",",
+                                         )
+                    pass
+                elif destination_database_type == 2:
+                    # myqsl_writer
+                    column = [col.get("dmp_data_table_column_name") for col in base_column]
+                    writer = mysql_writer(model=method,
+                                          username=destination_db_username,
+                                          password=destination_db_passwd,
+                                          column=column,
+                                          host=destination_db_host,
+                                          port=destination_db_port,
+                                          db=destination_db_name,
+                                          table=destination_db_table_name,
+                                          preSql=None,
+                                          postSql=None,
+                                          )
+                elif destination_database_type == 3:
+                    # mongo_writer
+                    column = [{"name": col.get("dmp_data_table_column_name")} for col in base_column]
+                    writer = mongodb_writer(host=destination_db_host,
+                                            port=destination_db_port,
+                                            username=destination_db_username,
+                                            password=destination_db_passwd,
+                                            db_name=destination_db_name,
+                                            collection_name=destination_db_table_name,
+                                            column=column,
+                                            )
+
+                job_hanlder.delay(reader=reader, writer=writer)
+                return resp_hanlder(result="OK!")
+
             elif form_type == 3:
                 # 数据迁移表单
                 approve_form = FromMigrate.get(form_id)

@@ -14,13 +14,12 @@ from dmp.utils import CM_tools,resp_hanlder
 index = Blueprint("index", __name__)
 
 
-import cm_client as cm
+
 
 @index.route('/modelhealth/', methods=["GET"], defaults={"desc": "组件健康状态"})
 def modelhealth(desc):
     if request.method == "GET":
         try:
-            cm = CM_tools()
             res = cm.get_model_health()
             return resp_hanlder(result= res)
         except Exception as err:
@@ -32,6 +31,7 @@ def disk_io(desc):
     if request.method == "GET":
         try:
             time_interval = request.json.get("time_interval")
+            cm = CM_tools()
             res = cm.get_disk_IO(time_interval)
             return resp_hanlder(result=res)
         except Exception as err:
@@ -44,6 +44,7 @@ def network_io(desc):
     if request.method == "GET":
         try:
             time_interval = request.json.get("time_interval")
+            cm = CM_tools()
             res = cm.get_network_IO(time_interval)
             return resp_hanlder(result=res)
         except Exception as err:
@@ -55,7 +56,8 @@ def cpu_usage(desc):
     if request.method == "GET":
         try:
             time_interval = request.json.get("time_interval")
-            res = cm.get_model_health(time_interval)
+            cm = CM_tools()
+            res = cm.get_cpu_usage(time_interval)
             return resp_hanlder(result=res)
         except Exception as err:
             return resp_hanlder(err=err)
@@ -66,7 +68,8 @@ def hdfs_io(desc):
     if request.method == "GET":
         try:
             time_interval = request.json.get("time_interval")
-            res = cm.get_model_health(time_interval)
+            cm = CM_tools()
+            res = cm.get_hdfs_IO(time_interval)
             return resp_hanlder(result=res)
         except Exception as err:
             return resp_hanlder(err=err)
@@ -111,3 +114,10 @@ def get_disk_IO_test(desc):
     c.close()
 
     return resp_hanlder(result=buffer.getvalue().decode())
+@index.route('/cm_test/', methods=["GET"], defaults={"desc": "组件健康状态"})
+def get_cm_test(desc):
+    from dmp.utils import CM_tools
+    the_cm = CM_tools()
+    res = the_cm.get_cpu_usage(time_interval=3600)
+
+    return resp_hanlder(result=res)
