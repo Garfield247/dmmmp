@@ -20,6 +20,7 @@ index = Blueprint("index", __name__)
 def modelhealth(desc):
     if request.method == "GET":
         try:
+            cm = CM_tools()
             res = cm.get_model_health()
             return resp_hanlder(result= res)
         except Exception as err:
