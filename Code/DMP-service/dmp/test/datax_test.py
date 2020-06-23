@@ -3,10 +3,12 @@
 # @Date    : 2020/5/25
 # @Author  : SHTD 
 
-
+import os
 from flask import current_app
-from dmp.utils.datax_job_hanlder import mongodb_reader,mysql_writer
+import pandas as pd
+from dmp.utils.datax_job_hanlder import mongodb_reader,mysql_writer,textfile_reader,textfile_writer,hive_reader,hive_writer
 from dmp.utils.job_task import job_hanlder
+from dmp.engine import create_table_query_hanlder
 def test():
     mongo_cloumn = [{"index": 1, "name": "job_name", "type": "string"},
                                                        {"index": 2, "name": "tag", "type": "string"},
@@ -35,3 +37,35 @@ def test():
     res = job_hanlder.delay(reader=r,writer=w)
     current_app.logger.info(res)
 
+def test_csv2mysql():
+    table_name = "testxxx"
+    file_path = os.path.join(current_app.config.get("UPLOADED_PATH"), "hdy2.csv")
+    csv_column = list(pd.read_csv(file_path, header=0).columns)
+    csv_column_d = [{"index":i,"type":"string"}for i,cc in enumerate(csv_column)]
+    r = textfile_reader(
+        filepath=file_path,
+        column=csv_column_d
+
+    )
+    preSql = create_table_query_hanlder(table_name=table_name,fields=csv_column)
+    w = mysql_writer(model=1, host="192.168.3.87", port=3306, username="root", password="shtd123.", column=csv_column,
+                     db="dmp_test", table="test_hdy", preSql=preSql, postSql=None)
+
+    res = job_hanlder.delay(reader=r, writer=w)
+    current_app.logger.info(res)
+
+def test_csv2hive():
+    table_name = "testxxx"
+    file_path = os.path.join(current_app.config.get("UPLOADED_PATH"), "hdy2.csv")
+    csv_column = list(pd.read_csv(file_path, header=0).columns)
+    csv_column_d = [{"index":i,"type":"string"}for i,cc in enumerate(csv_column)]
+    r = textfile_reader(
+        filepath=file_path,
+        column=csv_column_d
+
+    )
+    hive_columns = [{"name":col,"type":"string"}for col in csv_column]
+    w = hive_writer(host="192.168.3.140",port=10000,filename="test1",path="/user/hive/warehouse/test.db/test_hdy",column=hive_columns)
+
+    res = job_hanlder.delay(reader=r, writer=w)
+    current_app.logger.info(res)

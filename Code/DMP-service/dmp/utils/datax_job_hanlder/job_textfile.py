@@ -11,6 +11,7 @@ def textfile_reader(filepath,column,encoding="UTF-8",fieldDelimiter=","):
                         "path": [filepath],
                         "encoding": encoding,
                         "column": column,
+                        "skipHeader":True,
                         "fieldDelimiter": fieldDelimiter,
                     }}
     return textfile_reader_json

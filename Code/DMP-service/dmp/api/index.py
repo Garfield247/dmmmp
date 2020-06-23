@@ -115,10 +115,20 @@ def get_disk_IO_test(desc):
     c.close()
 
     return resp_hanlder(result=buffer.getvalue().decode())
+
+
 @index.route('/cm_test/', methods=["GET"], defaults={"desc": "组件健康状态"})
 def get_cm_test(desc):
     from dmp.utils import CM_tools
     the_cm = CM_tools()
     res = the_cm.get_cpu_usage(time_interval=3600)
 
+    return resp_hanlder(result=res)
+
+
+@index.route('/hdfs_disk_usage/', methods=["GET"], defaults={"desc": "HDFS磁盘占用"})
+def get_hdfs_disk_usage(desc):
+    from dmp.utils import CM_tools
+    the_cm = CM_tools()
+    res = the_cm.get_hdfs_disk_usage(time_interval=60)
     return resp_hanlder(result=res)

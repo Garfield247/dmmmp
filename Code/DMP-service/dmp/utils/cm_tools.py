@@ -56,3 +56,14 @@ class CM_tools():
         query = "select total_bytes_read_rate_across_datanodes, total_bytes_written_rate_across_datanodes where category = SERVICE and serviceType = HDFS"
         res = self.services_api_IO.query_time_series(_from=from_time, query=query, to=to_time).to_dict()
         return res
+
+    def get_hdfs_disk_usage(self, time_interval):
+        from_time = datetime.datetime.fromtimestamp(
+            time.time() - int(60))
+        to_time = datetime.datetime.fromtimestamp(time.time())
+        query = "select dfs_capacity, dfs_capacity_used, dfs_capacity_used_non_hdfs where entityName=hdfs"
+        res = self.services_api_IO.query_time_series(_from=from_time, query=query, to=to_time).to_dict()
+
+        res_ = [ {"metric_name":serie.get("metadata",{}).get("metric_name"),"value":serie.get("data",{})[0].get("value")} for serie in res.get("items",{})[0].get("time_series",[])]
+        # print(res_)
+        return res_

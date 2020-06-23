@@ -40,7 +40,7 @@ def from_db(desc):
             return resp_hanlder(code=999,err=err)
 
 
-@form.route("/formfile/",methods=["POST"],defaults={"desc":"从文件添加数据表的表单"})
+@form.route("/fromfile/",methods=["POST"],defaults={"desc":"从文件添加数据表的表单"})
 def from_file(desc):
     if request.method == "POST":
         try:
@@ -50,8 +50,9 @@ def from_file(desc):
             column_line = form_info.get("column_line")
             column = form_info.get("column")
             json_dimension_reduction = form_info.get("json_dimension_reduction")
-            destination_dmp_datebase_id = form_info.get("destination_dmp_datebase_id")
-            tablename = form_info.get("tablename")
+            destination_dmp_database_id = form_info.get("destination_dmp_database_id")
+            destination_db_table_name = form_info.get("tablename")
+            dmp_data_table_name = form_info.get("dmp_data_table_name")
             method = form_info.get("method")
             dmp_data_case_id = form_info.get("dmp_data_case_id")
             description = form_info.get("description")
@@ -62,8 +63,9 @@ def from_file(desc):
                 column_line = column_line,
                 column = column,
                 json_dimension_reduction = json_dimension_reduction,
-                destination_dmp_datebase_id = destination_dmp_datebase_id,
-                new_tablename = tablename,
+                destination_dmp_database_id = destination_dmp_database_id,
+                destination_db_table_name = destination_db_table_name,
+                dmp_data_table_name=dmp_data_table_name,
                 method = method,
                 dmp_data_case_id = dmp_data_case_id,
                 description = description,
