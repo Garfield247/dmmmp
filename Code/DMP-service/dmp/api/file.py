@@ -5,7 +5,7 @@
 import os
 
 from flask import Blueprint, jsonify, request, current_app
-from dmp.utils import resp_hanlder
+from dmp.utils import resp_hanlder,uuid_str
 
 file = Blueprint("file", __name__)
 
@@ -32,12 +32,13 @@ def upload(desc):
 
 @file.route("/success/", methods=["GET"], defaults={"desc": "文件上传完成"})
 def success(desc):
-    target_filename = request.josn.get('filename')
+    target_filename = request.json.get('filename')
     task = request.args.get('task_id')
     chunk = 0
     upload_path = current_app.config.get("UPLOADED_PATH")
     current_app.logger.info("%s%s%s"%(target_filename,task,upload_path))
-    with open(os.path.join(upload_path, target_filename), 'wb') as target_file:
+    finally_filename = uuid_str()+target_filename
+    with open(os.path.join(upload_path, finally_filename), 'wb') as target_file:
         while True:
             try:
                 filename = os.path.join(upload_path, '%s%d'%(task, chunk))
@@ -51,7 +52,7 @@ def success(desc):
             chunk += 1
             # 删除该分片，节约空间
             os.remove(filename)
-    current_app.logger.info(target_filename)
+    current_app.logger.info(finally_filename)
     return resp_hanlder(result={"filename": target_filename})
 
 

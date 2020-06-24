@@ -26,6 +26,8 @@ class Config:
         r"^/user/forgetpwd/",
         r"^/verifier/email/",
         r"^/verifier/username/",
+        r"^/file/upload/",
+        r"^/file/download/",
     ]
     # 免认证
     NO_PERMISSION_LIST = [
