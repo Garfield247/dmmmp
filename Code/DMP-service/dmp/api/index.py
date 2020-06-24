@@ -5,6 +5,8 @@
 import time
 from datetime import datetime
 from flask import Blueprint,current_app,request
+from sqlalchemy import func
+
 from dmp.utils.job_task import add
 from dmp.models import *
 from dmp.extensions import db
@@ -14,7 +16,20 @@ from dmp.utils import CM_tools,resp_hanlder
 index = Blueprint("index", __name__)
 
 
+@index.route("/case_count/",methods=["GET"],defaults={"desc": "案例数据量信息"})
+def case_count(desc):
+    # counts = db.session.query(DataTable.dmp_case_id,func.sum(DataTable.db_data_count)).group_by(DataTable.dmp_case_id).all()
+    # data = [ {"case_name":Case.get(case_id).dmp_case_name,"count":count}  for case_id,count in counts ]
+    for dg in DataTable.query.group_by(DataTable.dmp_case_id):
+        print(dg.query.count())
+    data = []
+    return resp_hanlder(result=data)
 
+@index.route("/case_table/",methods=["GET"],defaults={"desc": "案例数据表信息"})
+def case_table(desc):
+    counts = db.session.query(DataTable.dmp_case_id,func.sum(DataTable.dmp_case_id)).group_by(DataTable.dmp_case_id).all()
+    data = [ {"case_name":Case.get(case_id).dmp_case_name,"count":count}  for case_id,count in counts ]
+    return resp_hanlder(result=data)
 
 @index.route('/modelhealth/', methods=["GET"], defaults={"desc": "组件健康状态"})
 def modelhealth(desc):

@@ -16,7 +16,7 @@ class DataTable(db.Model, DMPModel):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     dmp_data_table_name = db.Column(db.String(32), unique=True, nullable=False, comment='数据名称')
     db_table_name = db.Column(db.String(32), nullable=False, comment='数据库内数据表名称')
-    db_data_count = db.Column(db.Integer,comment='数据表内的数据量')
+    db_data_count = db.Column(db.Integer,default=0,comment='数据表内的数据量')
     description = db.Column(db.String(128), comment='数据说明')
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
@@ -24,28 +24,17 @@ class DataTable(db.Model, DMPModel):
     dmp_database_id = db.Column(db.Integer, db.ForeignKey('dmp_database.id'), nullable=False, comment='数据库ID')
     dmp_case_id = db.Column(db.Integer, db.ForeignKey('dmp_case.id'), nullable=False, comment='所属案例ID')
 
-    # users = db.relationship('Users', backref='users_datatable')
+    users = db.relationship('Users', backref='users_datatable')
     database = db.relationship('Database', backref='database_datatable')
-    # case = db.relationship('Case', backref='case_datatable')
+    case = db.relationship('Case', backref='case_datatable')
 
     def data_count(self):
-        from dmp.utils.engine import engines
-        from dmp.models import Database
-        db = Database.get(self.dmp_database_id)
-        current_app.logger.info(db.__json__())
-        Engine = engines.get(db.db_type)
-        if Engine:
-            conn = Engine(host=db.db_host,
-            port=db.db_port,
-            user = db.db_username,
-            passwd = db.db_passwd,
-            db = db.db_name,
-            )
-            count = conn.count(self.db_table_name)
-            self.db_data_count  = count
-            self.put()
-        else:
-            return 0
+        from dmp.utils.engine import auto_connect
+        conn = auto_connect(self.dmp_database_id)
+        count = conn.count(self.db_table_name)
+        self.db_data_count  = count
+        self.put()
+
 
     def delete(self):
         from dmp.models import DataTableColumn

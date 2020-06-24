@@ -6,7 +6,7 @@
 import os
 import json
 
-def mysql_reader(username,password,column,host,port,db,table,where,querySql):
+def mysql_reader(username,password,column,host,port,db,table,where):
     """
     mysql数据读取者构造器
     :param username: str,数据库用户名,必填
@@ -17,7 +17,6 @@ def mysql_reader(username,password,column,host,port,db,table,where,querySql):
     :param db: str,数据库名称,必填
     :param table: str,数据表名称,必填
     :param where: str,筛选条件,非必填
-    :param querySql: str,自定SQL语句，非必填
     :return:
     """
 
@@ -29,7 +28,6 @@ def mysql_reader(username,password,column,host,port,db,table,where,querySql):
             "column": column,
             "connection": [
                 {
-                "querySql": [querySql],
                 "jdbcUrl": "jdbc:mysql://%s:%d/%s"%(host,port,db),
                 "table": [table]
                 }
@@ -39,7 +37,7 @@ def mysql_reader(username,password,column,host,port,db,table,where,querySql):
         }
     return mysql_reader_josn
 
-def mysql_writer(model,username,password,column,host,port,db,table,preSql,postSql):
+def mysql_writer(model,username,password,column,host,port,db,table):
     """
     mysql数据写入者构造器
     :param model: int，写入模式，必填 1 insert 2 replace 3 update
@@ -50,8 +48,7 @@ def mysql_writer(model,username,password,column,host,port,db,table,preSql,postSq
     :param port: int,数据库端口,必填
     :param db: str,数据库名称,必填
     :param table: str,数据表名称,必填
-    :param preSql: list[str],数据写入前执行的SQL，非必填
-    :param postSql: list[str],数据写入后执行的SQL语句，非必填
+
     :return:
     """
 
@@ -67,8 +64,6 @@ def mysql_writer(model,username,password,column,host,port,db,table,preSql,postSq
             "username": username,
             "password": password,
             "column": column,
-            "preSql": preSql,
-            "postSql":postSql,
             "connection": [
                 {
                     "jdbcUrl": "jdbc:mysql://%s:%d/%s"%(host,port,db),
