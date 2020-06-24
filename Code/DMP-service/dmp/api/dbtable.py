@@ -121,6 +121,7 @@ def column(desc):
                         mark = False
                 if mark:
                     columns.append(i)
+            current_app.logger.info(columns)
             return resp_hanlder(result=columns)
         except Exception as err:
             current_app.logger.error(err)
@@ -177,6 +178,7 @@ def retrieve(desc):
         db_table_name = dmp_data_table.db_table_name
         conn = auto_connect(db_id=database_id)
         data = conn.retrieve(db_table_name)
+        current_app.logger.info(data)
         return  resp_hanlder(result=data)
 
 

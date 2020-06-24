@@ -29,6 +29,7 @@ def info(desc):
                     user_ids.append(current_user_id)
                     current_app.logger.info(user_ids)
                     data = [d.__json__() for d in Database.query.filter(Database.dmp_user_id.in_(user_ids) or Database.ispublic==True).all()]
+                    current_app.logger.info(data)
             return resp_hanlder(result=data)
         except Exception as err:
             return resp_hanlder(code=999, err=err)
@@ -115,6 +116,7 @@ def table_list(desc):
         db_id= request.json.get("dmp_database_id")
         conn = auto_connect(db_id=db_id)
         res = conn.tables_list()
+        current_app.logger.info(res)
         return resp_hanlder(result=res)
 
 

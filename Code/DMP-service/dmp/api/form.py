@@ -135,8 +135,13 @@ def download(desc):
 
 
 def form_permission(user_id):
-    if user_id:
-        return 3
+    user = Users.get(user_id)
+    if user.groups.id == 1:
+        return  3
+    elif user.groups.id ==2:
+        return 2
+    elif user.groups.id ==3:
+        return 1
 
 
 @form.route("/info/", methods=["GET"], defaults={"desc": "获取表单信息"})
@@ -146,7 +151,8 @@ def info(desc):
                  FromUpload,
                  FromMigrate,
                  FromDownload, ]
-        user_id = 2
+        auth_token = request.headers.get('Authorization')
+        user_id = Users.decode_auth_token(auth_token)
         try:
             committed, pending, complete = [], [], []
             if form_permission(user_id) == 1:
