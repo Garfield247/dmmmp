@@ -11,7 +11,7 @@ class HiveEngone():
 
     def __init__(self,host,port,user,passwd,db):
         try:
-            self.connect = hive.Connection(host=host, port=port, username=user, password=passwd,
+            self.conn = hive.Connection(host=host, port=port, username=user, password=passwd,
                                    database=db)
             current_app.logger.info(self.client)
         except Exception as e:
@@ -28,7 +28,7 @@ class HiveEngone():
         return result
         
     def columns(self,table_name):
-        cursor = self.connect.cursor()
+        cursor = self.conn.cursor()
         sql = """
         desc '{table_name}'
         """
@@ -38,7 +38,7 @@ class HiveEngone():
         return columns_type_list
 
     def count(self,table_name):
-        cursor = self.connect.cursor()
+        cursor = self.conn.cursor()
         sql = """
         select count(1) from {table_name}
         """
@@ -47,11 +47,11 @@ class HiveEngone():
         return int(_count[0][0])
 
     def execsql(self,sql):
-        cursor = self.connect.cursor()
+        cursor = self.conn.cursor()
         cursor.execute(sql)
 
     def retrieve(self,table_name,limit=100):
-        cursor = self.connect.cursor()
+        cursor = self.conn.cursor()
         sql = """
         Select * from {table_name }  limit {limit}
         """
@@ -60,4 +60,4 @@ class HiveEngone():
         return res
 
     def close_conn(self):
-        self.connect.close()
+        self.conn.close()
