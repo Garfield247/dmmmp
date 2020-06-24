@@ -318,7 +318,7 @@ def approve(desc):
                     elif method == 3:
                         preSQL = [del_table_sql.format(table_name=destination_db_table_name), create_table_sql]
                     column = [col.get("dmp_data_table_column_name") for col in text_column]
-                    writer = mysql_writer(model=method,
+                    writer = mysql_writer(model=1,
                                           username=destination_db_username,
                                           password=destination_db_passwd,
                                           column=column,
@@ -457,7 +457,7 @@ def approve(desc):
                                                                       semicolon=True,
                                                                       fieldDelimiter=None)
                         preSQL = [create_table_sql]
-                        writer = mysql_writer(model=method,
+                        writer = mysql_writer(model=1,
                                               username=destination_db_username,
                                               password=destination_db_passwd,
                                               column=column,
@@ -484,7 +484,7 @@ def approve(desc):
                 approve_form.put()
                 return resp_hanlder(result="OK!")
             elif form_type == 4:
-                # 数据迁移表单
+                # 数据导出表单
                 approve_form = FromDownload.get(form_id)
                 approve_form.approve_dmp_user_id = approve_user_id
                 approve_form.approve_result = approve_result
@@ -500,7 +500,6 @@ def approve(desc):
                     origin_db_name = origin_database.db_name
                     origin_db_table_name = origin_data_table.db_table_name
                     rule = approve_form.rule
-                    method = approve_form.method
                     base_column = auto_connect(origin_data_table.dmp_database_id).columns(
                         origin_data_table.db_table_name)
                     # current_app.logger.info(base_column)
