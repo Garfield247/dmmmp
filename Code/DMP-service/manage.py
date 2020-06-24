@@ -24,8 +24,10 @@ manager.add_command('runserver', Server(host='0.0.0.0', port=7789))
 # 路由列表命令
 @manager.command
 def url_map():
-    for i in app.url_map.__dict__.get("_rules"):
-        app.logger.info(i)
+    permission_list = [{"route": r.rule, "desc": None if not r.defaults else r.defaults.get("desc")} for r in
+                       app.url_map.__dict__.get("_rules")]
+    for per in permission_list:
+        app.logger.info(per)
 
 
 # 删除所有表
