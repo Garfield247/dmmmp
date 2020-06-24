@@ -481,8 +481,8 @@ def approve(desc):
                         column = [{"name": col.get("dmp_data_table_column_name")} for col in base_column]
                         writer = mongodb_writer(host=destination_db_host,
                                                 port=destination_db_port,
-                                                username=destination_db_username,
-                                                password=destination_db_passwd,
+                                                username=destination_db_username if destination_db_username else None,
+                                                password=destination_db_passwd if destination_db_passwd else None,
                                                 db_name=destination_db_name,
                                                 collection_name=destination_db_table_name,
                                                 column=column,

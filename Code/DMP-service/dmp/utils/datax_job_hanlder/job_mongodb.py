@@ -30,7 +30,7 @@ def mongodb_writer(host,port,username,password,db_name,collection_name,column):
     :return:
     """
     mongodb_writer_json = {
-        "name": "mongodb_writer",
+        "name": "mongodbwriter",
               "parameter": {
                   "address": [
                       "%s:%d"%(host,port)
