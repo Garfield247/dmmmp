@@ -332,8 +332,6 @@ def approve(desc):
                                           port=destination_db_port,
                                           db=destination_db_name,
                                           table=destination_db_table_name,
-                                          preSql=preSQL,
-                                          postSql=None,
                                           )
                 elif destination_database_type == 3:
                     # mongo_writer
@@ -473,8 +471,6 @@ def approve(desc):
                                               port=destination_db_port,
                                               db=destination_db_name,
                                               table=destination_db_table_name,
-                                              preSql=preSQL,
-                                              postSql=None,
                                               )
                     elif destination_database_type == 3:
                         # mongo_writer
