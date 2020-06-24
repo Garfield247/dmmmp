@@ -19,7 +19,7 @@ class MongodbEngine():
 
     def tables_list(self):
         res = self.database.collection_names()
-        data
+        # data
         return res
 
     def columns(self, collection):
