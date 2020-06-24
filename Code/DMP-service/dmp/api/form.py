@@ -313,14 +313,16 @@ def approve(desc):
                                                                   id_primary_key=True,
                                                                   semicolon=True,
                                                                   fieldDelimiter=None)
+                    mysql_conn = auto_connect(destination_dmp_database_id)
                     del_table_sql = "drop table {table_name };"
                     preSQL = []
                     if method == 1:
-                        preSQL = [create_table_sql]
+                        mysql_conn.execsql(sql=create_table_sql)
                     elif method == 2:
                         pass
                     elif method == 3:
-                        preSQL = [del_table_sql.format(table_name=destination_db_table_name), create_table_sql]
+                        mysql_conn.execsql(del_table_sql.format(table_name=destination_db_table_name))
+                        mysql_conn.execsql(create_table_sql)
                     column = [col.get("dmp_data_table_column_name") for col in text_column]
                     writer = mysql_writer(model=1,
                                           username=destination_db_username,
@@ -460,7 +462,9 @@ def approve(desc):
                                                                       id_primary_key=True,
                                                                       semicolon=True,
                                                                       fieldDelimiter=None)
-                        preSQL = [create_table_sql]
+                        mysql_conn  = auto_connect(approve_form.destination_dmp_database_id)
+                        mysql_conn.execsql(sql=create_table_sql)
+                        preSQL = []
                         writer = mysql_writer(model=1,
                                               username=destination_db_username,
                                               password=destination_db_passwd,
