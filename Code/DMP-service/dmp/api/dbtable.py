@@ -186,15 +186,14 @@ def retrieve(desc):
 def dbtdel(desc):
     if request.method == "DELETE":
         try:
-            current_user_id = 3
-            # current_user_id = get_current_user().id
+            auth_token = request.headers.get('Authorization')
+            current_user_id = Users.decode_auth_token(auth_token)
             del_data_table_id = request.json.get("dmp_data_table_id")
             if del_data_table_id:
                 del_data_table = DataTable.get(del_data_table_id)
                 if del_data_table:
                     is_user = Users.get(DataTable.get(del_data_table_id).dmp_user_id).id == current_user_id
-                    is_user_leader = Users.get(
-                        DataTable.get(del_data_table_id).dmp_user_id).leader_dmp_user_id == current_user_id
+                    is_user_leader = Users.get(DataTable.get(del_data_table_id).dmp_user_id).leader_dmp_user_id == current_user_id
                     is_admin = Users.get(current_user_id).dmp_group_id == 1
                     if is_user or is_user_leader or is_admin:
                         del_data_table.delete()

@@ -50,7 +50,7 @@ class DataTable(db.Model, DMPModel):
     def delete(self):
         from dmp.models import DataTableColumn
         data_table_columns = DataTableColumn.query.filter_by(
-            dmp_database_id=self.id).all()
+            dmp_data_table_id=self.id).all()
         for dtc in data_table_columns:
             current_app.logger.info(dtc.__json__())
             dtc.delete()

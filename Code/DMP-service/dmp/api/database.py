@@ -58,7 +58,7 @@ def dbdel(desc):
                         else:
                             return resp_hanlder(code=501)
                     else:
-                        return resp_hanlder(code=501)
+                        return resp_hanlder(code=301)
                 else:
                     return resp_hanlder(code=404)
             else:
