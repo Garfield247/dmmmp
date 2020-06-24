@@ -20,7 +20,7 @@ class FromUpload(db.Model, DMPModel):
     new_table_name = db.Column(db.String(32), nullable=False, comment='表名')
     method = db.Column(db.Integer, default=1, comment='新建1、添加2或覆盖3')
     description = db.Column(db.String(128), comment='说明')
-    submit_on = db.Column(db.DateTime, nullable=False, comment='提交时间')
+    submit_on = db.Column(db.DateTime, default=datetime.datetime.now, nullable=False, comment='提交时间')
     approve_on = db.Column(db.DateTime, comment='审批时间')
     approve_result = db.Column(db.Integer, default=0, comment='审批结果,默认:0,通过:1,不通过:2')
     answer = db.Column(db.String(32), comment='审批答复')
