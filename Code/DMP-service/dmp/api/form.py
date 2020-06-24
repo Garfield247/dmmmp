@@ -22,13 +22,14 @@ form = Blueprint("form", __name__)
 def from_db(desc):
     if request.method == "POST":
         try:
+            auth_token = request.headers.get('Authorization')
+            submit_dmp_user_id = Users.decode_auth_token(auth_token)
             form_info = request.json
             data_tablename = form_info.get("data_tablename")
             db_tablename = form_info.get("db_tablename")
             database_id = form_info.get("database_id")
             dmp_data_case_id = form_info.get("dmp_data_case_id")
             description = form_info.get("description")
-            submit_dmp_user_id = 3
             new_form = FromAddDataTable(
                 dmp_data_table_name=data_tablename,
                 db_table_name=db_tablename,
@@ -48,6 +49,8 @@ def from_db(desc):
 def from_file(desc):
     if request.method == "POST":
         try:
+            auth_token = request.headers.get('Authorization')
+            submit_dmp_user_id = Users.decode_auth_token(auth_token)
             form_info = request.json
             filetype = form_info.get("filetype")
             filepath = form_info.get("filepath")
@@ -60,7 +63,6 @@ def from_file(desc):
             method = form_info.get("method")
             dmp_data_case_id = form_info.get("dmp_data_case_id")
             description = form_info.get("description")
-            submit_dmp_user_id = 3
             new_form = FromUpload(
                 filetype=filetype,
                 filepath=filepath,
@@ -86,6 +88,8 @@ def from_file(desc):
 def migration(desc):
     if request.method == "POST":
         try:
+            auth_token = request.headers.get('Authorization')
+            submit_dmp_user_id = Users.decode_auth_token(auth_token)
             form_info = request.json
             origin_dmp_table_id = form_info.get("origin_dmp_table_id")
             rule = form_info.get("rule")
@@ -93,7 +97,6 @@ def migration(desc):
             new_table_name = form_info.get("new_table_name")
             method = form_info.get("method")
             description = form_info.get("description")
-            submit_dmp_user_id = 3
             new_form = FromMigrate(
                 origin_dmp_table_id=origin_dmp_table_id,
                 rule=rule,
@@ -114,11 +117,12 @@ def migration(desc):
 def download(desc):
     if request.method == "POST":
         try:
+            auth_token = request.headers.get('Authorization')
+            submit_dmp_user_id = Users.decode_auth_token(auth_token)
             form_info = request.json
             dmp_data_table_id = form_info.get("dmp_data_table_id")
             rule = form_info.get("rule")
             description = form_info.get("description")
-            submit_dmp_user_id = 3
             new_form = FromDownload(
                 dmp_data_table_id=dmp_data_table_id,
                 rule=rule,
