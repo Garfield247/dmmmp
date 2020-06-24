@@ -115,13 +115,13 @@ def download(desc):
     if request.method == "POST":
         try:
             form_info = request.json
-            dmp_table_id = form_info.get("dmp_table_id")
+            dmp_data_table_id = form_info.get("dmp_data_table_id")
             rule = form_info.get("rule")
             destination_dmp_datebase_id = form_info.get("destination_dmp_datebase_id")
             description = form_info.get("description")
             submit_dmp_user_id = 3
             new_form = FromDownload(
-                dmp_table_id=dmp_table_id,
+                dmp_data_table_id=dmp_data_table_id,
                 rule=rule,
                 destination_dmp_datebase_id=destination_dmp_datebase_id,
                 description=description,
