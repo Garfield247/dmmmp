@@ -30,7 +30,7 @@ def from_db(desc):
             database_id = form_info.get("database_id")
             dmp_data_case_id = form_info.get("dmp_data_case_id")
             description = form_info.get("description")
-            new_form = FromUpload(
+            new_form = FromAddDataTable(
                 dmp_data_table_name=data_tablename,
                 db_table_name=db_tablename,
                 dmp_database_id=database_id,
@@ -73,7 +73,7 @@ def from_file(desc):
                 destination_db_table_name=destination_db_table_name,
                 dmp_data_table_name=dmp_data_table_name,
                 method=method,
-                dmp_data_case_id=dmp_data_case_id,
+                dmp_case_id=dmp_data_case_id,
                 description=description,
                 submit_dmp_user_id=submit_dmp_user_id,
             )
