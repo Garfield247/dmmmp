@@ -9,9 +9,10 @@ from flask import Flask
 from dmp.config import config
 from dmp.extensions import config_extensions
 from dmp.api import config_blueprint
-
+from dmp.utils.rbac import rbac_middleware
 
 # 封装一个方法，专门用于创建Flask实例
+
 
 
 def create_app(config_name):
@@ -29,7 +30,7 @@ def create_app(config_name):
     config_blueprint(app)
 
     # RBAC权限拦截
-    # app.before_request(rbac_middleware)
+    app.before_request(rbac_middleware)
 
     # 返回应用实例
     return app
