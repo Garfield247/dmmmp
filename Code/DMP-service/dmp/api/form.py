@@ -555,11 +555,11 @@ def approve(desc):
                     download_path = os.path.join(current_app.config.get("DOWNLOAD_PATH"),approve_form.submit_users.dmp_username)
                     file_name = origin_db_table_name
                     headers = [col.get("dmp_data_table_column_name") for col in base_column]
-                    writer = textfile_writer(filepath=download_path, filename=file_name, header=headers)
+                    writer = textfile_writer(filepath=download_path, filename=file_name, header=None)
 
                     job_hanlder.delay(reader=reader, writer=writer)
                     ip = socket.gethostbyname(socket.gethostname())
-                    approve_form.ftp_url  = "ftp://%s:21/%s"%(str(ip),str(os.path.join(approve_form.submit_user.dmp_username,file_name)))
+                    approve_form.ftp_url  = "ftp://%s:21/%s"%(str(ip),str(os.path.join(approve_form.submit_users.dmp_username,file_name)))
                     approve_form.ftp_pid = 4396
                     approve_form.filepath = download_path
                     job_hanlder.delay(reader=reader, writer=writer)
