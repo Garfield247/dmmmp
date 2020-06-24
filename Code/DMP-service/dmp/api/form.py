@@ -509,7 +509,7 @@ def approve(desc):
                     if origin_database_type == 1:
                         # hive_reader
                         reader = hive_reader(host=origin_db_host,
-                                             port=8082,
+                                             port=8020,
                                              path="/user/hive/warehouse/%s.db/%s" % (
                                              origin_db_name, origin_db_table_name),
                                              fileType="text",
