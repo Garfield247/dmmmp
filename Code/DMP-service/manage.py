@@ -80,8 +80,8 @@ def sys_init():
 
 @manager.command
 def test_datax():
-    from dmp.test.datax_test import test_csv2mysql,test_csv2hive
-    test_csv2hive()
+    from dmp.test.datax_test import test_csv2mysql,test_csv2hive,test_hive2csv
+    test_hive2csv()
 
     # from dmp.models import Users
     # Users.create_test_user()

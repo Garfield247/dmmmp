@@ -3,18 +3,22 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 import os
+import socket
+
 import pandas as pd
-from flask import Blueprint, jsonify, request, current_app
-from dmp.models import FromUpload,FromMigrate,FromDownload,FromAddDataTable,Users,DataTable,Database
+from flask import Blueprint, request, current_app
+from dmp.models import FromUpload, FromMigrate, FromDownload, FromAddDataTable, Users, DataTable, Database
 from dmp.utils import resp_hanlder
-from dmp.utils.datax_job_hanlder import mysql_reader,mysql_writer,mongodb_reader,mongodb_writer,hive_reader,hive_writer,textfile_reader,textfile_writer
+from dmp.utils.datax_job_hanlder import mysql_reader, mysql_writer, mongodb_reader, mongodb_writer, hive_reader, \
+    hive_writer, textfile_reader, textfile_writer
 from dmp.utils.job_task import job_hanlder
 from dmp.api.dbtable import post
-from dmp.engine import auto_connect
+from dmp.utils.engine import auto_connect, hive_engine, mysql_engine, mongo_engine, create_table_query_handler
 
-form = Blueprint("form",__name__)
+form = Blueprint("form", __name__)
 
-@form.route("/formdb/",methods=["POST"],defaults={"desc":"从数据库添加数据表的表单"})
+
+@form.route("/formdb/", methods=["POST"], defaults={"desc": "提交从数据库添加数据表的表单"})
 def from_db(desc):
     if request.method == "POST":
         try:
@@ -26,21 +30,21 @@ def from_db(desc):
             description = form_info.get("description")
             submit_dmp_user_id = 3
             new_form = FromAddDataTable(
-                dmp_data_table_name = data_tablename,
-                db_table_name = db_tablename,
-                dmp_database_id = database_id,
-                dmp_case_id = dmp_data_case_id,
-                description = description,
-                submit_dmp_user_id = submit_dmp_user_id,
-                )
+                dmp_data_table_name=data_tablename,
+                db_table_name=db_tablename,
+                dmp_database_id=database_id,
+                dmp_case_id=dmp_data_case_id,
+                description=description,
+                submit_dmp_user_id=submit_dmp_user_id,
+            )
             new_form.save()
             current_app.logger.info(new_form.id)
             return resp_hanlder(result="OK")
         except Exception as err:
-            return resp_hanlder(code=999,err=err)
+            return resp_hanlder(code=999, err=err)
 
 
-@form.route("/fromfile/",methods=["POST"],defaults={"desc":"从文件添加数据表的表单"})
+@form.route("/fromfile/", methods=["POST"], defaults={"desc": "提交从文件添加数据表的表单"})
 def from_file(desc):
     if request.method == "POST":
         try:
@@ -58,28 +62,28 @@ def from_file(desc):
             description = form_info.get("description")
             submit_dmp_user_id = 3
             new_form = FromUpload(
-                filetype = filetype,
-                filepath = filepath,
-                column_line = column_line,
-                column = column,
-                json_dimension_reduction = json_dimension_reduction,
-                destination_dmp_database_id = destination_dmp_database_id,
-                destination_db_table_name = destination_db_table_name,
+                filetype=filetype,
+                filepath=filepath,
+                column_line=column_line,
+                column=column,
+                json_dimension_reduction=json_dimension_reduction,
+                destination_dmp_database_id=destination_dmp_database_id,
+                destination_db_table_name=destination_db_table_name,
                 dmp_data_table_name=dmp_data_table_name,
-                method = method,
-                dmp_data_case_id = dmp_data_case_id,
-                description = description,
-                submit_dmp_user_id = submit_dmp_user_id,
-                )
+                method=method,
+                dmp_data_case_id=dmp_data_case_id,
+                description=description,
+                submit_dmp_user_id=submit_dmp_user_id,
+            )
             new_form.add()
             current_app.logger.info(new_form.id)
             return resp_hanlder(result="OK")
         except Exception as err:
-            return resp_hanlder(code=999,err=err)
+            return resp_hanlder(code=999, err=err)
 
-@form.route("/migration/",methods=["POST"],defaults={"desc":"数据迁移表单"})
+
+@form.route("/migration/", methods=["POST"], defaults={"desc": "提交数据迁移表单"})
 def migration(desc):
-
     if request.method == "POST":
         try:
             form_info = request.json
@@ -91,24 +95,23 @@ def migration(desc):
             description = form_info.get("description")
             submit_dmp_user_id = 3
             new_form = FromMigrate(
-                origin_dmp_table_id = origin_dmp_table_id,
-                rule = rule,
-                destination_dmp_database_id = destination_dmp_database_id,
-                new_table_name = new_table_name,
-                method = method,
-                description = description,
-                submit_dmp_user_id = submit_dmp_user_id,
-                )
+                origin_dmp_table_id=origin_dmp_table_id,
+                rule=rule,
+                destination_dmp_database_id=destination_dmp_database_id,
+                new_table_name=new_table_name,
+                description=description,
+                submit_dmp_user_id=submit_dmp_user_id,
+            )
             current_app.logger.info(new_form.__json__())
             new_form.save()
             current_app.logger.info(new_form.id)
             return resp_hanlder(result="OK")
         except Exception as err:
-            return resp_hanlder(code=999,err=err)
+            return resp_hanlder(code=999, err=err)
 
-@form.route("/download/",methods=["POST"],defaults={"desc":"文件下载表单"})
+
+@form.route("/download/", methods=["POST"], defaults={"desc": "提交文件下载表单"})
 def download(desc):
-
     if request.method == "POST":
         try:
             form_info = request.json
@@ -118,70 +121,90 @@ def download(desc):
             description = form_info.get("description")
             submit_dmp_user_id = 3
             new_form = FromDownload(
-                dmp_table_id = dmp_table_id,
-                rule = rule,
-                destination_dmp_datebase_id = destination_dmp_datebase_id,
-                description = description,
-                submit_dmp_user_id = submit_dmp_user_id,
-                )
+                dmp_table_id=dmp_table_id,
+                rule=rule,
+                destination_dmp_datebase_id=destination_dmp_datebase_id,
+                description=description,
+                submit_dmp_user_id=submit_dmp_user_id,
+            )
             new_form.add()
             current_app.logger.info(new_form.id)
             return resp_hanlder(result="OK")
         except Exception as err:
-            return resp_hanlder(code=999,err=err)
+            return resp_hanlder(code=999, err=err)
+
 
 def form_permission(user_id):
     if user_id:
         return 3
 
-@form.route("/info/",methods=["GET"],defaults={"desc":"获取表单信息"})
+
+@form.route("/info/", methods=["GET"], defaults={"desc": "获取表单信息"})
 def info(desc):
     if request.method == "GET":
         forms = [FromAddDataTable,
-                FromUpload,
-                FromMigrate,
-                FromDownload,]
+                 FromUpload,
+                 FromMigrate,
+                 FromDownload, ]
         user_id = 2
         try:
-            committed,pending,complete = [],[],[]
+            committed, pending, complete = [], [], []
             if form_permission(user_id) == 1:
                 for _form in forms:
-                    committed.extend([f.__json__() for f in _form.query.filter_by(submit_dmp_user_id=user_id,approve_result=0).all()])
-                    complete.extend([f.__json__() for f in _form.query.filter(_form.submit_dmp_user_id==user_id,_form.approve_result!=0).all()])
-                return resp_hanlder(result={"comiitted":committed,"complete":complete})
+                    committed.extend([f.__json__() for f in
+                                      _form.query.filter_by(submit_dmp_user_id=user_id, approve_result=0).all()])
+                    complete.extend([f.__json__() for f in _form.query.filter(_form.submit_dmp_user_id == user_id,
+                                                                              _form.approve_result != 0).all()])
+                return resp_hanlder(result={"comiitted": committed, "complete": complete})
             elif form_permission(user_id) == 2:
                 for _form in forms:
-                    committed.extend([f.__json__() for f in _form.query.filter_by(submit_dmp_user_id=user_id,approve_result=0).all()])
-                    pending.extend([f.__json__()  for f in _form.query.filter_by(submit_dmp_user_id=u.id,approve_result=0).all() for u in Users.query.filter_by(leader_dmp_user_id=user_id).all()] )
-                    complete.extend([f.__json__() for f in _form.query.filter(_form.submit_dmp_user_id==user_id or _form.approve_dmp_user_id==user_id,_form.approve_result!=0).all()])
-                return resp_hanlder(result={"comiitted":committed,"pending":pending,"complete":complete})
+                    committed.extend([f.__json__() for f in
+                                      _form.query.filter_by(submit_dmp_user_id=user_id, approve_result=0).all()])
+                    pending.extend(
+                        [f.__json__() for f in _form.query.filter_by(submit_dmp_user_id=u.id, approve_result=0).all()
+                         for u in Users.query.filter_by(leader_dmp_user_id=user_id).all()])
+                    complete.extend([f.__json__() for f in _form.query.filter(
+                        _form.submit_dmp_user_id == user_id or _form.approve_dmp_user_id == user_id,
+                        _form.approve_result != 0).all()])
+                return resp_hanlder(result={"comiitted": committed, "pending": pending, "complete": complete})
             elif form_permission(user_id) == 3:
                 for _form in forms:
-                    pending.extend([f.__json__()  for f in _form.query.filter_by(approve_result=0).all() ] )
-                    complete.extend([f.__json__() for f in _form.query.filter(_form.approve_result!=0).all()])
-                return resp_hanlder(result={"pending":pending,"complete":complete})
+                    pending.extend([f.__json__() for f in _form.query.filter_by(approve_result=0).all()])
+                    complete.extend([f.__json__() for f in _form.query.filter(_form.approve_result != 0).all()])
+                return resp_hanlder(result={"pending": pending, "complete": complete})
         except Exception as err:
-            return resp_hanlder(code=999,err=err)
+            return resp_hanlder(code=999, err=err)
 
 
+def postfunc(meta):
+    new_table = meta.item
+    post(
+        dmp_data_table_name=new_table.dmp_data_table_name,
+        db_table_name=new_table.db_table_name,
+        dmp_user_id=new_table.submit_dmp_user_id,
+        dmp_database_id=new_table.dmp_database_id,
+        dmp_case_id=new_table.dmp_case_id,
+        description=new_table.description
+    )
 
-@form.route("/approve/",methods=["PUT"],defaults={"desc":"表单审批"})
+
+@form.route("/approve/", methods=["PUT"], defaults={"desc": "表单审批"})
 def approve(desc):
     if request.method == "PUT":
         try:
             approve_form_info = request.json
             auth_token = request.headers.get('Authorization')
             approve_user_id = Users.decode_auth_token(auth_token)
-            form_type = approve_form_info.get("dmp_form_type",None)
-            form_id = approve_form_info.get("dmp_form_id",None)
-            approve_result = approve_form_info.get("approve_result",None)
-            answer = approve_form_info.get("answer",None)
+            form_type = approve_form_info.get("dmp_form_type", None)
+            form_id = approve_form_info.get("dmp_form_id", None)
+            approve_result = approve_form_info.get("approve_result", None)
+            answer = approve_form_info.get("answer", None)
 
             if form_type == 1:
                 # 从数据库添加数据表单
                 approve_form = FromAddDataTable.get(form_id)
                 approve_form.approve_dmp_user_id = approve_user_id
-                approve_form.approve_result=approve_result
+                approve_form.approve_result = approve_result
                 approve_form.answer = answer
                 if approve_result == 1:
                     post(
@@ -191,27 +214,29 @@ def approve(desc):
                         dmp_database_id=approve_form.dmp_database_id,
                         dmp_case_id=approve_form.dmp_case_id,
                         description=approve_form.description
-                        )
+                    )
                 approve_form.put()
                 return resp_hanlder(result="OK!")
             elif form_type == 2:
                 # 文件上传添加数据表单
                 approve_form = FromUpload.get(form_id)
                 approve_form.approve_dmp_user_id = approve_user_id
-                approve_form.approve_result=approve_result
+                approve_form.approve_result = approve_result
                 approve_form.answer = answer
 
-                file_path = os.path.join(current_app.config.get("UPLOADED_PATH"),approve_form.file_path)
-                filetype = approve_form.get("filetype")
-                filepath = approve_form.get("filepath")
-                column_line = approve_form.get("column_line")
-                column = approve_form.get("column")
+                file_path = os.path.join(current_app.config.get("UPLOADED_PATH"), approve_form.file_path)
+                file_type = approve_form.filetype
+                filepath = approve_form.filepath
+                column_line = approve_form.column_line
+                column = approve_form.column
                 json_dimension_reduction = approve_form.json_dimension_reduction
                 destination_dmp_database_id = approve_form.destination_dmp_database_id
                 destination_db_table_name = approve_form.destination_db_table_name
                 dmp_data_table_name = approve_form.dmp_data_table_name
                 method = approve_form.method
-                dmp_data_case_id = approve_form.get("dmp_data_case_id")
+                description = approve_form.description
+                submit_dmp_user_id = approve_form.submit_dmp_user_id
+                dmp_case_id = approve_form.dmp_case_id
 
                 destination_database = Database.get(destination_dmp_database_id)
                 destination_database_type = destination_database.db_type
@@ -220,38 +245,75 @@ def approve(desc):
                 destination_db_username = destination_database.db_username
                 destination_db_passwd = destination_database.db_passwd
                 destination_db_name = destination_database.db_name
-                destination_db_table_name = approve_form.new_table_name
+
                 reader = []
-                if approve_form.file_type == 1:
+                text_column = []
+                if file_type == 1:
                     # csv
-                    csv_column = list(pd.read_csv(os.path.join(current_app.config.get("DMP_UPLOAD_PATH"),filepath),header=column_line)\
-                    .colums)
+                    text_column = column if column else list(
+                        pd.read_csv(os.path.join(current_app.config.get("DMP_UPLOAD_PATH"), file_path),
+                                    header=column_line) \
+                            .colums)
+                    csv_column_d = [{"index": i, "type": "string"} for i, cc in enumerate(text_column)]
                     reader = textfile_reader(
-                        filepath = filepath,
-                        column = csv_column if not column else column,
+                        filepath=filepath,
+                        column=csv_column_d
                     )
 
                     pass
-                elif approve_form.file_type == 2:
+                elif file_type == 2:
                     # json
                     pass
-                elif approve_form.file_type == 3:
-                    #excel
+                elif file_type == 3:
+                    # excel
                     pass
                 writer = []
                 if destination_database_type == 1:
                     # hive_writer
+                    hive_columns = [{"name": col, "type": "string"} for col in text_column]
+                    hive_path = "/user/hive/warehouse/%s.db/%s" % (destination_db_name, destination_db_table_name)
+                    hive_conn = auto_connect(destination_dmp_database_id)
+                    create_table_sql = create_table_query_handler(table_name=destination_db_table_name,
+                                                                  fields=text_column,
+                                                                  uniform_type="string",
+                                                                  id_primary_key=False,
+                                                                  semicolon=False,
+                                                                  fieldDelimiter=",")
+
+                    current_app.logger.info(create_table_sql)
+                    if method == 1:
+                        hive_conn.execsql(create_table_sql)
+                    elif method == 3:
+                        del_table_sql = "drop table {table_name }"
+                        hive_conn.execsql(del_table_sql.format(table_name=destination_db_table_name))
+                        hive_conn.execsql(create_table_sql)
+                    else:
+                        pass
                     writer = hive_writer(host=destination_db_host,
-                                         port=destination_db_port,
-                                         path=None,
-                                         filename=None,
-                                         column=[],
+                                         port=8082,
+                                         path=hive_path,
+                                         filename=destination_db_table_name,
+                                         column=hive_columns,
                                          fieldDelimiter=",",
                                          )
-                    pass
+
                 elif destination_database_type == 2:
-                    # myqsl_writer
-                    column = [col.get("dmp_data_table_column_name") for col in base_column]
+                    # mysql_writer
+                    create_table_sql = create_table_query_handler(table_name=destination_db_table_name,
+                                                                  fields=text_column,
+                                                                  uniform_type="text",
+                                                                  id_primary_key=True,
+                                                                  semicolon=True,
+                                                                  fieldDelimiter=None)
+                    del_table_sql = "drop table {table_name };"
+                    preSQL = []
+                    if method == 1:
+                        preSQL = [create_table_sql]
+                    elif method == 2:
+                        pass
+                    elif method == 3:
+                        preSQL = [del_table_sql.format(table_name=destination_db_table_name), create_table_sql]
+                    column = [col.get("dmp_data_table_column_name") for col in text_column]
                     writer = mysql_writer(model=method,
                                           username=destination_db_username,
                                           password=destination_db_passwd,
@@ -260,12 +322,15 @@ def approve(desc):
                                           port=destination_db_port,
                                           db=destination_db_name,
                                           table=destination_db_table_name,
-                                          preSql=None,
+                                          preSql=preSQL,
                                           postSql=None,
                                           )
                 elif destination_database_type == 3:
                     # mongo_writer
-                    column = [{"name": col.get("dmp_data_table_column_name")} for col in base_column]
+                    mongo_conn = auto_connect(destination_dmp_database_id)
+                    if method == 3:
+                        mongo_conn.del_table(table_name=destination_db_table_name)
+                    column = [{"name": col.get("dmp_data_table_column_name")} for col in text_column]
                     writer = mongodb_writer(host=destination_db_host,
                                             port=destination_db_port,
                                             username=destination_db_username,
@@ -274,15 +339,24 @@ def approve(desc):
                                             collection_name=destination_db_table_name,
                                             column=column,
                                             )
-
-                job_hanlder.delay(reader=reader, writer=writer)
+                meta = {
+                    "dmp_data_table_name": dmp_data_table_name,
+                    "db_table_name": destination_db_table_name,
+                    "submit_dmp_user_id": submit_dmp_user_id,
+                    "dmp_database_id": destination_dmp_database_id,
+                    "dmp_case_id": dmp_case_id,
+                    "description": description,
+                }
+                job_hanlder.delay(reader=reader, writer=writer, func=postfunc, meta=meta)
+                approve_form.put()
                 return resp_hanlder(result="OK!")
+
 
             elif form_type == 3:
                 # 数据迁移表单
                 approve_form = FromMigrate.get(form_id)
                 approve_form.approve_dmp_user_id = approve_user_id
-                approve_form.approve_result=approve_result
+                approve_form.approve_result = approve_result
                 approve_form.answer = answer
                 if approve_result == 1:
                     origin_data_table = DataTable.get(approve_form.origin_dmp_table_id)
@@ -297,100 +371,189 @@ def approve(desc):
 
                     destination_database = Database.get(approve_form.destination_dmp_database_id)
                     destination_database_type = destination_database.db_type
-                    destination_db_host =  destination_database.db_host
-                    destination_db_port =  destination_database.db_port
-                    destination_db_username =  destination_database.db_username
-                    destination_db_passwd =  destination_database.db_passwd
-                    destination_db_name =  destination_database.db_name
-                    destination_db_table_name =  approve_form.new_table_name
+                    destination_db_host = destination_database.db_host
+                    destination_db_port = destination_database.db_port
+                    destination_db_username = destination_database.db_username
+                    destination_db_passwd = destination_database.db_passwd
+                    destination_db_name = destination_database.db_name
+                    destination_db_table_name = approve_form.new_table_name
 
                     rule = approve_form.rule
-                    method = approve_form.method
-                    base_column = auto_connect(origin_data_table.dmp_database_id).columns(origin_data_table.db_table_name)
+                    base_column = auto_connect(origin_data_table.dmp_database_id).columns(
+                        origin_data_table.db_table_name)
                     # current_app.logger.info(base_column)
-                    reader= []
+                    reader = []
                     if origin_database_type == 1:
                         # hive_reader
                         reader = hive_reader(host=origin_db_host,
-                        port = origin_db_port,
-                        path = None,
-                        fileType=None,
-                        haveKerberos=None,
-                        kerberosKeytabFilePath=None,
-                        kerberosPrincipal=None,
-                        column=[],
-                        fieldDelimiter=',',
-                        encoding="utf-8"
-                        )
+                                             port=8082,
+                                             path="/user/hive/warehouse/%s.db/%s" % (
+                                             origin_db_name, origin_db_table_name),
+                                             fileType="text",
+                                             column=["*"],
+                                             fieldDelimiter=',',
+                                             encoding="utf-8"
+                                             )
                     elif origin_database_type == 2:
                         # mysql_reader
                         column = [col.get("dmp_data_table_column_name") for col in base_column]
                         reader = mysql_reader(username=origin_db_username,
-                        password=origin_db_passwd,
-                        column=column,
-                        host=origin_db_host,
-                        port=origin_db_port,
-                        db=origin_db_name,
-                        table=origin_db_table_name,
-                        where=None,
-                        # querySql=None
-                        )
+                                              password=origin_db_passwd,
+                                              column=column,
+                                              host=origin_db_host,
+                                              port=origin_db_port,
+                                              db=origin_db_name,
+                                              table=origin_db_table_name,
+                                              where=None,
+                                              )
 
                     elif origin_database_type == 3:
                         # mongodb
-                        column = [{"index":i+1,"name":col.get("dmp_data_table_column_name"),"type":col.get("dmp_data_table_column_type")} for i,col in enumerate(base_column)]
+                        column = [{"index": i + 1, "name": col.get("dmp_data_table_column_name"),
+                                   "type": col.get("dmp_data_table_column_type")} for i, col in enumerate(base_column)]
                         reader = mongodb_reader(host=origin_db_host,
-                        port=origin_db_port,
-                        db_name=origin_db_name,
-                        collection_name=origin_db_table_name,
-                        column=column,
-                        username=origin_db_username,
-                        password=origin_db_passwd
-                        )
+                                                port=origin_db_port,
+                                                db_name=origin_db_name,
+                                                collection_name=origin_db_table_name,
+                                                column=column,
+                                                username=origin_db_username,
+                                                password=origin_db_passwd
+                                                )
                         pass
                     writer = []
                     if destination_database_type == 1:
                         # hive_writer
+                        hive_col = [col.get("dmp_data_table_column_name") for col in base_column]
+                        hive_columns = [{"name": col, "type": "string"} for col in hive_col]
+                        hive_path = "/user/hive/warehouse/%s.db/%s" % (destination_db_name, destination_db_table_name)
+                        hive_conn = auto_connect(approve_form.destination_dmp_database_id)
+                        create_table_sql = create_table_query_handler(table_name=destination_db_table_name,
+                                                                      fields=hive_col,
+                                                                      uniform_type="string",
+                                                                      id_primary_key=False,
+                                                                      semicolon=False,
+                                                                      fieldDelimiter=",")
+
+                        hive_conn.execsql(create_table_sql)
+
                         writer = hive_writer(host=destination_db_host,
-                        port=destination_db_port,
-                        path=None,
-                        filename=None,
-                        column=[],
-                        fieldDelimiter=",",
-                        )
-                        pass
+                                             port=8082,
+                                             path=hive_path,
+                                             filename=destination_db_table_name,
+                                             column=hive_columns,
+                                             fieldDelimiter=",",
+                                             )
                     elif destination_database_type == 2:
-                        # myqsl_writer
+                        # mysql_writer
                         column = [col.get("dmp_data_table_column_name") for col in base_column]
+                        create_table_sql = create_table_query_handler(table_name=destination_db_table_name,
+                                                                      fields=column,
+                                                                      uniform_type="text",
+                                                                      id_primary_key=True,
+                                                                      semicolon=True,
+                                                                      fieldDelimiter=None)
+                        preSQL = [create_table_sql]
                         writer = mysql_writer(model=method,
-                        username=destination_db_username,
-                        password=destination_db_passwd,
-                        column=column,
-                        host=destination_db_host,
-                        port=destination_db_port,
-                        db=destination_db_name,
-                        table=destination_db_table_name,
-                        preSql=None,
-                        postSql=None,
-                        )
+                                              username=destination_db_username,
+                                              password=destination_db_passwd,
+                                              column=column,
+                                              host=destination_db_host,
+                                              port=destination_db_port,
+                                              db=destination_db_name,
+                                              table=destination_db_table_name,
+                                              preSql=preSQL,
+                                              postSql=None,
+                                              )
                     elif destination_database_type == 3:
                         # mongo_writer
                         column = [{"name": col.get("dmp_data_table_column_name")} for col in base_column]
                         writer = mongodb_writer(host=destination_db_host,
-                        port=destination_db_port,
-                        username=destination_db_username,
-                        password=destination_db_passwd,
-                        db_name=destination_db_name,
-                        collection_name=destination_db_table_name,
-                        column=column,
-                        )
+                                                port=destination_db_port,
+                                                username=destination_db_username,
+                                                password=destination_db_passwd,
+                                                db_name=destination_db_name,
+                                                collection_name=destination_db_table_name,
+                                                column=column,
+                                                )
 
-                    job_hanlder.delay(reader= reader,writer=writer)
+                    job_hanlder.delay(reader=reader, writer=writer)
                 approve_form.put()
                 return resp_hanlder(result="OK!")
-                pass
             elif form_type == 4:
-                # 数据下载表单
-                pass
+                # 数据迁移表单
+                approve_form = FromDownload.get(form_id)
+                approve_form.approve_dmp_user_id = approve_user_id
+                approve_form.approve_result = approve_result
+                approve_form.answer = answer
+                if approve_result == 1:
+                    origin_data_table = DataTable.get(approve_form.dmp_data_table_id)
+                    origin_database = Database.get(origin_data_table.dmp_database_id)
+                    origin_database_type = origin_database.db_type
+                    origin_db_host = origin_database.db_host
+                    origin_db_port = origin_database.db_port
+                    origin_db_username = origin_database.db_username
+                    origin_db_passwd = origin_database.db_passwd
+                    origin_db_name = origin_database.db_name
+                    origin_db_table_name = origin_data_table.db_table_name
+                    rule = approve_form.rule
+                    method = approve_form.method
+                    base_column = auto_connect(origin_data_table.dmp_database_id).columns(
+                        origin_data_table.db_table_name)
+                    # current_app.logger.info(base_column)
+
+
+                    reader = []
+                    if origin_database_type == 1:
+                        # hive_reader
+                        reader = hive_reader(host=origin_db_host,
+                                             port=8082,
+                                             path="/user/hive/warehouse/%s.db/%s" % (
+                                             origin_db_name, origin_db_table_name),
+                                             fileType="text",
+                                             column=["*"],
+                                             fieldDelimiter=',',
+                                             encoding="utf-8"
+                                             )
+                    elif origin_database_type == 2:
+                        # mysql_reader
+                        column = [col.get("dmp_data_table_column_name") for col in base_column]
+                        reader = mysql_reader(username=origin_db_username,
+                                              password=origin_db_passwd,
+                                              column=column,
+                                              host=origin_db_host,
+                                              port=origin_db_port,
+                                              db=origin_db_name,
+                                              table=origin_db_table_name,
+                                              where=None,
+                                              )
+
+                    elif origin_database_type == 3:
+                        # mongodb
+                        column = [{"index": i + 1, "name": col.get("dmp_data_table_column_name"),
+                                   "type": col.get("dmp_data_table_column_type")} for i, col in enumerate(base_column)]
+                        reader = mongodb_reader(host=origin_db_host,
+                                                port=origin_db_port,
+                                                db_name=origin_db_name,
+                                                collection_name=origin_db_table_name,
+                                                column=column,
+                                                username=origin_db_username,
+                                                password=origin_db_passwd
+                                                )
+                        pass
+                    writer = []
+                    download_path = os.path.join(current_app.config.get("DMP_UPLOAD_PATH"),approve_form.submit_users.name)
+                    file_name = origin_db_table_name
+                    headers = [col.get("dmp_data_table_column_name") for col in base_column]
+                    writer = textfile_writer(filepath=download_path, filename=file_name, header=headers)
+
+                    job_hanlder.delay(reader=reader, writer=writer)
+                    ip = socket.gethostbyname(socket.gethostname())
+                    approve_form.ftp_url  = "ftp://%s:21/%s"%(str(ip),str(os.path.join(approve_form.submit_users.name,file_name)))
+                    approve_form.ftp_pid = 4396
+                    approve_form.filepath = download_path
+                    job_hanlder.delay(reader=reader, writer=writer)
+                approve_form.put()
+
+                return resp_hanlder(result="OK!")
         except Exception as err:
-            return resp_hanlder(code=999,err=err)
+            return resp_hanlder(code=999, err=err)

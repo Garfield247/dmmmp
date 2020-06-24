@@ -3,10 +3,10 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, request, current_app
 from dmp.models import Database, Users, DataTable
 from dmp.utils import resp_hanlder
-from dmp.engine import auto_connect
+from dmp.utils.engine import auto_connect
 
 database = Blueprint("database", __name__)
 

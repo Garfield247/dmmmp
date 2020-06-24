@@ -4,7 +4,7 @@
 # @Author  : SHTD 
 
 
-def hive_reader(host,port,path,fileType,haveKerberos,kerberosKeytabFilePath,kerberosPrincipal,column,fieldDelimiter=",",encoding="UTF-8",):
+def hive_reader(host,port,path,fileType,column,fieldDelimiter=",",encoding="UTF-8",):
     """
 
     :param host:
@@ -20,7 +20,7 @@ def hive_reader(host,port,path,fileType,haveKerberos,kerberosKeytabFilePath,kerb
     :return:
     """
     hive_reader_json = {
-        "name": "hdfs_reader",
+        "name": "hdfsreader",
         "parameter": {
             "path": path,
             "defaultFS": "hdfs://%s:%d"%(host,port),
@@ -41,7 +41,7 @@ def hive_reader(host,port,path,fileType,haveKerberos,kerberosKeytabFilePath,kerb
 
 def hive_writer(host,port,path,filename,column,fieldDelimiter=","):
     hive_writer_json = {
-        "name": "hdfs_writer",
+        "name": "hdfswriter",
         "parameter": {
             "defaultFS": "hdfs://%s:%d"%(host,port),
             "fileType": "text",

@@ -87,6 +87,7 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:shtd123.@192.168.3.87:3306/dmpdb?charset=utf8mb4"
     # UPLOADED
     UPLOADED_PATH = os.environ.get("DMP_UPLOAD_PATH") or os.path.join(base_dir, "static/upload")
+    DOWNLOAD_PATH = os.environ.get("DMP_DOWNLOAD_PATH") or os.path.join(base_dir, "static/download")
 
     # DataX
     DATAX_HOME = os.environ.get("DATAX_HOME") or ""
@@ -94,7 +95,7 @@ class TestingConfig(Config):
     DATAX_LOG_PATH = os.environ.get("DATAX_LOG_PATH") or ""
 
     # ICON_URL
-    SAVE_URL = 'dmp/static/icon/'
+    SAVE_URL = os.path.join(base_dir, "static/icon")
     ICON_URL = 'http://192.168.26.1:7789/static/icon/'
 
 

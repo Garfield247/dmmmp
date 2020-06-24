@@ -119,4 +119,6 @@ venv.bak/
 migrations/
 
 upload/
+download/
+icon/
 dmp_data_job_*

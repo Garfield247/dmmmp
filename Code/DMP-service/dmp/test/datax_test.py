@@ -4,11 +4,14 @@
 # @Author  : SHTD 
 
 import os
+from hdfs import Client
 from flask import current_app
 import pandas as pd
 from dmp.utils.datax_job_hanlder import mongodb_reader,mysql_writer,textfile_reader,textfile_writer,hive_reader,hive_writer
 from dmp.utils.job_task import job_hanlder
-from dmp.engine import create_table_query_hanlder
+from dmp.utils import uuid_str
+import datetime
+from dmp.utils.engine import create_table_query_hanlder
 def test():
     mongo_cloumn = [{"index": 1, "name": "job_name", "type": "string"},
                                                        {"index": 2, "name": "tag", "type": "string"},
@@ -55,17 +58,35 @@ def test_csv2mysql():
     current_app.logger.info(res)
 
 def test_csv2hive():
+
     table_name = "testxxx"
+    hdfs_url = "http://{host}:{port}"
+    hdfs_cli = Client(hdfs_url.format(host="192.168.3.140",port=50070))
     file_path = os.path.join(current_app.config.get("UPLOADED_PATH"), "hdy2.csv")
     csv_column = list(pd.read_csv(file_path, header=0).columns)
     csv_column_d = [{"index":i,"type":"string"}for i,cc in enumerate(csv_column)]
     r = textfile_reader(
         filepath=file_path,
         column=csv_column_d
-
     )
-    hive_columns = [{"name":col,"type":"string"}for col in csv_column]
-    w = hive_writer(host="192.168.3.140",port=10000,filename="test1",path="/user/hive/warehouse/test.db/test_hdy",column=hive_columns)
 
+    fpath = "/dmp_cache/%s_data/%s_%s"%(str(datetime.datetime.now().date()),table_name,uuid_str())
+    # fpath = "/dmp_cache/2020-06-23-data/testxxx_asda8937/"
+    print(fpath)
+    hdfs_cli.makedirs(hdfs_path=fpath,permission="775")
+    hive_columns = [{"name":col,"type":"string"}for col in csv_column]
+    w = hive_writer(host="192.168.3.140",port=8020,filename=table_name,path=fpath,column=hive_columns)
+
+    res = job_hanlder.delay(reader=r, writer=w)
+    current_app.logger.info(res)
+
+
+def test_hive2csv():
+    # col = ['siteCode', 'siteName', 'dateTime', 'pH', 'DO', 'NH4', 'CODMn', 'TOC', 'level', 'levelStatus', 'attribute',
+    #  'status'
+    #  ]
+    # colu = [{}for c in col]
+    r = hive_reader(host="192.168.3.140",port=8020,path="/user/hive/warehouse/test.db/test_hdy",fileType="text",column=["*"],fieldDelimiter=",")
+    w = textfile_writer(filepath="./",filename="hdy_test.csv",header=0)
     res = job_hanlder.delay(reader=r, writer=w)
     current_app.logger.info(res)

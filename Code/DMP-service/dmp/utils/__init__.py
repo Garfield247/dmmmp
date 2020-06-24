@@ -7,3 +7,4 @@
 
 from .response_hanlder import resp_hanlder
 from .cm_tools import CM_tools
+from .uuid_str import uuid_str

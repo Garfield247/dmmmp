@@ -12,7 +12,7 @@ from dmp.models import Users
 from dmp.utils.response_hanlder import resp_hanlder
 from dmp.utils.verify import UserVerify
 from dmp.utils.put_data import PuttingData
-from dmp.rbac.service.init_permission import INIT_PERMISSION
+from dmp.utils.rbac import INIT_PERMISSION
 
 
 def rbac_middleware():

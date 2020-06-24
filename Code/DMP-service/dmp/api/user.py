@@ -12,7 +12,7 @@ from operator import or_
 from dmp.config import config
 from dmp.extensions import db
 from dmp.models import Users, Groups
-from dmp.rbac.middlewares.rbac import rbac_middleware
+from dmp.utils.rbac.middlewares import rbac_middleware
 from dmp.utils.put_data import PuttingData
 from dmp.utils.validation import ValidationEmail
 from dmp.utils.verify import LoginVerify

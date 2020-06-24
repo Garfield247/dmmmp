@@ -39,5 +39,9 @@ class MongodbEngine():
         data = [r for r in res_]
         return  data
 
+    def del_table(self,table_name):
+        collection_ = self.database[table_name]
+        collection_.drop()
+
     def close_conn(self):
         self.connect.close()

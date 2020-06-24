@@ -16,7 +16,7 @@ def add(x, y):
 
 
 @celery.task
-def job_hanlder(reader, writer):
+def job_hanlder(reader, writer,func=None,meta=None):
     job_file_name = "dmp_data_job_" + str(uuid.uuid1())
     job_file_path = os.path.join(current_app.config.get("DATAX_JOB_PATH"), job_file_name)
     job_json = {
@@ -38,5 +38,11 @@ def job_hanlder(reader, writer):
 
     task_commit_commamd = "python {Datax_path}/bin3/datax.py {Datax_Job_path}"
     os.system(task_commit_commamd.format(Datax_path=current_app.config.get("DATAX_HOME"), Datax_Job_path=job_file_path))
+    if func and meta:
+        func(meta)
+    elif func:
+        func()
+    else:
+        pass
 
 

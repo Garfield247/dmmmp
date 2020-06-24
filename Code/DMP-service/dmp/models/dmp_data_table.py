@@ -6,7 +6,6 @@
 import datetime
 from flask import current_app
 from dmp.extensions import db
-from .dmp_user import Users
 from dmp.models import DMPModel
 
 
@@ -30,7 +29,7 @@ class DataTable(db.Model, DMPModel):
     # case = db.relationship('Case', backref='case_datatable')
 
     def data_count(self):
-        from dmp.engine import engines
+        from dmp.utils.engine import engines
         from dmp.models import Database
         db = Database.get(self.dmp_database_id)
         current_app.logger.info(db.__json__())

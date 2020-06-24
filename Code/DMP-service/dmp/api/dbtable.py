@@ -5,10 +5,10 @@
 
 
 from flask import Blueprint, request, current_app
-from dmp.models import Case, DataTable, Users, Database,DataTableColumn
+from dmp.models import DataTable, Users, Database,DataTableColumn
 from dmp.utils import resp_hanlder
-from dmp.engine import MongodbEngine,MysqlEngine,HiveEngone
-from dmp.engine import auto_connect
+from dmp.utils.engine import MongodbEngine,MysqlEngine
+from dmp.utils.engine import auto_connect
 
 dbtable = Blueprint("dbtable", __name__)
 

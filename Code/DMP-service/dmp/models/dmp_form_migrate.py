@@ -14,7 +14,6 @@ class FromMigrate(db.Model, DMPModel):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     rule = db.Column(db.String(64), comment='数据库提取规则')
     new_table_name = db.Column(db.String(32), nullable=False, comment='新表名')
-    method = db.Column(db.Integer, default=1, comment='新建1、覆盖2或添加3')
     description = db.Column(db.String(128), comment='说明')
     submit_on = db.Column(db.DateTime, nullable=False,default=datetime.datetime.now, comment='提交时间')
     approve_on = db.Column(db.DateTime,onupdate=datetime.datetime.now, comment='审批时间')
