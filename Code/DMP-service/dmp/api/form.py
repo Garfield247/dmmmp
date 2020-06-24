@@ -30,7 +30,7 @@ def from_db(desc):
             database_id = form_info.get("database_id")
             dmp_data_case_id = form_info.get("dmp_data_case_id")
             description = form_info.get("description")
-            new_form = FromAddDataTable(
+            new_form = FromUpload(
                 dmp_data_table_name=data_tablename,
                 db_table_name=db_tablename,
                 dmp_database_id=database_id,
