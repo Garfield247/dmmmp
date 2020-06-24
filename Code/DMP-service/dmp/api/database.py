@@ -51,7 +51,7 @@ def dbdel(desc):
                     is_admin = Users.get(current_user_id).dmp_group_id == 1
                     if is_user or is_user_leader or is_admin:
                         # current_app.logger.info(DataTable.query.filter_by(dmp_database_id=current_user_id).count())
-                        if DataTable.query.filter_by(dmp_database_id=current_user_id).count() == 0:
+                        if DataTable.query.filter_by(dmp_database_id=del_database_id).count() == 0:
                             del_database.delete()
                             current_app.logger.info("del db complete!")
                             return resp_hanlder(result="OK")
