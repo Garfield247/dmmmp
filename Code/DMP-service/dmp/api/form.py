@@ -559,7 +559,7 @@ def approve(desc):
 
                     job_hanlder.delay(reader=reader, writer=writer)
                     ip = socket.gethostbyname(socket.gethostname())
-                    approve_form.ftp_url  = "ftp://%s:21/%s"%(str(ip),str(os.path.join(approve_form.submit_users.name,file_name)))
+                    approve_form.ftp_url  = "ftp://%s:21/%s"%(str(ip),str(os.path.join(approve_form.submit_user.dmp_sername,file_name)))
                     approve_form.ftp_pid = 4396
                     approve_form.filepath = download_path
                     job_hanlder.delay(reader=reader, writer=writer)
