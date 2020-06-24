@@ -125,7 +125,7 @@ def download(desc):
                 description=description,
                 submit_dmp_user_id=submit_dmp_user_id,
             )
-            new_form.add()
+            new_form.save()
             current_app.logger.info(new_form.id)
             return resp_hanlder(result="OK")
         except Exception as err:
