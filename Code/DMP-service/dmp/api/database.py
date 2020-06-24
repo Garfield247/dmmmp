@@ -22,6 +22,7 @@ def info(desc):
                 data = Database.query.get(database_id).__json__()
             else:
                 data = []
+                current_app.logger.info(Users.get(current_user_id).dmp_group_id)
                 if Users.get(current_user_id).dmp_group_id == 1:
                     data = [d.__json__() for d in Database.query.all()]
                 else:
@@ -29,7 +30,7 @@ def info(desc):
                     user_ids.append(current_user_id)
                     current_app.logger.info(user_ids)
                     data = [d.__json__() for d in Database.query.filter(Database.dmp_user_id.in_(user_ids) or Database.ispublic==True).all()]
-                    current_app.logger.info(data)
+                current_app.logger.info(data)
             return resp_hanlder(result=data)
         except Exception as err:
             return resp_hanlder(code=999, err=err)
