@@ -13,7 +13,7 @@ class HiveEngone():
         try:
             self.conn = hive.Connection(host=host, port=port, username=user, password=passwd,
                                    database=db)
-            # current_app.logger.info(self.conn.client)
+            current_app.logger.info(self.conn.client)
         except Exception as e:
             current_app.logger.error("Connect Failed! Error Message：%s"%str(e))
 
