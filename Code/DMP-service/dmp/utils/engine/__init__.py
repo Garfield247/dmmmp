@@ -28,7 +28,7 @@ def auto_connect(db_id):
 
 def create_table_query_handler(table_name, fields,uniform_type, id_primary_key=True, semicolon=True, fieldDelimiter=None):
     create = "create table {table_name}("
-    id_pri = "id int  auto_increment primary key"
+    id_pri = "id int  auto_increment primary key,"
     col = "{columns})"
     Delimiter = "row format delimited fields terminated by '{fieldDelimiter}'"
     columns = ",".join(["%s %s"%(col,uniform_type) if col.strip() or col == "id" else ",None_" + col + "_%d text" % i for i, col in
