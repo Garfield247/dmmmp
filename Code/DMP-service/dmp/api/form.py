@@ -159,7 +159,7 @@ def info(desc):
                                       _form.query.filter_by(submit_dmp_user_id=user_id, approve_result=0).all()])
                     complete.extend([f.__json__() for f in _form.query.filter(_form.submit_dmp_user_id == user_id,
                                                                               _form.approve_result != 0).all()])
-                return resp_hanlder(result={"comiitted": committed, "complete": complete})
+                return resp_hanlder(result={"committed": committed, "complete": complete})
             elif form_permission(user_id) == 2:
                 for _form in forms:
                     committed.extend([f.__json__() for f in
@@ -170,7 +170,7 @@ def info(desc):
                     complete.extend([f.__json__() for f in _form.query.filter(
                         _form.submit_dmp_user_id == user_id or _form.approve_dmp_user_id == user_id,
                         _form.approve_result != 0).all()])
-                return resp_hanlder(result={"comiitted": committed, "pending": pending, "complete": complete})
+                return resp_hanlder(result={"committed": committed, "pending": pending, "complete": complete})
             elif form_permission(user_id) == 3:
                 for _form in forms:
                     pending.extend([f.__json__() for f in _form.query.filter_by(approve_result=0).all()])
@@ -294,7 +294,7 @@ def approve(desc):
                     else:
                         pass
                     writer = hive_writer(host=destination_db_host,
-                                         port=8082,
+                                         port=8020,
                                          path=hive_path,
                                          filename=destination_db_table_name,
                                          column=hive_columns,
@@ -390,7 +390,7 @@ def approve(desc):
                     if origin_database_type == 1:
                         # hive_reader
                         reader = hive_reader(host=origin_db_host,
-                                             port=8082,
+                                             port=8020,
                                              path="/user/hive/warehouse/%s.db/%s" % (
                                              origin_db_name, origin_db_table_name),
                                              fileType="text",
@@ -441,7 +441,7 @@ def approve(desc):
                         hive_conn.execsql(create_table_sql)
 
                         writer = hive_writer(host=destination_db_host,
-                                             port=8082,
+                                             port=8020,
                                              path=hive_path,
                                              filename=destination_db_table_name,
                                              column=hive_columns,
