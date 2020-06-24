@@ -28,7 +28,7 @@ def mysql_reader(username,password,column,host,port,db,table,where):
             "column": column,
             "connection": [
                 {
-                "jdbcUrl": "jdbc:mysql://%s:%d/%s"%(host,port,db),
+                "jdbcUrl": ["jdbc:mysql://%s:%d/%s"%(host,port,db)],
                 "table": [table]
                 }
             ],

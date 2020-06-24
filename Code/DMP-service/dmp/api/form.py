@@ -555,7 +555,7 @@ def approve(desc):
                     download_path = os.path.join(current_app.config.get("DOWNLOAD_PATH"),approve_form.submit_users.dmp_username)
                     file_name = origin_db_table_name
                     headers = [col.get("dmp_data_table_column_name") for col in base_column]
-                    writer = textfile_writer(filepath=download_path, filename=file_name, header=None)
+                    writer = textfile_writer(filepath=download_path, filename=file_name, header=headers)
 
                     job_hanlder.delay(reader=reader, writer=writer)
                     ip = socket.gethostbyname(socket.gethostname())
