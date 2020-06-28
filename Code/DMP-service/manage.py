@@ -2,16 +2,21 @@
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
 # @Author  : SHTD
-
+import os
 
 from flask_script import Manager, Server
 from flask_migrate import MigrateCommand
 
-from dmp import app
+from dmp import create_app
 from dmp.extensions import db
 
 # 创建命令起动控制对象
 
+# 获取配置
+config_name = os.environ.get('DMP_CONFIG') or 'default'
+
+# 创建实例
+app = create_app(config_name)
 manager = Manager(app)
 # 添加数据库迁移命令
 manager.add_command('db', MigrateCommand)
