@@ -14,15 +14,15 @@ from dmp.extensions import db
 main = Blueprint("mian", __name__)
 
 
-# @main.route("/", defaults={"desc": "服务跟路由"})
-# def test(desc):
-#     db.create_all()
-#     result = {
-#         "status": 0,
-#         "msg": "success",
-#         "results": "DMP_SERVERS"
-#     }
-#     return jsonify(result)
+@main.route("/", defaults={"desc": "服务跟路由"})
+def test(desc):
+    db.create_all()
+    result = {
+        "status": 0,
+        "msg": "success",
+        "results": "DMP_SERVERS"
+    }
+    return jsonify(result)
 #
 #
 # @main.route("/apilist", defaults={"desc": "API列表"})
