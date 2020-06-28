@@ -6,6 +6,7 @@ import os
 
 from flask import Blueprint, jsonify, request, current_app
 from dmp.utils import resp_hanlder,uuid_str
+from dmp.models import FromDownload
 
 file = Blueprint("file", __name__)
 
@@ -56,12 +57,19 @@ def success(desc):
     return resp_hanlder(result={"filename": target_filename})
 
 
+class FormDownload(object):
+    pass
+
+
 @file.route("/dlcomplete/", methods=["GET"], defaults={"desc": "文件下载完成"})
 def dlcomplete(desc):
-    result = {
-        "status": 0,
-        "msg": "ok",
-        "results": {
-        }
-    }
-    return jsonify(result)
+    if request.method =="GET":
+        try:
+            form_id = request.json.get("form_id")
+            form_ = FromDownload.get(form_id)
+            rm_filepath = form_.filepath
+            os.remove(rm_filepath)
+            return resp_hanlder(result="OK")
+        except Exception as err:
+            return resp_hanlder(result="OK")
+
