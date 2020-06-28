@@ -28,6 +28,7 @@ class Config:
         r"^/verifier/username/",
         r"^/file/upload/",
         r"^/file/success/",
+        r"^/index/*"
     ]
     # 免认证
     NO_PERMISSION_LIST = [
