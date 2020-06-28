@@ -19,7 +19,7 @@ index = Blueprint("index", __name__)
 @index.route("/case_count/",methods=["GET"],defaults={"desc": "案例数据量信息"})
 def case_count(desc):
     counts = db.session.query(DataTable.dmp_case_id,func.sum(DataTable.db_data_count)).group_by(DataTable.dmp_case_id).all()
-    data = [ {"case_name":Case.get(case_id).dmp_case_name,"count":count}  for case_id,count in counts ]
+    data = [ {"case_name":str(Case.get(case_id).dmp_case_name),"count":int(count)}  for case_id,count in counts ]
     return resp_hanlder(result=data)
 
 @index.route("/case_table/",methods=["GET"],defaults={"desc": "案例数据表信息"})
