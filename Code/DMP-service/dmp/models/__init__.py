@@ -63,9 +63,9 @@ class DMPModel(object):
             _d[k] = v
         current_app.logger.info(vars(self).keys())
         if "dmp_user_id" in vars(self).keys():
-            _d["dmp_user_name"] = self.users.dmp_username
+            _d["dmp_user_name"] = self.users.dmp_username if self.users else "None"
         if "leader_dmp_user_id" in vars(self).keys():
-            _d["leader_dmp_username"] = self.leader.dmp_username
+            _d["leader_dmp_username"] = self.leader.dmp_username if self.leader else "None"
         if "approve_dmp_user_id" in vars(self).keys():
             _d["approve_dmp_username"] = self.approve_users.dmp_username
         if "submit_dmp_user_id" in vars(self).keys():
