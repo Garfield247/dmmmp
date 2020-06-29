@@ -273,7 +273,6 @@ def icon(desc):
             icon.write(icon_data)
             icon.close()
             icon_obj = current_app.config.get("ICON_URL")+icon_name
-            current_app.logger.error(icon_obj)
             if os.path.exists(save_url + icon_name):
                 origin_icon = current_obj.icon
                 if origin_icon == None or origin_icon == '':
@@ -283,12 +282,10 @@ def icon(desc):
                     origin_icon_name = origin_icon.split('/')[-1]
                     os.remove(os.path.join(save_url, origin_icon_name))
             current_obj.icon = icon_obj
-            db.session.add(current_obj)
-            db.session.commit()
+            current_obj.put()
             icon_url = current_obj.user_to_dict().get('icon')
             return resp_hanlder(code=4001, msg=RET.alert_code[4001], result=icon_url)
         except Exception as err:
-            db.session.rollback()
             return resp_hanlder(code=999, err=err)
 
 
