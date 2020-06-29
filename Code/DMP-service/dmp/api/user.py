@@ -272,7 +272,7 @@ def icon(desc):
             icon = open(save_url + icon_name, 'wb')
             icon.write(icon_data)
             icon.close()
-            icon_obj = os.path.join(save_url, icon_name)
+            icon_obj = os.path.join(current_app.config.get("ICON_URL"), icon_name)
             if os.path.exists(save_url + icon_name):
                 origin_icon = current_obj.icon
                 if origin_icon == None or origin_icon == '':
