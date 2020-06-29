@@ -44,7 +44,7 @@ class MysqlEngine():
     def count(self,table_name):
         cursor = self.conn.cursor()
         sql = """
-        Select count(*) form {table_name};
+        Select count(*) from {table_name};
         """
         cursor.execute(sql.format(table_name=table_name))
         _count = cursor.fetchall()
