@@ -9,8 +9,8 @@ from dmp.utils.email import EmailBody, send_mail
 class ValidationEmail():
 
     def __init__(self):
-        self.confirm_url = 'http://192.168.26.2:8080/forget?sign=activation&token='
-        self.reset_url = 'http://192.168.26.2:8080/forget?token='
+        self.confirm_url = 'http://192.168.3.87:8080/forget?sign=activation&token='
+        self.reset_url = 'http://192.168.3.87:8080/forget?token='
 
     def activate_email(self, user, email):
         token = user.encode_auth_token().decode('utf-8')
