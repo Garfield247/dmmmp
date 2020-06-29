@@ -76,30 +76,30 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     # Mail
     # TESTING = True
-    LOG_LEVE = "info"
+    LOG_LEVE = "error"
     # Mail
-    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.163.com'
-    EMAIL_PORT = 587
+    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.shtdtech.com'
+    EMAIL_PORT = 25
     EMAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or '15010080053@163.com'
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'KPIKDLKPCQSQELTF'
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'dmp.service@shtdtech.com'
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'shtd.123'
     # Celery
     CELERY_RESULT_BACKEND = "redis://192.168.3.87:6379/1"
     CELERY_BROKER_URL = "amqp://dmp:dmp123.@192.168.3.87:5672/dmpvhost"
     # db
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:shtd123.@192.168.3.87:3306/dmpdb?charset=utf8mb4"
     # UPLOADED
-    UPLOADED_PATH = os.environ.get("DMP_UPLOAD_PATH") or os.path.join(base_dir, "static/upload")
-    DOWNLOAD_PATH = os.environ.get("DMP_DOWNLOAD_PATH") or os.path.join(base_dir, "static/download")
+    UPLOADED_PATH = os.environ.get("DMP_UPLOAD_PATH") or "/home/dmp/dmp_upload"
+    DOWNLOAD_PATH = os.environ.get("DMP_DOWNLOAD_PATH") or "/home/dmp/dmp_download"
 
     # DataX
-    DATAX_HOME = os.environ.get("DATAX_HOME") or ""
-    DATAX_JOB_PATH = os.environ.get("DATAX_JOB_PATH") or ""
-    DATAX_LOG_PATH = os.environ.get("DATAX_LOG_PATH") or ""
+    DATAX_HOME = os.environ.get("DATAX_HOME") or "/home/dmp/datax"
+    DATAX_JOB_PATH = os.environ.get("DATAX_JOB_PATH") or "/home/dmp/dmp_job"
+    DATAX_LOG_PATH = os.environ.get("DATAX_LOG_PATH") or "/home/dmp/dmp_log/datax"
 
     # ICON_URL
     SAVE_URL = os.path.join(base_dir, "static/icon")
-    ICON_URL = 'http://192.168.26.1:7789/static/icon/'
+    ICON_URL = 'http://192.168.3.87:7789/static/icon/'
 
 
 # 生产环境
