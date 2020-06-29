@@ -34,5 +34,8 @@ def create_app(config_name):
 
     # 返回应用实例
     return app
-
+# 获取配置
+config_name = os.environ.get('DMP_CONFIG') or 'testing'
+# 创建实例
+app = create_app(config_name)
 
