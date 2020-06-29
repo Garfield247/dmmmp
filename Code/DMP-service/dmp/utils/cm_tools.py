@@ -26,7 +26,7 @@ class CM_tools():
 
     def get_model_health(self):
         services = self.services_api_health.read_services("cluster")
-        return [{"display_name":summary.display_name,"health_summary":summary.health_summary} for summary in services.items]
+        return [{"display_name":summary.display_name,"entity_status":summary.entity_status} for summary in services.items]
 
     def get_disk_IO(self,time_interval):
         from_time = datetime.datetime.fromtimestamp(time.time() - int(time_interval))

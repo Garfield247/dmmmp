@@ -69,7 +69,7 @@ class DevelopmentConfig(Config):
 
     # ICON_URL
     SAVE_URL = 'dmp/static/icon/'
-    ICON_URL = 'http://192.168.26.1:7789/static/icon/'
+    ICON_URL = 'http://192.168.3.87:7789/static/icon/'
 
 
 # 测试环境

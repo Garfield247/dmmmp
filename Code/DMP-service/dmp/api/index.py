@@ -64,7 +64,7 @@ def network_io(desc):
             return resp_hanlder(err=err)
 
 
-@index.route('/cpu_usage/', methods=["GET"], defaults={"desc": "组件健康状态"})
+@index.route('/cpu_usage/', methods=["GET"], defaults={"desc": "CPU占用"})
 def cpu_usage(desc):
     if request.method == "GET":
         try:
@@ -76,7 +76,7 @@ def cpu_usage(desc):
             return resp_hanlder(err=err)
 
 
-@index.route('/hdfs_io/', methods=["GET"], defaults={"desc": "组件健康状态"})
+@index.route('/hdfs_io/', methods=["GET"], defaults={"desc": "HDFS_IO"})
 def hdfs_io(desc):
     if request.method == "GET":
         try:
