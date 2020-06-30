@@ -150,23 +150,23 @@ def post(desc):
         try:
             if db_info.get("dmp_database_id"):
                 modify_db = Database.get(db_info.get("dmp_database_id"))
-                if db_info.get("dmp_database_name"):
+                if db_info.has_key("dmp_database_name"):
                     modify_db.dmp_database_name = db_info.get("dmp_database_name")
-                if db_info.get("db_type"):
+                if db_info.has_key("db_type"):
                     modify_db.db_type = db_info.get("db_type")
-                if db_info.get("db_host"):
+                if db_info.has_key("db_host"):
                     modify_db.db_host = db_info.get("db_host")
-                if db_info.get("db_port"):
+                if db_info.has_key("db_port"):
                     modify_db.db_port = db_info.get("db_port")
-                if db_info.get("db_username"):
+                if db_info.has_key("db_username"):
                     modify_db.db_username = db_info.get("db_username")
-                if db_info.get("db_passwd"):
+                if db_info.has_key("db_passwd"):
                     modify_db.db_passwd = db_info.get("db_passwd")
-                if db_info.get("db_name"):
+                if db_info.has_key("db_name"):
                     modify_db.db_name = db_info.get("db_name")
-                if db_info.get("ispublic"):
-                    modify_db.ispublic = db_info.get("ispublic"),
-                if db_info.get("description"):
+                if db_info.has_key("ispublic"):
+                    modify_db.ispublic =True if db_info.get("ispublic") else False
+                if db_info.has_key("description"):
                     modify_db.description = db_info.get("description")
                 modify_db.put()
                 current_app.logger.info("database info modify complete!")
