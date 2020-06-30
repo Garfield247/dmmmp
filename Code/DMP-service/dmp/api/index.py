@@ -90,7 +90,11 @@ def hdfs_io(desc):
 
 @index.route('/hdfs_disk_usage/', methods=["GET"], defaults={"desc": "HDFS磁盘占用"})
 def get_hdfs_disk_usage(desc):
-    from dmp.utils import CM_tools
-    the_cm = CM_tools()
-    res = the_cm.get_hdfs_disk_usage(time_interval=60)
-    return resp_hanlder(result=res)
+    if request.method == "GET":
+        try:
+            from dmp.utils import CM_tools
+            the_cm = CM_tools()
+            res = the_cm.get_hdfs_disk_usage(time_interval=60)
+            return resp_hanlder(result=res)
+        except Exception  as err:
+            return resp_hanlder(err=err)

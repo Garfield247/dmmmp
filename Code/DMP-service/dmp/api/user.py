@@ -269,21 +269,16 @@ def icon(desc):
             icon_data = base64.b64decode(icon_obj_str)
             icon_name = uuid_str() + '.jpg'
             save_url = current_app.config.get("SAVE_URL")
-            icon = open(save_url + icon_name, 'wb')
-            icon.write(icon_data)
-            icon.close()
-            icon_obj = icon_name
-            if os.path.exists(save_url + icon_name):
-                origin_icon = current_obj.icon
-                if origin_icon == None or origin_icon == '':
-                    pass
-                elif origin_icon != None or origin_icon != '':
-                    # 在linux下路径分隔符需要改变
-                    origin_icon_name = origin_icon.split('/')[-1]
-                    os.remove(os.path.join(save_url, origin_icon_name))
-            current_obj.icon = icon_obj
+            origin_icon = current_obj.icon
+            origin_icon_path = os.path.join(save_url,origin_icon)
+            if os.path.exists(origin_icon_path):
+                    os.remove(origin_icon_path)
+            new_icon_path = os.path.join(save_url,icon_name)
+            with open(new_icon_path, 'wb') as new_icon:
+                new_icon.write(icon_data)
+            current_obj.icon = current_app.config.get("ICON_URL")+icon_name
             current_obj.put()
-            icon_url = current_obj.user_to_dict().get('icon')
+            icon_url = current_obj.icon
             return resp_hanlder(code=4001, msg=RET.alert_code[4001], result=icon_url)
         except Exception as err:
             db.session.rollback()
