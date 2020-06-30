@@ -173,4 +173,4 @@ def post(desc):
             else:
                 return resp_hanlder(code=101)
         except Exception as err:
-            return resp_hanlder(err=err)
+            return resp_hanlder(code=999,err=err)
