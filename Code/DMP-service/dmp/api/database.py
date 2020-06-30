@@ -146,28 +146,31 @@ def post(desc):
         except Exception as err:
             return resp_hanlder(code=200, err=err)
     elif request.method == "PUT":
-        if db_info.get("dmp_database_id"):
-            modify_db = Database.get(db_info.get("dmp_database_id"))
-            if db_info.get("dmp_database_name"):
-                modify_db.dmp_database_name = db_info.get("dmp_database_name")
-            if db_info.get("db_type"):
-                modify_db.db_type = db_info.get("db_type")
-            if db_info.get("db_host"):
-                modify_db.db_host = db_info.get("db_host")
-            if db_info.get("db_port"):
-                modify_db.db_port = db_info.get("db_port")
-            if db_info.get("db_username"):
-                modify_db.db_username = db_info.get("db_username")
-            if db_info.get("db_passwd"):
-                modify_db.db_passwd = db_info.get("db_passwd")
-            if db_info.get("db_name"):
-                modify_db.db_name = db_info.get("db_name")
-            if db_info.get("ispublic"):
-                modify_db.ispublic = db_info.get("ispublic"),
-            if db_info.get("description"):
-                modify_db.description = db_info.get("description")
-            modify_db.put()
-            current_app.logger.info("database info modify complete!")
-            return resp_hanlder(result={"modify": "ok!"})
-        else:
-            return resp_hanlder(code=101)
+        try:
+            if db_info.get("dmp_database_id"):
+                modify_db = Database.get(db_info.get("dmp_database_id"))
+                if db_info.get("dmp_database_name"):
+                    modify_db.dmp_database_name = db_info.get("dmp_database_name")
+                if db_info.get("db_type"):
+                    modify_db.db_type = db_info.get("db_type")
+                if db_info.get("db_host"):
+                    modify_db.db_host = db_info.get("db_host")
+                if db_info.get("db_port"):
+                    modify_db.db_port = db_info.get("db_port")
+                if db_info.get("db_username"):
+                    modify_db.db_username = db_info.get("db_username")
+                if db_info.get("db_passwd"):
+                    modify_db.db_passwd = db_info.get("db_passwd")
+                if db_info.get("db_name"):
+                    modify_db.db_name = db_info.get("db_name")
+                if db_info.get("ispublic"):
+                    modify_db.ispublic = db_info.get("ispublic"),
+                if db_info.get("description"):
+                    modify_db.description = db_info.get("description")
+                modify_db.put()
+                current_app.logger.info("database info modify complete!")
+                return resp_hanlder(result={"modify": "ok!"})
+            else:
+                return resp_hanlder(code=101)
+        except Exception as err:
+            return resp_hanlder(err=err)

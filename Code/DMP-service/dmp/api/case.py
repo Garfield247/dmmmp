@@ -4,9 +4,8 @@
 # @Author  : SHTD
 
 
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, request, current_app
 
-from dmp.extensions import db
 from dmp.models import Case, DataTable
 from dmp.utils import resp_hanlder
 

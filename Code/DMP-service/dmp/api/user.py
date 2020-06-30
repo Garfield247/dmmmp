@@ -286,6 +286,7 @@ def icon(desc):
             icon_url = current_obj.user_to_dict().get('icon')
             return resp_hanlder(code=4001, msg=RET.alert_code[4001], result=icon_url)
         except Exception as err:
+            db.session.rollback()
             return resp_hanlder(code=999, err=err)
 
 
