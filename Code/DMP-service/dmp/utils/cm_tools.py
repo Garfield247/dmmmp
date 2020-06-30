@@ -5,13 +5,12 @@
 
 import time
 import datetime
-import cm_client as cm
-from cm_client.rest import ApiException
+from dmp.models import Database
 
 class CM_tools():
     user = "admin"
     password = "admin"
-    host = "192.168.3.140"
+    host = Database.get(1).db_host
     port = 7180
     version = "v19"
     api_url = "http://%s:%d/api/%s" % (host, port, version)
