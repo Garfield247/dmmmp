@@ -10,7 +10,7 @@ from dmp.models import Database
 class CM_tools():
     user = "admin"
     password = "admin"
-    host = Database.get(1).db_host
+    host = "192.168.3.60"
     port = 7180
     version = "v19"
     api_url = "http://%s:%d/api/%s" % (host, port, version)
