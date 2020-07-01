@@ -187,12 +187,12 @@ def info(desc):
 def postfunc(meta):
     new_table = meta.item
     post(
-        dmp_data_table_name=new_table.dmp_data_table_name,
-        db_table_name=new_table.db_table_name,
-        dmp_user_id=new_table.submit_dmp_user_id,
-        dmp_database_id=new_table.dmp_database_id,
-        dmp_case_id=new_table.dmp_case_id,
-        description=new_table.description
+        dmp_data_table_name=new_table.get("dmp_data_table_name"),
+        db_table_name=new_table.get("db_table_name"),
+        dmp_user_id=new_table.get("submit_dmp_user_id"),
+        dmp_database_id=new_table.get("dmp_database_id"),
+        dmp_case_id=new_table.get("dmp_case_id"),
+        description=new_table.get("description")
     )
 
 
