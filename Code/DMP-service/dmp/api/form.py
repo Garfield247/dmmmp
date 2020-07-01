@@ -234,7 +234,7 @@ def approve(desc):
                 approve_form.approve_result = approve_result
                 approve_form.answer = answer
 
-                file_path = os.path.join(current_app.config.get("UPLOADED_PATH"), approve_form.file_path)
+                file_path = os.path.join(current_app.config.get("UPLOADED_PATH"), approve_form.filepath)
                 file_type = approve_form.filetype
                 filepath = approve_form.filepath
                 column_line = approve_form.column_line
