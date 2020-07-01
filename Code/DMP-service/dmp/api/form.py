@@ -352,7 +352,7 @@ def approve(desc):
                 meta = {
                     "dmp_data_table_name": dmp_data_table_name,
                     "db_table_name": destination_db_table_name,
-                    "submit_dmp_user_id": submit_dmp_user_id,
+                    "dmp_user_id": submit_dmp_user_id,
                     "dmp_database_id": destination_dmp_database_id,
                     "dmp_case_id": dmp_case_id,
                     "description": description,

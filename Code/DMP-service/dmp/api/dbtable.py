@@ -193,7 +193,7 @@ def retrieve(desc):
         database_id = dmp_data_table.dmp_database_id
         db_table_name = dmp_data_table.db_table_name
         conn = auto_connect(db_id=database_id)
-        data = conn.retrieve(db_table_name)
+        data = conn.retrieve(table_name=db_table_name)
         current_app.logger.info(data)
         return  resp_hanlder(result=data)
 

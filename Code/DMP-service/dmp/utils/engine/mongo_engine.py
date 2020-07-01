@@ -33,8 +33,8 @@ class MongodbEngine():
     def count(self,collection):
         return int(self.database[collection].count())
 
-    def retrieve(self,collection,limit=100):
-        collection_ = self.database[collection]
+    def retrieve(self,table_name,limit=100):
+        collection_ = self.database[table_name]
         res_= collection_.find({},{"_id":0}).limit(100)
         data = [r for r in res_]
         return  data
