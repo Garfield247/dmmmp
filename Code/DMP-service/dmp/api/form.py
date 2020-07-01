@@ -258,17 +258,18 @@ def approve(desc):
                 text_column = []
                 if file_type == 1:
                     # csv
-                    csv_column = list(
-                        pd.read_csv(os.path.join(current_app.config.get("UPLOADED_PATH"), file_path),
-                                    header=column_line).colums)
-                    text_column = column if column and len(column)==len(csv_column) else csv_column
-                    csv_column_d = [{"index": i, "type": "string"} for i, cc in enumerate(text_column)]
-                    reader = textfile_reader(
-                        filepath=filepath,
-                        column=csv_column_d
-                    )
-
-                    pass
+                    try:
+                        csv_column = list(
+                            pd.read_csv(os.path.join(current_app.config.get("UPLOADED_PATH"), file_path),
+                                        header=column_line).colums)
+                        text_column = column if column and len(column)==len(csv_column) else csv_column
+                        csv_column_d = [{"index": i, "type": "string"} for i, cc in enumerate(text_column)]
+                        reader = textfile_reader(
+                            filepath=filepath,
+                            column=csv_column_d
+                        )
+                    except Exception as err:
+                        approve_form.upload_result = str(err)
                 elif file_type == 2:
                     # json
                     pass

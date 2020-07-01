@@ -24,7 +24,7 @@ class FromUpload(db.Model, DMPModel):
     approve_result = db.Column(db.Integer, default=0, comment='审批结果,默认:0,通过:1,不通过:2')
     answer = db.Column(db.String(32), comment='审批答复')
     upload = db.Column(db.Boolean, comment='是否成功')
-    upload_result = db.Column(db.String(32), comment='数据上传结果')
+    upload_result = db.Column(db.String(128), comment='数据上传结果')
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
     submit_dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), nullable=False, comment='提交人')

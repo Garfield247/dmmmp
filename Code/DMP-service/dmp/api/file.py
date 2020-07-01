@@ -54,7 +54,7 @@ def success(desc):
             # 删除该分片，节约空间
             os.remove(filename)
     current_app.logger.info(finally_filename)
-    return resp_hanlder(result={"filename": target_filename})
+    return resp_hanlder(result={"filename": finally_filename})
 
 
 class FormDownload(object):
