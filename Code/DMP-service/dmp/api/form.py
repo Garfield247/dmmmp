@@ -293,7 +293,7 @@ def approve(desc):
                     if method == 1:
                         hive_conn.execsql(create_table_sql)
                     elif method == 3:
-                        del_table_sql = "drop table {table_name }"
+                        del_table_sql = "drop table {table_name}"
                         hive_conn.execsql(del_table_sql.format(table_name=destination_db_table_name))
                         hive_conn.execsql(create_table_sql)
                     else:
