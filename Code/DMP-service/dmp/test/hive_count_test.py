@@ -7,4 +7,4 @@
 def hct():
     from dmp.models import DataTable
     h = DataTable.get(1)
-    h.data_counnt()
+    h.data_count()
