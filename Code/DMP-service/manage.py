@@ -93,6 +93,11 @@ def test_datax():
     # from dmp.models import Users
     # Users.create_test_user()
 
+@manager.command
+def test_hive():
+    from dmp.test.hive_count_test import hct
+    hct()
+
 
 @manager.option('-n', '-dmp_username', dest='dmp_username')
 @manager.option('-r', '-real_name', dest='real_name')
