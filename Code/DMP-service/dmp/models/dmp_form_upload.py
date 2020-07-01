@@ -17,7 +17,6 @@ class FromUpload(db.Model, DMPModel):
     column_line = db.Column(db.Integer, comment='列名行号')
     column = db.Column(db.String(32), comment='自定义列名')
     json_dimension_reduction = db.Column(db.Boolean, comment='json数据是否遍历存储')
-    new_table_name = db.Column(db.String(32), nullable=False, comment='表名')
     method = db.Column(db.Integer, default=1, comment='新建1、添加2或覆盖3')
     description = db.Column(db.String(128), comment='说明')
     submit_on = db.Column(db.DateTime, default=datetime.datetime.now, nullable=False, comment='提交时间')
@@ -39,5 +38,5 @@ class FromUpload(db.Model, DMPModel):
 
     submit_users = db.relationship('Users', foreign_keys=submit_dmp_user_id, backref='submitusers_from_upload')
     approve_users = db.relationship('Users', foreign_keys=approve_dmp_user_id, backref='approveusers_from_upload')
-    database = db.relationship('Database', backref='database_from_upload')
-    datacase = db.relationship('Case', backref='case_from_upload')
+    database = db.relationship('Database',foreign_keys=destination_dmp_database_id, backref='database_from_upload')
+    datacase = db.relationship('Case', foreign_keys=dmp_case_id,backref='case_from_upload')

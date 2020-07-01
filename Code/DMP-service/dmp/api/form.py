@@ -61,7 +61,6 @@ def from_file(desc):
             destination_db_table_name = form_info.get("tablename")
             dmp_data_table_name = form_info.get("dmp_data_table_name")
             method = form_info.get("method")
-            new_table_name = form_info.get("tablename")
             dmp_data_case_id = form_info.get("dmp_data_case_id")
             description = form_info.get("description")
             new_form = FromUpload(
@@ -69,7 +68,6 @@ def from_file(desc):
                 filepath=filepath,
                 column_line=column_line,
                 column=column,
-                new_table_name=new_table_name,
                 json_dimension_reduction=json_dimension_reduction,
                 destination_dmp_database_id=destination_dmp_database_id,
                 destination_db_table_name=destination_db_table_name,
@@ -233,8 +231,8 @@ def approve(desc):
                 approve_form.approve_dmp_user_id = approve_user_id
                 approve_form.approve_result = approve_result
                 approve_form.answer = answer
-
-                file_path = os.path.join(current_app.config.get("UPLOADED_PATH"), approve_form.filepath)
+                upload_path = current_app.config.get("UPLOADED_PATH")
+                file_path = os.path.join(upload_path, approve_form.filepath)
                 file_type = approve_form.filetype
                 filepath = approve_form.filepath
                 column_line = approve_form.column_line
