@@ -259,7 +259,7 @@ def approve(desc):
                 if file_type == 1:
                     # csv
                     csv_column = list(
-                        pd.read_csv(os.path.join(current_app.config.get("UPLOAD_PATH"), file_path),
+                        pd.read_csv(os.path.join(current_app.config.get("UPLOADED_PATH"), file_path),
                                     header=column_line).colums)
                     text_column = column if column and len(column)==len(csv_column) else csv_column
                     csv_column_d = [{"index": i, "type": "string"} for i, cc in enumerate(text_column)]
