@@ -314,6 +314,7 @@ def approve(desc):
                                                                   id_primary_key=True,
                                                                   semicolon=True,
                                                                   fieldDelimiter=None)
+                    current_app.logger.info(create_table_sql)
                     mysql_conn = auto_connect(destination_dmp_database_id)
                     del_table_sql = "drop table {table_name };"
                     preSQL = []
