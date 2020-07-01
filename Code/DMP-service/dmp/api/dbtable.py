@@ -41,7 +41,7 @@ def all(desc):
                 dtb_d["case_name"] = dtb.case.dmp_case_name
                 dtb_d["database_name"] = dtb.database.dmp_database_name
                 dtb_d["user_name"] = dtb.users.dmp_username
-                dbtables.append(dbtables)
+                dbtables.append(dtb)
                 current_app.logger.info(dbtables)
             return resp_hanlder(result=dbtables)
         except Exception as err:
