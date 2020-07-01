@@ -265,7 +265,7 @@ def approve(desc):
                         text_column = column if column and len(column)==len(csv_column) else csv_column
                         csv_column_d = [{"index": i, "type": "string"} for i, cc in enumerate(text_column)]
                         reader = textfile_reader(
-                            filepath=filepath,
+                            filepath=csv_filepath,
                             column=csv_column_d
                         )
                     except Exception as err:
