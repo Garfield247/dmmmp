@@ -238,7 +238,7 @@ def approve(desc):
                 file_type = approve_form.filetype
                 filepath = approve_form.filepath
                 column_line = approve_form.column_line
-                column = approve_form.column.split(",")
+                column = approve_form.column.split(",") if type(approve_form.column)==str else []
                 json_dimension_reduction = approve_form.json_dimension_reduction
                 destination_dmp_database_id = approve_form.destination_dmp_database_id
                 destination_db_table_name = approve_form.destination_db_table_name
