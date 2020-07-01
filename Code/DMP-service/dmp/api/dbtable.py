@@ -31,6 +31,21 @@ def info(desc):
             return resp_hanlder(err=err)
 
 
+@dbtable.route("/all/",methods=["GET"],defaults={"desc":"获取所有数据表信息"})
+def all(desc):
+    if request.method == "GET":
+        try:
+            dbtables = []
+            for dtb in DataTable.query.all():
+                dtb_d = dtb.__json__()
+                dtb_d["case_name"] = dtb.case.dmp_case_name
+                dtb_d["database_name"] = dtb.database.dmp_database_name
+                dtb_d["user_name"] = dtb_d.users.dmp_username
+                dbtables.append(dbtables)
+                current_app.logger.info(dbtables)
+            return resp_hanlder(result=dbtables)
+        except Exception as err:
+            return resp_hanlder(err=err)
 
 def post(dmp_data_table_name,
          db_table_name,
