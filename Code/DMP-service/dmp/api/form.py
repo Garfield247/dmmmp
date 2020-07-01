@@ -340,7 +340,7 @@ def approve(desc):
                     mongo_conn = auto_connect(destination_dmp_database_id)
                     if method == 3:
                         mongo_conn.del_table(table_name=destination_db_table_name)
-                    column = [{"name": col} for col in text_column]
+                    column = [{"name": col,"type":"string"} for col in text_column]
                     writer = mongodb_writer(host=destination_db_host,
                                             port=destination_db_port,
                                             username=destination_db_username,

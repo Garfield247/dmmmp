@@ -64,7 +64,7 @@ def database_name(desc):
             return resp_hanlder(err=err)
 
 
-@verifier.route("/table_name/", methods=["GET"], defaults={"desc": "验证数据库名占用"})
+@verifier.route("/table_name/", methods=["GET"], defaults={"desc": "验证数据表名占用"})
 def table_name(desc):
     if request.method == "GET":
         try:
