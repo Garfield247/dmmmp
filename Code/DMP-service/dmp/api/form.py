@@ -261,7 +261,7 @@ def approve(desc):
                     try:
                         csv_filepath = os.path.join(current_app.config.get("UPLOADED_PATH"), file_path)
                         dt = pd.read_csv(csv_filepath,header=column_line)
-                        csv_column = list(dt.colums)
+                        csv_column = list(dt.columns)
                         text_column = column if column and len(column)==len(csv_column) else csv_column
                         csv_column_d = [{"index": i, "type": "string"} for i, cc in enumerate(text_column)]
                         reader = textfile_reader(
