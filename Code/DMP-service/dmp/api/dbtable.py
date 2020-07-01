@@ -40,7 +40,7 @@ def all(desc):
                 dtb_d = dtb.__json__()
                 dtb_d["case_name"] = dtb.case.dmp_case_name
                 dtb_d["database_name"] = dtb.database.dmp_database_name
-                dtb_d["user_name"] = dtb_d.users.dmp_username
+                dtb_d["user_name"] = dtb.users.dmp_username
                 dbtables.append(dbtables)
                 current_app.logger.info(dbtables)
             return resp_hanlder(result=dbtables)

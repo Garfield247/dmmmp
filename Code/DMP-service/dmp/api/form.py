@@ -238,7 +238,7 @@ def approve(desc):
                 file_type = approve_form.filetype
                 filepath = approve_form.filepath
                 column_line = approve_form.column_line
-                column = approve_form.column
+                column = approve_form.column.split(",")
                 json_dimension_reduction = approve_form.json_dimension_reduction
                 destination_dmp_database_id = approve_form.destination_dmp_database_id
                 destination_db_table_name = approve_form.destination_db_table_name
@@ -260,10 +260,10 @@ def approve(desc):
                 text_column = []
                 if file_type == 1:
                     # csv
-                    text_column = column if column else list(
+                    csv_column = list(
                         pd.read_csv(os.path.join(current_app.config.get("DMP_UPLOAD_PATH"), file_path),
-                                    header=column_line) \
-                            .colums)
+                                    header=column_line).colums)
+                    text_column = column if column and len(column)==len(csv_column) else csv_column
                     csv_column_d = [{"index": i, "type": "string"} for i, cc in enumerate(text_column)]
                     reader = textfile_reader(
                         filepath=filepath,
