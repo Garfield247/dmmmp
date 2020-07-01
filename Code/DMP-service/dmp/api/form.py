@@ -185,7 +185,7 @@ def info(desc):
 
 
 def postfunc(meta):
-    new_table = meta.item
+    new_table = meta
     post(
         dmp_data_table_name=new_table.get("dmp_data_table_name"),
         db_table_name=new_table.get("db_table_name"),
