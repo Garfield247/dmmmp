@@ -62,6 +62,7 @@ def post(dmp_data_table_name,
         dmp_database_id=dmp_database_id,
         dmp_case_id=dmp_case_id)
     new_db_table.save()
+    print("new data table saved")
     new_db_table.data_count()
     return new_db_table.__json__()
 

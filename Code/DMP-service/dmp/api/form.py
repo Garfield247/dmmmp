@@ -316,7 +316,7 @@ def approve(desc):
                                                                   fieldDelimiter=None)
                     current_app.logger.info(create_table_sql)
                     mysql_conn = auto_connect(destination_dmp_database_id)
-                    del_table_sql = "drop table {table_name };"
+                    del_table_sql = "drop table {table_name};"
                     preSQL = []
                     if method == 1:
                         mysql_conn.execsql(sql=create_table_sql)
@@ -325,7 +325,7 @@ def approve(desc):
                     elif method == 3:
                         mysql_conn.execsql(del_table_sql.format(table_name=destination_db_table_name))
                         mysql_conn.execsql(create_table_sql)
-                    column = [col.get("dmp_data_table_column_name") for col in text_column]
+                    column = text_column
                     writer = mysql_writer(model=1,
                                           username=destination_db_username,
                                           password=destination_db_passwd,
