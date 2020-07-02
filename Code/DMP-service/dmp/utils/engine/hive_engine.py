@@ -31,7 +31,7 @@ class HiveEngone():
     def columns(self, table_name):
         cursor = self.conn.cursor()
         sql = """
-        desc '{table_name}'
+        desc {table_name}
         """
         cursor.execute(sql.format(table_name=table_name))
         _d = cursor.fetchall()
