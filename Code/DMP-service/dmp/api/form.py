@@ -214,7 +214,7 @@ def dlfunc(meta):
         with open(full_name,"wb") as fp:
             for f in files:
                 data = open(f,"rb")
-                fp.write(data)
+                fp.write(data.read())
                 data.close()
                 os.remove(f)
     else:
