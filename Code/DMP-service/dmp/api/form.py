@@ -207,7 +207,7 @@ def dlfunc(meta):
     download_path = meta.get("download_path")
     full_name = os.path.join(download_path,file_name)
     ftp_url = meta.get("ftp_url")
-    files = [os.path.join(download_path, f) for f in os.listdir(download_path) if f.endswith(file_name)]
+    files = [os.path.join(download_path, f) for f in os.listdir(download_path) if f.startswith(file_name)]
     if len(files) == 1:
         os.rename(files[0],full_name)
     elif len(files) > 1:
