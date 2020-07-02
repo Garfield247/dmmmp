@@ -117,17 +117,18 @@ def column(desc):
             if colums4sdb.count() > 0:
                 column4sdb_array = [col.__json__() for col in colums4sdb.all()]
             columns4db = []
-            if db_type == 1:
-                # hive
-                pass
-            elif db_type == 2:
-                # mysql
-                db = MysqlEngine(host=db_host, port=db_port, user=db_username, passwd=db_passwd, db=db_name)
-                columns4db = db.columns(db_table_name)
-            elif db_type == 3:
-                # mongo
-                db = MongodbEngine(host=db_host, port=db_port, user=db_username, passwd=db_passwd, db=db_name)
-                columns4db = db.columns(db_table_name)
+            columns4db = auto_connect(data_table_info.dmp_database_id).columns(db_name)
+            # if db_type == 1:
+            #     # hive
+            #     pass
+            # elif db_type == 2:
+            #     # mysql
+            #     db = MysqlEngine(host=db_host, port=db_port, user=db_username, passwd=db_passwd, db=db_name)
+            #     columns4db = db.columns(db_table_name)
+            # elif db_type == 3:
+            #     # mongo
+            #     db = MongodbEngine(host=db_host, port=db_port, user=db_username, passwd=db_passwd, db=db_name)
+            #     columns4db = db.columns(db_table_name)
             # dmp_data_table_column_name
             current_app.logger.info(column4sdb_array)
             columns = []
