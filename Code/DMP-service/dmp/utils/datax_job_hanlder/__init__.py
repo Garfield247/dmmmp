@@ -12,6 +12,4 @@ from dmp.extensions import celery
 from .job_mongodb import mongodb_reader, mongodb_writer
 from .job_mysql import mysql_reader, mysql_writer
 from .job_hive import hive_reader, hive_writer
-from .job_textfile import textfile_reader,textfile_writer
-
-
+from .job_textfile import textfile_reader, textfile_writer

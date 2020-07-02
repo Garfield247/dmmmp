@@ -102,7 +102,6 @@ class TestingConfig(Config):
     ICON_URL = 'http://192.168.3.87:7789/static/icon/'
 
 
-
 # 生产环境
 class ProductionConfig(Config):
     # Mail

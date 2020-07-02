@@ -24,22 +24,23 @@ class MongodbEngine():
 
     def columns(self, collection):
         collection_ = self.database[collection]
-        column_list = [{"dmp_data_table_column_name": k, "dmp_data_table_column_type": "Array" if type(v) == list else "string"} for k, v in
-                       collection_.find().limit(1)[0].items() if
-                       k != "_id"]
+        column_list = [
+            {"dmp_data_table_column_name": k, "dmp_data_table_column_type": "Array" if type(v) == list else "string"}
+            for k, v in
+            collection_.find().limit(1)[0].items() if
+            k != "_id"]
         return column_list
 
-
-    def count(self,collection):
+    def count(self, collection):
         return int(self.database[collection].count())
 
-    def retrieve(self,table_name,limit=100):
+    def retrieve(self, table_name, limit=100):
         collection_ = self.database[table_name]
-        res_= collection_.find({},{"_id":0}).limit(100)
+        res_ = collection_.find({}, {"_id": 0}).limit(100)
         data = [r for r in res_]
-        return  data
+        return data
 
-    def del_table(self,table_name):
+    def del_table(self, table_name):
         collection_ = self.database[table_name]
         collection_.drop()
 

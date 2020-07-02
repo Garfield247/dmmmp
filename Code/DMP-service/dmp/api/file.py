@@ -5,7 +5,7 @@
 import os
 
 from flask import Blueprint, jsonify, request, current_app
-from dmp.utils import resp_hanlder,uuid_str
+from dmp.utils import resp_hanlder, uuid_str
 from dmp.models import FromDownload
 
 file = Blueprint("file", __name__)
@@ -37,12 +37,12 @@ def success(desc):
     task = request.args.get('task_id')
     chunk = 0
     upload_path = current_app.config.get("UPLOADED_PATH")
-    current_app.logger.info("%s%s%s"%(target_filename,task,upload_path))
-    finally_filename = uuid_str()+target_filename
+    current_app.logger.info("%s%s%s" % (target_filename, task, upload_path))
+    finally_filename = uuid_str() + target_filename
     with open(os.path.join(upload_path, finally_filename), 'wb') as target_file:
         while True:
             try:
-                filename = os.path.join(upload_path, '%s%d'%(task, chunk))
+                filename = os.path.join(upload_path, '%s%d' % (task, chunk))
                 # 按序打开每个分片
                 source_file = open(filename, 'rb')
                 # 读取分片内容写入新文件
@@ -63,7 +63,7 @@ class FormDownload(object):
 
 @file.route("/dlcomplete/", methods=["GET"], defaults={"desc": "文件下载完成"})
 def dlcomplete(desc):
-    if request.method =="GET":
+    if request.method == "GET":
         try:
             form_id = request.json.get("form_id")
             form_ = FromDownload.get(form_id)
@@ -72,4 +72,3 @@ def dlcomplete(desc):
             return resp_hanlder(result="OK")
         except Exception as err:
             return resp_hanlder(result="OK")
-

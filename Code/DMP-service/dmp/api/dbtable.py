@@ -5,9 +5,9 @@
 
 
 from flask import Blueprint, request, current_app
-from dmp.models import DataTable, Users, Database,DataTableColumn
+from dmp.models import DataTable, Users, Database, DataTableColumn
 from dmp.utils import resp_hanlder
-from dmp.utils.engine import MongodbEngine,MysqlEngine
+from dmp.utils.engine import MongodbEngine, MysqlEngine
 from dmp.utils.engine import auto_connect
 
 dbtable = Blueprint("dbtable", __name__)
@@ -31,7 +31,7 @@ def info(desc):
             return resp_hanlder(err=err)
 
 
-@dbtable.route("/all/",methods=["GET"],defaults={"desc":"获取所有数据表信息"})
+@dbtable.route("/all/", methods=["GET"], defaults={"desc": "获取所有数据表信息"})
 def all(desc):
     if request.method == "GET":
         try:
@@ -46,6 +46,7 @@ def all(desc):
             return resp_hanlder(result=dbtables)
         except Exception as err:
             return resp_hanlder(err=err)
+
 
 def post(dmp_data_table_name,
          db_table_name,
@@ -67,9 +68,9 @@ def post(dmp_data_table_name,
     return new_db_table.__json__()
 
 
-@dbtable.route("/put/",methods=["PUT"],defaults={"desc":"修改数据表信息"})
+@dbtable.route("/put/", methods=["PUT"], defaults={"desc": "修改数据表信息"})
 def put(desc):
-    if request.method =="PUT":
+    if request.method == "PUT":
         auth_token = request.headers.get('Authorization')
         current_user_id = Users.decode_auth_token(auth_token)
         dbt_info = request.json
@@ -79,17 +80,18 @@ def put(desc):
         dbt = DataTable.get(dbt_id)
         if dbt:
             dmp_user_id = dbt.dmp_user_id
-            if current_user_id ==1 or current_user_id == dmp_user_id or Users.get(dmp_user_id).leader_dmp_user_id == current_user_id:
+            if current_user_id == 1 or current_user_id == dmp_user_id or Users.get(
+                    dmp_user_id).leader_dmp_user_id == current_user_id:
                 if dbt_name:
                     dbt.dmp_data_table_name = dbt_name
                 if description:
                     dbt.description = description
                 dbt.put()
-                return  resp_hanlder(result="OK!")
+                return resp_hanlder(result="OK!")
             else:
-                return  resp_hanlder(code=301)
+                return resp_hanlder(code=301)
         else:
-            return  resp_hanlder(code=404)
+            return resp_hanlder(code=404)
 
 
 @dbtable.route("/column/", methods=["GET"], defaults={"desc": "获取数据表的列信息"})
@@ -112,7 +114,7 @@ def column(desc):
             colums4sdb = DataTableColumn.query.filter_by(dmp_data_table_id=dmp_data_table_id)
             column4sdb_array = []
             current_app.logger.info(colums4sdb.count())
-            if colums4sdb.count()>0:
+            if colums4sdb.count() > 0:
                 column4sdb_array = [col.__json__() for col in colums4sdb.all()]
             columns4db = []
             if db_type == 1:
@@ -120,17 +122,17 @@ def column(desc):
                 pass
             elif db_type == 2:
                 # mysql
-                db = MysqlEngine(host=db_host,port=db_port,user=db_username,passwd=db_passwd,db=db_name)
+                db = MysqlEngine(host=db_host, port=db_port, user=db_username, passwd=db_passwd, db=db_name)
                 columns4db = db.columns(db_table_name)
             elif db_type == 3:
                 # mongo
-                db = MongodbEngine(host=db_host,port=db_port,user=db_username,passwd=db_passwd,db=db_name)
+                db = MongodbEngine(host=db_host, port=db_port, user=db_username, passwd=db_passwd, db=db_name)
                 columns4db = db.columns(db_table_name)
             # dmp_data_table_column_name
             current_app.logger.info(column4sdb_array)
             columns = []
             for i in columns4db:
-                mark=True
+                mark = True
                 for j in column4sdb_array:
                     if j.get("dmp_data_table_column_name") == i.get("dmp_data_table_column_name"):
                         columns.append(j)
@@ -141,14 +143,14 @@ def column(desc):
             return resp_hanlder(result=columns)
         except Exception as err:
             current_app.logger.error(err)
-            return  resp_hanlder(code=999,err=err)
+            return resp_hanlder(code=999, err=err)
 
 
 @dbtable.route("/columnsetting/", methods=["POST"], defaults={"desc": "数据表的数据列设置"})
 def columnsetting(desc):
     if request.method == "POST":
         columns_info = request.json
-        dmp_data_table_id  = columns_info.get("dmp_data_table_id")
+        dmp_data_table_id = columns_info.get("dmp_data_table_id")
         columns = columns_info.get("columns")
         for col in columns:
             column_id = col.get("id")
@@ -171,12 +173,12 @@ def columnsetting(desc):
                 col_.put()
             else:
                 col_ = DataTableColumn(
-                    dmp_data_table_column_name = dmp_data_table_column_name,
-                    dmp_data_table_column_type = dmp_data_table_column_type,
-                    groupby = groupby,
-                    wherein = wherein,
-                    isdate = isdate,
-                    description = description,
+                    dmp_data_table_column_name=dmp_data_table_column_name,
+                    dmp_data_table_column_type=dmp_data_table_column_type,
+                    groupby=groupby,
+                    wherein=wherein,
+                    isdate=isdate,
+                    description=description,
                     dmp_data_table_id=dmp_data_table_id
                 )
                 col_.save()
@@ -184,7 +186,7 @@ def columnsetting(desc):
         return resp_hanlder(result="OK!")
 
 
-@dbtable.route("/retrieve/",methods=["GET"],defaults={"desc":"数据查询"})
+@dbtable.route("/retrieve/", methods=["GET"], defaults={"desc": "数据查询"})
 def retrieve(desc):
     if request.method == "GET":
         retrieve_info = request.json
@@ -195,7 +197,7 @@ def retrieve(desc):
         conn = auto_connect(db_id=database_id)
         data = conn.retrieve(table_name=db_table_name)
         current_app.logger.info(data)
-        return  resp_hanlder(result=data)
+        return resp_hanlder(result=data)
 
 
 @dbtable.route("/del/", methods=["DELETE"], defaults={"desc": "删除数据表"})
@@ -209,7 +211,8 @@ def dbtdel(desc):
                 del_data_table = DataTable.get(del_data_table_id)
                 if del_data_table:
                     is_user = Users.get(DataTable.get(del_data_table_id).dmp_user_id).id == current_user_id
-                    is_user_leader = Users.get(DataTable.get(del_data_table_id).dmp_user_id).leader_dmp_user_id == current_user_id
+                    is_user_leader = Users.get(
+                        DataTable.get(del_data_table_id).dmp_user_id).leader_dmp_user_id == current_user_id
                     is_admin = Users.get(current_user_id).dmp_group_id == 1
                     if is_user or is_user_leader or is_admin:
                         del_data_table.delete()

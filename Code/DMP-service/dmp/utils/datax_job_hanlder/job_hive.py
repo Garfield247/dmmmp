@@ -4,7 +4,7 @@
 # @Author  : SHTD 
 
 
-def hive_reader(host,port,path,fileType,column,fieldDelimiter=",",encoding="UTF-8",):
+def hive_reader(host, port, path, fileType, column, fieldDelimiter=",", encoding="UTF-8", ):
     """
 
     :param host:
@@ -23,8 +23,8 @@ def hive_reader(host,port,path,fileType,column,fieldDelimiter=",",encoding="UTF-
         "name": "hdfsreader",
         "parameter": {
             "path": path,
-            "defaultFS": "hdfs://%s:%d"%(host,port),
-            "column": column ,
+            "defaultFS": "hdfs://%s:%d" % (host, port),
+            "column": column,
             "fileType": fileType,
             "encoding": encoding or "UTF-8",
             "fieldDelimiter": fieldDelimiter,
@@ -38,18 +38,17 @@ def hive_reader(host,port,path,fileType,column,fieldDelimiter=",",encoding="UTF-
     return hive_reader_json
 
 
-
-def hive_writer(host,port,path,filename,column,fieldDelimiter=","):
+def hive_writer(host, port, path, filename, column, fieldDelimiter=","):
     hive_writer_json = {
         "name": "hdfswriter",
         "parameter": {
-            "defaultFS": "hdfs://%s:%d"%(host,port),
+            "defaultFS": "hdfs://%s:%d" % (host, port),
             "fileType": "text",
             "path": path,
             "fileName": filename,
             "column": column,
             "writeMode": "append",
-            "fieldDelimiter":fieldDelimiter,
+            "fieldDelimiter": fieldDelimiter,
         }
     }
     return hive_writer_json

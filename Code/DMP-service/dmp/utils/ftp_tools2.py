@@ -11,14 +11,13 @@ max_upload = 300 * 1024
 max_download = 300 * 1024
 max_cons = 256
 max_pre_ip = 10
-passive_ports = (2223,2233)
+passive_ports = (2223, 2233)
 enable_anonymous = False
 enable_logging = True
 logging_name = r"pyftp.log"
 masquerade_address = ""
 welcome_banner = r"Welcome to private ftp."
 anonymous_path = r"/tmp"
-
 
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.servers import FTPServer
@@ -45,7 +44,7 @@ def init_ftp_server():
     """
     # # 日志记录
     if enable_logging:
-        logging.basicConfig(filename="pyftp.log",level=logging.INFO)
+        logging.basicConfig(filename="pyftp.log", level=logging.INFO)
     # 匿名登录
     if enable_anonymous:
         authorize.add_anonymous(anonymous_path)
@@ -70,24 +69,26 @@ def init_ftp_server():
     handler.passive_ports = passive_ports
     handler.masquerade_address = masquerade_address
 
-    address_port = (ip,port)
-    server = FTPServer(address_port,handler=handler)
+    address_port = (ip, port)
+    server = FTPServer(address_port, handler=handler)
     server.max_cons = max_cons
     server.max_cons_per_ip = max_pre_ip
     server.serve_forever()
 
+
 def init_conf_file(text):
-    for x,item in enumerate(text):
+    for x, item in enumerate(text):
         if item == "#":
             return text[:x]
         pass
     return text
 
-def init_user_listconf():   #
+
+def init_user_listconf():  #
     try:
-        f = open('baseftp.ini',encoding='utf-8')
+        f = open('baseftp.ini', encoding='utf-8')
     except:
-        print ("baseftp open error.")
+        print("baseftp open error.")
         exit(1)
     while 1:
         line = f.readline()
@@ -96,6 +97,7 @@ def init_user_listconf():   #
         if not line:
             break
     f.close()
+
 
 if __name__ == '__main__':
     user_list = []

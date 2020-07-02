@@ -181,7 +181,6 @@ def changepwd(desc):
             return resp_hanlder(code=1007, msg=res)
 
 
-
 @user.route("/list/", methods=["GET"], defaults={"desc": "用户列表"})
 def ulist(desc):
     '''
@@ -270,13 +269,13 @@ def icon(desc):
             icon_name = uuid_str() + '.jpg'
             save_url = current_app.config.get("SAVE_URL")
             origin_icon = current_obj.icon
-            origin_icon_path = os.path.join(save_url,origin_icon)
+            origin_icon_path = os.path.join(save_url, origin_icon)
             if os.path.exists(origin_icon_path):
-                    os.remove(origin_icon_path)
-            new_icon_path = os.path.join(save_url,icon_name)
+                os.remove(origin_icon_path)
+            new_icon_path = os.path.join(save_url, icon_name)
             with open(new_icon_path, 'wb') as new_icon:
                 new_icon.write(icon_data)
-            current_obj.icon = current_app.config.get("ICON_URL")+icon_name
+            current_obj.icon = current_app.config.get("ICON_URL") + icon_name
             current_obj.put()
             icon_url = current_obj.icon
             return resp_hanlder(code=4001, msg=RET.alert_code[4001], result=icon_url)
@@ -412,7 +411,6 @@ def udel(desc):
             return resp_hanlder(code=999, err=err)
 
 
-
 @user.before_request
 def before_request():
     '''
@@ -421,4 +419,3 @@ def before_request():
     返回值:有权限访问url通过,没权限访问返回提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':301}
     '''
     rbac_middleware()
-

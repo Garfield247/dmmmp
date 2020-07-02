@@ -43,6 +43,7 @@ def info(desc):
         except Exception as err:
             return resp_hanlder(code=999, err=err)
 
+
 @usergroup.route("/post/", methods=["POST", "PUT"], defaults={"desc": "添加编辑用户组信息"})
 def post_group(desc):
     '''

@@ -9,14 +9,13 @@ from dmp.extensions import db
 from dmp.models import DMPModel
 
 
-
 class DataTable(db.Model, DMPModel):
     """数据表"""
     __tablename__ = 'dmp_data_table'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     dmp_data_table_name = db.Column(db.String(32), unique=True, nullable=False, comment='数据名称')
     db_table_name = db.Column(db.String(32), nullable=False, comment='数据库内数据表名称')
-    db_data_count = db.Column(db.Integer,default=0,comment='数据表内的数据量')
+    db_data_count = db.Column(db.Integer, default=0, comment='数据表内的数据量')
     description = db.Column(db.String(128), comment='数据说明')
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
@@ -32,9 +31,8 @@ class DataTable(db.Model, DMPModel):
         from dmp.utils.engine import auto_connect
         conn = auto_connect(self.dmp_database_id)
         count = conn.count(self.db_table_name)
-        self.db_data_count  = count
+        self.db_data_count = count
         self.put()
-
 
     def delete(self):
         from dmp.models import DataTableColumn

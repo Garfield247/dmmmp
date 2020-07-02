@@ -10,8 +10,8 @@ from flask import Blueprint, request, current_app
 from sqlalchemy.sql import exists
 
 from dmp.extensions import db
-from dmp.models import FromUpload, FromMigrate, FromDownload, FromAddDataTable, Users, DataTable, Database,Permissions
-from dmp.utils import resp_hanlder
+from dmp.models import FromUpload, FromMigrate, FromDownload, FromAddDataTable, Users, DataTable, Database, Permissions
+from dmp.utils import resp_hanlder,uuid_str
 from dmp.utils.datax_job_hanlder import mysql_reader, mysql_writer, mongodb_reader, mongodb_writer, hive_reader, \
     hive_writer, textfile_reader, textfile_writer
 from dmp.utils.job_task import job_hanlder
@@ -145,7 +145,7 @@ def form_permission(user_id):
     approve_id = Permissions.query.filter_by(route="/form/approve/").first().id
     p_ids = [p.id for p in user.groups.permissions]
     if usergroup_id == 1:
-        return  3
+        return 3
     elif approve_id in p_ids:
         return 2
     elif approve_id not in p_ids:
@@ -242,7 +242,7 @@ def approve(desc):
                 file_type = approve_form.filetype
                 filepath = approve_form.filepath
                 column_line = approve_form.column_line
-                column = approve_form.column.split(",") if type(approve_form.column)==str else []
+                column = approve_form.column.split(",") if type(approve_form.column) == str else []
                 json_dimension_reduction = approve_form.json_dimension_reduction
                 destination_dmp_database_id = approve_form.destination_dmp_database_id
                 destination_db_table_name = approve_form.destination_db_table_name
@@ -266,9 +266,9 @@ def approve(desc):
                     # csv
                     try:
                         csv_filepath = os.path.join(current_app.config.get("UPLOADED_PATH"), file_path)
-                        dt = pd.read_csv(csv_filepath,header=column_line)
+                        dt = pd.read_csv(csv_filepath, header=column_line)
                         csv_column = list(dt.columns)
-                        text_column = column if column and len(column)==len(csv_column) else csv_column
+                        text_column = column if column and len(column) == len(csv_column) else csv_column
                         csv_column_d = [{"index": i, "type": "string"} for i, cc in enumerate(text_column)]
                         reader = textfile_reader(
                             filepath=csv_filepath,
@@ -346,7 +346,7 @@ def approve(desc):
                     mongo_conn = auto_connect(destination_dmp_database_id)
                     if method == 3:
                         mongo_conn.del_table(table_name=destination_db_table_name)
-                    column = [{"name": col,"type":"string"} for col in text_column]
+                    column = [{"name": col, "type": "string"} for col in text_column]
                     writer = mongodb_writer(host=destination_db_host,
                                             port=destination_db_port,
                                             username=destination_db_username,
@@ -404,7 +404,7 @@ def approve(desc):
                         reader = hive_reader(host=origin_db_host,
                                              port=8020,
                                              path="/user/hive/warehouse/%s.db/%s" % (
-                                             origin_db_name, origin_db_table_name),
+                                                 origin_db_name, origin_db_table_name),
                                              fileType="text",
                                              column=["*"],
                                              fieldDelimiter=',',
@@ -468,7 +468,7 @@ def approve(desc):
                                                                       id_primary_key=True,
                                                                       semicolon=True,
                                                                       fieldDelimiter=None)
-                        mysql_conn  = auto_connect(approve_form.destination_dmp_database_id)
+                        mysql_conn = auto_connect(approve_form.destination_dmp_database_id)
                         mysql_conn.execsql(sql=create_table_sql)
                         preSQL = []
                         writer = mysql_writer(model=1,
@@ -482,7 +482,8 @@ def approve(desc):
                                               )
                     elif destination_database_type == 3:
                         # mongo_writer
-                        column = [{"name": col.get("dmp_data_table_column_name"),"type":"string"} for col in base_column]
+                        column = [{"name": col.get("dmp_data_table_column_name"), "type": "string"} for col in
+                                  base_column]
                         writer = mongodb_writer(host=destination_db_host,
                                                 port=destination_db_port,
                                                 username=destination_db_username if destination_db_username else None,
@@ -516,14 +517,13 @@ def approve(desc):
                         origin_data_table.db_table_name)
                     # current_app.logger.info(base_column)
 
-
                     reader = []
                     if origin_database_type == 1:
                         # hive_reader
                         reader = hive_reader(host=origin_db_host,
                                              port=8020,
                                              path="/user/hive/warehouse/%s.db/%s" % (
-                                             origin_db_name, origin_db_table_name),
+                                                 origin_db_name, origin_db_table_name),
                                              fileType="text",
                                              column=["*"],
                                              fieldDelimiter=',',
@@ -556,14 +556,16 @@ def approve(desc):
                                                 )
                         pass
                     writer = []
-                    download_path = os.path.join(current_app.config.get("DOWNLOAD_PATH"),approve_form.submit_users.dmp_username)
-                    file_name = origin_db_table_name
+                    download_path = os.path.join(current_app.config.get("DOWNLOAD_PATH"),
+                                                 approve_form.submit_users.dmp_username)
+                    file_name = origin_db_table_name + uuid_str() +".csv"
                     headers = [col.get("dmp_data_table_column_name") for col in base_column]
                     writer = textfile_writer(filepath=download_path, filename=file_name, header=headers)
 
                     job_hanlder.delay(reader=reader, writer=writer)
                     ip = socket.gethostbyname(socket.gethostname())
-                    approve_form.ftp_url  = "ftp://%s:21/%s"%(str(ip),str(os.path.join(approve_form.submit_users.dmp_username,file_name)))
+                    approve_form.ftp_url = "ftp://%s:21/%s" % (
+                        str(ip), str(os.path.join(approve_form.submit_users.dmp_username, file_name)))
                     approve_form.ftp_pid = 4396
                     approve_form.filepath = download_path
                     job_hanlder.delay(reader=reader, writer=writer)

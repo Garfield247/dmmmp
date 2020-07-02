@@ -7,6 +7,7 @@ import time
 import datetime
 from dmp.models import Database
 
+
 class CM_tools():
     user = "admin"
     password = "admin"
@@ -25,23 +26,24 @@ class CM_tools():
 
     def get_model_health(self):
         services = self.services_api_health.read_services("cluster")
-        return [{"display_name":summary.display_name,"entity_status":summary.entity_status} for summary in services.items]
+        return [{"display_name": summary.display_name, "entity_status": summary.entity_status} for summary in
+                services.items]
 
-    def get_disk_IO(self,time_interval):
+    def get_disk_IO(self, time_interval):
         from_time = datetime.datetime.fromtimestamp(time.time() - int(time_interval))
         to_time = datetime.datetime.fromtimestamp(time.time())
         query = "select total_read_bytes_rate_across_disks, total_write_bytes_rate_across_disks where category = CLUSTER"
         res = self.services_api_IO.query_time_series(_from=from_time, query=query, to=to_time).to_dict()
         return res
 
-    def get_network_IO(self,time_interval):
+    def get_network_IO(self, time_interval):
         from_time = datetime.datetime.fromtimestamp(time.time() - int(time_interval))
         to_time = datetime.datetime.fromtimestamp(time.time())
         query = "select total_bytes_receive_rate_across_network_interfaces, total_bytes_transmit_rate_across_network_interfaces where category = CLUSTER"
         res = self.services_api_IO.query_time_series(_from=from_time, query=query, to=to_time).to_dict()
         return res
 
-    def get_cpu_usage(self,time_interval):
+    def get_cpu_usage(self, time_interval):
         from_time = datetime.datetime.fromtimestamp(time.time() - int(time_interval))
         to_time = datetime.datetime.fromtimestamp(time.time())
         query = "select cpu_percent_across_hosts where category = CLUSTER"
@@ -63,6 +65,8 @@ class CM_tools():
         query = "select dfs_capacity, dfs_capacity_used, dfs_capacity_used_non_hdfs where entityName=hdfs"
         res = self.services_api_IO.query_time_series(_from=from_time, query=query, to=to_time).to_dict()
 
-        res_ = [ {"metric_name":serie.get("metadata",{}).get("metric_name"),"value":serie.get("data",{})[0].get("value")} for serie in res.get("items",{})[0].get("time_series",[])]
+        res_ = [{"metric_name": serie.get("metadata", {}).get("metric_name"),
+                 "value": serie.get("data", {})[0].get("value")} for serie in
+                res.get("items", {})[0].get("time_series", [])]
         # print(res_)
         return res_

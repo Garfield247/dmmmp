@@ -6,7 +6,8 @@
 import os
 import json
 
-def mysql_reader(username,password,column,host,port,db,table,where):
+
+def mysql_reader(username, password, column, host, port, db, table, where):
     """
     mysql数据读取者构造器
     :param username: str,数据库用户名,必填
@@ -28,16 +29,17 @@ def mysql_reader(username,password,column,host,port,db,table,where):
             "column": column,
             "connection": [
                 {
-                "jdbcUrl": ["jdbc:mysql://%s:%d/%s"%(host,port,db)],
-                "table": [table]
+                    "jdbcUrl": ["jdbc:mysql://%s:%d/%s" % (host, port, db)],
+                    "table": [table]
                 }
             ],
             "where": where
-            }
         }
+    }
     return mysql_reader_josn
 
-def mysql_writer(model,username,password,column,host,port,db,table):
+
+def mysql_writer(model, username, password, column, host, port, db, table):
     """
     mysql数据写入者构造器
     :param model: int，写入模式，必填 1 insert 2 replace 3 update
@@ -53,20 +55,20 @@ def mysql_writer(model,username,password,column,host,port,db,table):
     """
 
     model_dict = {
-        1:"insert",
-        2:"replace",
-        3:"update",
+        1: "insert",
+        2: "replace",
+        3: "update",
     }
     mysql_writer_json = {
-        "name":"mysqlwriter",
-        "parameter":{
+        "name": "mysqlwriter",
+        "parameter": {
             "writeMode": model_dict.get(model),
             "username": username,
             "password": password,
             "column": column,
             "connection": [
                 {
-                    "jdbcUrl": "jdbc:mysql://%s:%d/%s"%(host,port,db),
+                    "jdbcUrl": "jdbc:mysql://%s:%d/%s" % (host, port, db),
                     "table": [
                         table
                     ]

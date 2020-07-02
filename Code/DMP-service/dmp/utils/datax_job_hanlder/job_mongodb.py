@@ -3,21 +3,21 @@
 # @Date    : 2020/5/25
 # @Author  : SHTD 
 
-def mongodb_reader(host,port,db_name,collection_name,column,username=None,password=None):
+def mongodb_reader(host, port, db_name, collection_name, column, username=None, password=None):
     mongodb_reader_json = {
-                  "name": "mongodbreader",
-                  "parameter": {
-                      "address": ["%s:%d"%(host,port)],
-                      "userName": username,
-                      "userPassword": password,
-                      "dbName": db_name,
-                      "collectionName": collection_name,
-                      "column": column,
-                  }}
+        "name": "mongodbreader",
+        "parameter": {
+            "address": ["%s:%d" % (host, port)],
+            "userName": username,
+            "userPassword": password,
+            "dbName": db_name,
+            "collectionName": collection_name,
+            "column": column,
+        }}
     return mongodb_reader_json
 
 
-def mongodb_writer(host,port,username,password,db_name,collection_name,column):
+def mongodb_writer(host, port, username, password, db_name, collection_name, column):
     """
 
     :param host:
@@ -31,15 +31,15 @@ def mongodb_writer(host,port,username,password,db_name,collection_name,column):
     """
     mongodb_writer_json = {
         "name": "mongodbwriter",
-              "parameter": {
-                  "address": [
-                      "%s:%d"%(host,port)
-                  ],
-                  "userName": username,
-                  "userPassword": password,
-                  "dbName": db_name,
-                  "collectionName": collection_name,
-                  "column": column,
-              }
-          }
+        "parameter": {
+            "address": [
+                "%s:%d" % (host, port)
+            ],
+            "userName": username,
+            "userPassword": password,
+            "dbName": db_name,
+            "collectionName": collection_name,
+            "column": column,
+        }
+    }
     return mongodb_writer_json

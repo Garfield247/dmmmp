@@ -6,16 +6,17 @@
 import pymysql
 from flask import current_app
 
+
 class MysqlEngine():
 
-    def __init__(self,host,port,user,passwd,db):
+    def __init__(self, host, port, user, passwd, db):
 
         try:
             print(host)
             # current_app.logger.info(host, port, user, passwd, db)
             self.conn = pymysql.Connect(host=host, port=port, user=user, passwd=passwd, db=db)
             current_app.logger.info(self.conn.server_version)
-        except Exception as e :
+        except Exception as e:
             current_app.logger.error(e)
 
     def tables_list(self):
@@ -28,7 +29,7 @@ class MysqlEngine():
         result = [i[0] for i in res]
         return result
 
-    def columns(self,table_name):
+    def columns(self, table_name):
         cursor = self.conn.cursor()
         sql = """
 
@@ -41,7 +42,7 @@ class MysqlEngine():
             {"dmp_data_table_column_name": column, "dmp_data_table_column_type": dtype} for column, dtype in _d]
         return columns_type_list
 
-    def count(self,table_name):
+    def count(self, table_name):
         cursor = self.conn.cursor()
         sql = """
         Select count(*) from {table_name};
@@ -50,16 +51,16 @@ class MysqlEngine():
         _count = cursor.fetchall()
         return int(_count[0][0])
 
-    def execsql(self,sql):
+    def execsql(self, sql):
         cursor = self.conn.cursor()
         cursor.execute(sql)
 
-    def retrieve(self,table_name,limit=100):
+    def retrieve(self, table_name, limit=100):
         cursor = self.conn.cursor()
         sql = """
         Select * from {table_name} limit {limit};
         """
-        cursor.execute(sql.format(table_name=table_name,limit=limit))
+        cursor.execute(sql.format(table_name=table_name, limit=limit))
         res = cursor.fetchall()
         return res
 

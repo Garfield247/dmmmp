@@ -28,7 +28,8 @@ def info(desc):
                     user_ids = [u.id for u in Users.query.filter_by(leader_dmp_user_id=current_user_id).all()]
                     user_ids.append(current_user_id)
                     current_app.logger.info(user_ids)
-                    data = [d.__json__() for d in Database.query.filter(Database.dmp_user_id.in_(user_ids) | Database.ispublic==True).all()]
+                    data = [d.__json__() for d in
+                            Database.query.filter(Database.dmp_user_id.in_(user_ids) | Database.ispublic == True).all()]
                 current_app.logger.info(data)
             return resp_hanlder(result=data)
         except Exception as err:
@@ -92,7 +93,8 @@ def connect(desc):
             try:
                 import pymysql
                 current_app.logger.info(db_host)
-                conn = pymysql.connect( port=db_port, host=db_host,user=db_user, passwd=db_password, db=db_name, charset='utf8mb4')
+                conn = pymysql.connect(port=db_port, host=db_host, user=db_user, passwd=db_password, db=db_name,
+                                       charset='utf8mb4')
                 current_app.logger.info(conn.server_version)
                 conn.close()
                 res = {"connect": "ok!"}
@@ -110,15 +112,15 @@ def connect(desc):
                 return resp_hanlder(code=303, err=err)
         return resp_hanlder(result=res)
 
-@database.route("/table_list/",methods=["GET"],defaults={"desc":"获取数据库的数据表"})
+
+@database.route("/table_list/", methods=["GET"], defaults={"desc": "获取数据库的数据表"})
 def table_list(desc):
     if request.method == "GET":
-        db_id= request.json.get("dmp_database_id")
+        db_id = request.json.get("dmp_database_id")
         conn = auto_connect(db_id=db_id)
         res = conn.tables_list()
         current_app.logger.info(res)
         return resp_hanlder(result=res)
-
 
 
 @database.route("/post/", methods=["POST", "PUT"], defaults={"desc": "添加/修改数据库信息"})
@@ -165,7 +167,7 @@ def post(desc):
                 if "db_name" in db_info.keys():
                     modify_db.db_name = db_info.get("db_name")
                 if "ispublic" in db_info.keys():
-                    modify_db.ispublic =True if db_info.get("ispublic") else False
+                    modify_db.ispublic = True if db_info.get("ispublic") else False
                 if "description" in db_info.keys():
                     modify_db.description = db_info.get("description")
                 modify_db.put()
@@ -174,4 +176,4 @@ def post(desc):
             else:
                 return resp_hanlder(code=101)
         except Exception as err:
-            return resp_hanlder(code=999,err=err)
+            return resp_hanlder(code=999, err=err)

@@ -15,7 +15,7 @@ class LoginVerify():
     @classmethod
     def __public_verify(cls, user, params):
         if user == None:
-            return {-1: '%s is not registered or entered wrong, please login again.'%params}
+            return {-1: '%s is not registered or entered wrong, please login again.' % params}
 
         if user.confirmed == False:
             # email = user.email
@@ -23,7 +23,6 @@ class LoginVerify():
             return {-1: 'Login failed, The message is not activated,'
                         ' please contact your administrator to activate it'}
         return
-
 
     @classmethod
     def __username_verify(cls, user):
