@@ -117,7 +117,7 @@ def column(desc):
             if colums4sdb.count() > 0:
                 column4sdb_array = [col.__json__() for col in colums4sdb.all()]
             columns4db = []
-            columns4db = auto_connect(data_table_info.dmp_database_id).columns(db_name)
+            columns4db = auto_connect(data_table_info.dmp_database_id).columns(db_table_name)
             # if db_type == 1:
             #     # hive
             #     pass
