@@ -387,7 +387,7 @@ def frozen_user(desc):
 
 
 @user.route("/del/", methods=["DELETE"], defaults={"desc": "删除用户"})
-def udel(desc):
+def  udel(desc):
     '''
     说明:删除用户接口
     参数:Authorization,dmp_user_id,说明:指定用户标识token,超级管理员无法删除,根据dmp_user_id删除指定的用户信息,数据类型:JSON
