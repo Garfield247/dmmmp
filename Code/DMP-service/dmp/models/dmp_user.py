@@ -24,6 +24,7 @@ class Users(db.Model, DMPModel):
     passwd = db.Column(db.String(512), nullable=False, comment='用户密码，加密储存')
     confirmed = db.Column(db.Boolean, default=False, comment='用户激活状态')
     icon = db.Column(db.String(128), default=None, comment='用户头像')
+    is_deleted = db.Column(db.Boolean, default=False, comment="用户逻辑删除")
     dmp_user_info = db.Column(db.String(256), default=None, comment='个人简介')
     last_login = db.Column(db.DateTime, default=datetime.datetime.now, comment='最后登录时间')
     created_on = db.Column(db.DateTime, default=datetime.datetime.now, comment='创建时间')

@@ -3,7 +3,7 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 
-from flask import current_app
+from flask import current_app, session
 
 from dmp.extensions import db
 from dmp.models import DMPModel
@@ -31,15 +31,24 @@ class Permissions(db.Model, DMPModel):
     def init_permission(cls):
         permission_list = [{"route": r.rule, "desc": None if not r.defaults else r.defaults.get("desc")} for r in
                            current_app.url_map.__dict__.get("_rules")]
+        db_permission_list = []
         current_app.logger.info(permission_list)
+        # 将is_permission=None的接口和{'route': '/static/<path:filename>'}、
+        # {'route': '/user/DMP-service/<path:filename>', 'desc': None}这两个接口剔除
         try:
             for rout in permission_list:
                 current_app.logger.info(rout)
+                child_rout = rout.get('desc')
+                if rout.get('desc') == None or child_rout.get('is_permission') == False:
+                    continue
                 permission = Permissions()
                 permission.route = str(rout.get("route"))
-                permission.dmp_permission_name = str(rout.get("desc"))
+                desc_dict = rout.get('desc')
+                permission.dmp_permission_name = str(desc_dict.get("interface_name"))
+                db_permission_list.append(rout)
                 db.session.add(permission)
             # db.session.commit()
+            session['db_permission_list'] = db_permission_list
             current_app.logger.info("permission init complete")
         except Exception as err:
             current_app.logger.error(err)

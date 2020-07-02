@@ -12,7 +12,7 @@ from dmp.utils import resp_hanlder
 case = Blueprint("case", __name__)
 
 
-@case.route("/all/", methods=["GET"], defaults={"desc": "案例列表"})
+@case.route("/all/", methods=["GET"], defaults={"desc": {"interface_name": "案例列表","is_permission": True,"permission_belong": 1}})
 def all(desc):
     """获取案例信息"""
     cases = list([c.__json__() for c in Case.query.all()])
@@ -21,7 +21,7 @@ def all(desc):
     return resp_hanlder(result=cases)
 
 
-@case.route("/post/", methods=["POST", "PUT"], defaults={"desc": "添加、修改案例"})
+@case.route("/post/", methods=["POST", "PUT"], defaults={"desc": {"interface_name": "添加、修改案例","is_permission": True,"permission_belong": 1}})
 def cpost(desc):
     """添加修改案例"""
     case_info = request.json
@@ -60,7 +60,7 @@ def cpost(desc):
                 return resp_hanlder(cdoe=203, err=err)
 
 
-@case.route("/del/", methods=["DELETE"], defaults={"desc": "删除案例"})
+@case.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除案例","is_permission": True,"permission_belong": 2}})
 def cdel(desc):
     del_case_id = request.json.get("case_id")
     current_app.logger.info("del case , case_id :%d" % del_case_id)

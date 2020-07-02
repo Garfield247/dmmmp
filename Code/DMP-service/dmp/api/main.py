@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
+# @Author  : SHTD
 
 from flask import (Blueprint,
                    jsonify,
@@ -14,7 +14,7 @@ from dmp.extensions import db
 main = Blueprint("mian", __name__)
 
 
-@main.route("/", defaults={"desc": "服务跟路由"})
+@main.route("/", defaults={"desc": {"interface_name": "服务跟路由","is_permission": False,"permission_belong": None}})
 def test(desc):
     db.create_all()
     result = {
@@ -25,13 +25,13 @@ def test(desc):
     return jsonify(result)
 #
 #
-# @main.route("/apilist", defaults={"desc": "API列表"})
+# @main.route("/apilist", defaults={"desc": {"interface_name": "API列表","is_permission": True,"permission_belong": 1}})
 # def apilist(desc):
 #     current_app.logger.info(current_app.url_map)
 #     return str(current_app.url_map)
 #
 #
-# @main.route('/testAdd', methods=["GET"], defaults={"desc": "celery测试路由"})
+# @main.route('/testAdd', methods=["GET"], defaults={"desc": {"interface_name": "celery测试路由","is_permission": True,"permission_belong": 1}})
 # def test_add(desc):
 #     """
 #     测试相加

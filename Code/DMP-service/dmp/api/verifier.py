@@ -12,7 +12,7 @@ from dmp.utils.response_hanlder import resp_hanlder, RET
 verifier = Blueprint("verifier", __name__)
 
 
-@verifier.route("/email/", methods=["POST"], defaults={"desc": "验证邮箱占用"})
+@verifier.route("/email/", methods=["POST"], defaults={"desc": {"interface_name": "验证邮箱占用","is_permission": False,"permission_belong": None}})
 def email(desc):
     if request.method == 'POST':
         data = request.json
@@ -23,7 +23,7 @@ def email(desc):
         return resp_hanlder(code=1011, msg=RET.alert_code[1011], result={"exist": False})
 
 
-@verifier.route("/username/", methods=["POST"], defaults={"desc": "验证用户名占用"})
+@verifier.route("/username/", methods=["POST"], defaults={"desc": {"interface_name": "验证用户名占用","is_permission": False,"permission_belong": None}})
 def username(desc):
     if request.method == 'POST':
         data = request.json
@@ -34,7 +34,7 @@ def username(desc):
         return resp_hanlder(code=1013, msg=RET.alert_code[1013], result={"exist": False})
 
 
-@verifier.route("/case_name/", methods=["GET"], defaults={"desc": "验证案例名占用"})
+@verifier.route("/case_name/", methods=["GET"], defaults={"desc": {"interface_name": "验证案例名占用","is_permission": False,"permission_belong": None}})
 def case_name(desc):
     if request.method == "GET":
         try:
@@ -49,7 +49,7 @@ def case_name(desc):
             return resp_hanlder(err=err)
 
 
-@verifier.route("/database_name/", methods=["GET"], defaults={"desc": "验证数据库名占用"})
+@verifier.route("/database_name/", methods=["GET"], defaults={"desc": {"interface_name": "验证数据库名占用","is_permission": False,"permission_belong": None}})
 def database_name(desc):
     if request.method == "GET":
         try:
@@ -64,7 +64,7 @@ def database_name(desc):
             return resp_hanlder(err=err)
 
 
-@verifier.route("/table_name/", methods=["GET"], defaults={"desc": "验证数据表名占用"})
+@verifier.route("/table_name/", methods=["GET"], defaults={"desc": {"interface_name": "验证数据表名占用","is_permission": False,"permission_belong": None}})
 def table_name(desc):
     if request.method == "GET":
         try:

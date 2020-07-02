@@ -13,7 +13,7 @@ from dmp.utils.engine import auto_connect
 dbtable = Blueprint("dbtable", __name__)
 
 
-@dbtable.route("/info/", methods=["GET"], defaults={"desc": "获取数据表信息"})
+@dbtable.route("/info/", methods=["GET"], defaults={"desc": {"interface_name": "获取数据表信息","is_permission": True,"permission_belong": 1}})
 def info(desc):
     if request.method == "GET":
         try:
@@ -31,7 +31,7 @@ def info(desc):
             return resp_hanlder(err=err)
 
 
-@dbtable.route("/all/", methods=["GET"], defaults={"desc": "获取所有数据表信息"})
+@dbtable.route("/all/", methods=["GET"], defaults={"desc": {"interface_name": "获取所有数据表信息","is_permission": True,"permission_belong": 1}})
 def all(desc):
     if request.method == "GET":
         try:
@@ -68,7 +68,7 @@ def post(dmp_data_table_name,
     return new_db_table.__json__()
 
 
-@dbtable.route("/put/", methods=["PUT"], defaults={"desc": "修改数据表信息"})
+@dbtable.route("/put/", methods=["PUT"], defaults={"desc": {"interface_name": "修改数据表信息","is_permission": True,"permission_belong": 1}})
 def put(desc):
     if request.method == "PUT":
         auth_token = request.headers.get('Authorization')
@@ -94,7 +94,7 @@ def put(desc):
             return resp_hanlder(code=404)
 
 
-@dbtable.route("/column/", methods=["GET"], defaults={"desc": "获取数据表的列信息"})
+@dbtable.route("/column/", methods=["GET"], defaults={"desc": {"interface_name": "获取数据表的列信息","is_permission": True,"permission_belong": 1}})
 def column(desc):
     if request.method == "GET":
         try:
@@ -147,7 +147,7 @@ def column(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@dbtable.route("/columnsetting/", methods=["POST"], defaults={"desc": "数据表的数据列设置"})
+@dbtable.route("/columnsetting/", methods=["POST"], defaults={"desc": {"interface_name": "数据表的数据列设置","is_permission": True,"permission_belong": 1}})
 def columnsetting(desc):
     if request.method == "POST":
         columns_info = request.json
@@ -187,7 +187,7 @@ def columnsetting(desc):
         return resp_hanlder(result="OK!")
 
 
-@dbtable.route("/retrieve/", methods=["GET"], defaults={"desc": "数据查询"})
+@dbtable.route("/retrieve/", methods=["GET"], defaults={"desc": {"interface_name": "数据查询","is_permission": True,"permission_belong": 1}})
 def retrieve(desc):
     if request.method == "GET":
         retrieve_info = request.json
@@ -201,7 +201,7 @@ def retrieve(desc):
         return resp_hanlder(result=data)
 
 
-@dbtable.route("/del/", methods=["DELETE"], defaults={"desc": "删除数据表"})
+@dbtable.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除数据表","is_permission": True,"permission_belong": 1}})
 def dbtdel(desc):
     if request.method == "DELETE":
         try:

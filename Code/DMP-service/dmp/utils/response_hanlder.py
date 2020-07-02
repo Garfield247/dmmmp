@@ -19,7 +19,7 @@ class RET():
         404: "Item_Does_Not_Exist",
         # 数据库类错误
         501: "Connection_Failed",
-        502: "Database_Occupied",
+        502: "Database_In_Use",
         # 其他错误
         999: "Other_Error",
 

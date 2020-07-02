@@ -11,7 +11,7 @@ from dmp.models import FromDownload
 file = Blueprint("file", __name__)
 
 
-@file.route("/upload/", methods=["POST"], defaults={"desc": "文件上传"})
+@file.route("/upload/", methods=["POST"], defaults={"desc": {"interface_name": "文件上传","is_permission": False,"permission_belong": None}})
 def upload(desc):
     if request.method == 'POST':
         try:
@@ -31,7 +31,7 @@ def upload(desc):
             return resp_hanlder()
 
 
-@file.route("/success/", methods=["GET"], defaults={"desc": "文件上传完成"})
+@file.route("/success/", methods=["GET"], defaults={"desc": {"interface_name": "文件上传完成","is_permission": False,"permission_belong": None}})
 def success(desc):
     target_filename = request.json.get('filename')
     task = request.args.get('task_id')
@@ -43,6 +43,7 @@ def success(desc):
         while True:
             try:
                 filename = os.path.join(upload_path, '%s%d' % (task, chunk))
+                current_app.logger.info(filename)
                 # 按序打开每个分片
                 source_file = open(filename, 'rb')
                 # 读取分片内容写入新文件
@@ -61,7 +62,7 @@ class FormDownload(object):
     pass
 
 
-@file.route("/dlcomplete/", methods=["GET"], defaults={"desc": "文件下载完成"})
+@file.route("/dlcomplete/", methods=["GET"], defaults={"desc": {"interface_name": "文件下载完成","is_permission": False,"permission_belong": None}})
 def dlcomplete(desc):
     if request.method == "GET":
         try:

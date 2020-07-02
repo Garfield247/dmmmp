@@ -5,6 +5,7 @@
 
 import base64
 import os
+import time
 
 from flask import Blueprint, request, session, current_app
 from operator import or_
@@ -25,7 +26,7 @@ from dmp.utils.ep_data import EnvelopedData
 user = Blueprint("user", __name__, static_folder='Code/DMP-service/')
 
 
-@user.route("/register/", methods=["POST"], defaults={"desc": "用户注册"})
+@user.route("/register/", methods=["POST"], defaults={"desc": {"interface_name": "用户注册","is_permission": False,"permission_belong": None}})
 def register(desc):
     '''
     说明:用户注册及超级管理员单一添加用户接口
@@ -69,7 +70,7 @@ def register(desc):
         return resp_hanlder(code=101, err=err)
 
 
-@user.route("/activate/", methods=["POST"], defaults={"desc": "用户激活"})
+@user.route("/activate/", methods=["POST"], defaults={"desc": {"interface_name": "用户激活","is_permission": False,"permission_belong": None}})
 def activate(desc):
     '''
     说明:用户邮箱激活接口
@@ -93,7 +94,7 @@ def activate(desc):
         return resp_hanlder(code=999, msg=err)
 
 
-@user.route("/login/", methods=["POST"], defaults={"desc": "用户登录"})
+@user.route("/login/", methods=["POST"], defaults={"desc": {"interface_name": "用户登录","is_permission": False,"permission_belong": None}})
 def login(desc):
     '''
     说明:用户登陆接口
@@ -132,19 +133,9 @@ def login(desc):
             return resp_hanlder(code=1004, msg=RET.alert_code[1004], err=err)
 
 
-@user.route("/logout/", methods=["GET"], defaults={"desc": "用户退出"})
-def logout(desc):
-    '''
-     说明:用户退出(注销)接口
-     参数:Authorization,说明:客户端用户标识，数据类型:String
-     返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
-     '''
-    if request.method == 'GET':
-        session.clear()
-        return resp_hanlder(code=1005, msg=RET.alert_code[1005])
 
 
-@user.route("/forgetpwd/", methods=["POST"], defaults={"desc": "找回密码"})
+@user.route("/forgetpwd/", methods=["POST"], defaults={"desc": {"interface_name": "找回密码","is_permission": False,"permission_belong": None}})
 def forgetpwd(desc):
     '''
      说明:用户找回密码接口
@@ -162,7 +153,7 @@ def forgetpwd(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@user.route('/changepwd/', methods=['PUT'], defaults={"desc": "重设密码"})
+@user.route('/changepwd/', methods=['PUT'], defaults={"desc": {"interface_name": "重设密码","is_permission": False,"permission_belong": None}})
 def changepwd(desc):
     '''
      说明:用户重设密码接口
@@ -181,7 +172,7 @@ def changepwd(desc):
             return resp_hanlder(code=1007, msg=res)
 
 
-@user.route("/list/", methods=["GET"], defaults={"desc": "用户列表"})
+@user.route("/list/", methods=["GET"], defaults={"desc": {"interface_name": "用户列表","is_permission": True,"permission_belong": 1}})
 def ulist(desc):
     '''
      说明:获取用户列表接口,管理员显示所有用户,教师显示直属管理者是自己的用户
@@ -206,7 +197,7 @@ def ulist(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@user.route("/info/", methods=["GET"], defaults={"desc": "用户资料"})
+@user.route("/info/", methods=["GET"], defaults={"desc": {"interface_name": "用户资料","is_permission": True,"permission_belong": 0}})
 def info(desc):
     '''
      说明:获取用户资料接口
@@ -248,7 +239,7 @@ def info(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@user.route("/icon/", methods=["POST"], defaults={"desc": "修改头像"})
+@user.route("/icon/", methods=["POST"], defaults={"desc": {"interface_name": "修改头像","is_permission": False,"permission_belong": None}})
 def icon(desc):
     '''
      说明:修改用户头像接口
@@ -284,7 +275,7 @@ def icon(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@user.route("/changeprofile/", methods=["PUT"], defaults={"desc": "修改资料"})
+@user.route("/changeprofile/", methods=["PUT"], defaults={"desc": {"interface_name": "修改资料","is_permission": True,"permission_belong": 0}})
 def changeprofile(desc):
     '''
      说明:修改用户资料接口
@@ -358,7 +349,7 @@ def changeprofile(desc):
             return resp_hanlder(code=3005, msg=RET.alert_code[3005], err=err)
 
 
-@user.route("/frozen/", methods=["POST"], defaults={"desc": "冻结用户"})
+@user.route("/frozen/", methods=["POST"], defaults={"desc": {"interface_name": "冻结用户","is_permission": True,"permission_belong": 1}})
 def frozen_user(desc):
     '''
      说明:冻结用户接口
@@ -386,7 +377,7 @@ def frozen_user(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@user.route("/del/", methods=["DELETE"], defaults={"desc": "删除用户"})
+@user.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除用户","is_permission": True,"permission_belong": 1}})
 def  udel(desc):
     '''
     说明:删除用户接口
@@ -404,8 +395,17 @@ def  udel(desc):
             if del_user_obj.id == 1:
                 return resp_hanlder(code=4005, msg=RET.alert_code[4005])
             else:
-                db.session.delete(del_user_obj)
-                db.session.commit()
+                # 逻辑删除，并改变用户名(加了时间戳)
+                del_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                del_time = del_time.split(' ')[0] + "-" + del_time.split(' ')[1]
+                if '[' and ']' not in del_user_obj.dmp_username:
+                    del_user_obj.is_deleted = True
+                    del_user_obj.dmp_username = del_user_obj.dmp_username + '[' + del_time + ']'
+                    db.session.commit()
+                else:
+                    dn = del_user_obj.dmp_username.split('[')[0]
+                    del_user_obj.dmp_username = dn + '[' + del_time + ']'
+                    db.session.commit()
                 return resp_hanlder(code=4006, msg=RET.alert_code[4006])
         except Exception as err:
             return resp_hanlder(code=999, err=err)

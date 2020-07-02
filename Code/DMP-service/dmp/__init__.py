@@ -30,7 +30,7 @@ def create_app(config_name):
     config_blueprint(app)
 
     # RBAC权限拦截
-    app.before_request(rbac_middleware)
+    # app.before_request(rbac_middleware)
 
     # 返回应用实例
     return app

@@ -21,7 +21,7 @@ from dmp.utils.engine import auto_connect, hive_engine, mysql_engine, mongo_engi
 form = Blueprint("form", __name__)
 
 
-@form.route("/formdb/", methods=["POST"], defaults={"desc": "提交从数据库添加数据表的表单"})
+@form.route("/formdb/", methods=["POST"], defaults={"desc": {"interface_name": "提交从数据库添加数据表的表单","is_permission": True,"permission_belong": 0}})
 def from_db(desc):
     if request.method == "POST":
         try:
@@ -48,7 +48,7 @@ def from_db(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@form.route("/fromfile/", methods=["POST"], defaults={"desc": "提交从文件添加数据表的表单"})
+@form.route("/fromfile/", methods=["POST"], defaults={"desc": {"interface_name": "提交从文件添加数据表的表单","is_permission": True,"permission_belong": 0}})
 def from_file(desc):
     if request.method == "POST":
         try:
@@ -87,7 +87,7 @@ def from_file(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@form.route("/migration/", methods=["POST"], defaults={"desc": "提交数据迁移表单"})
+@form.route("/migration/", methods=["POST"], defaults={"desc": {"interface_name": "提交数据迁移表单","is_permission": True,"permission_belong": 0}})
 def migration(desc):
     if request.method == "POST":
         try:
@@ -116,7 +116,7 @@ def migration(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@form.route("/download/", methods=["POST"], defaults={"desc": "提交文件下载表单"})
+@form.route("/download/", methods=["POST"], defaults={"desc": {"interface_name": "提交文件下载表单","is_permission": True,"permission_belong": 0}})
 def download(desc):
     if request.method == "POST":
         try:
@@ -152,7 +152,7 @@ def form_permission(user_id):
         return 1
 
 
-@form.route("/info/", methods=["GET"], defaults={"desc": "获取表单信息"})
+@form.route("/info/", methods=["GET"], defaults={"desc": {"interface_name": "获取表单信息","is_permission": True,"permission_belong": 0}})
 def info(desc):
     if request.method == "GET":
         forms = [FromAddDataTable,
@@ -229,7 +229,7 @@ def dlfunc(meta):
 
 
 
-@form.route("/approve/", methods=["PUT"], defaults={"desc": "表单审批"})
+@form.route("/approve/", methods=["PUT"], defaults={"desc": {"interface_name": "表单审批","is_permission": True,"permission_belong": 2}})
 def approve(desc):
     if request.method == "PUT":
         try:

@@ -14,7 +14,7 @@ from dmp.utils.ep_data import EnvelopedData
 usergroup = Blueprint("usergroup", __name__)
 
 
-@usergroup.route("/info/", methods=["GET"], defaults={"desc": "获取用户组信息"})
+@usergroup.route("/info/", methods=["GET"], defaults={"desc": {"interface_name": "获取用户组信息","is_permission": True,"permission_belong": 0}})
 def info(desc):
     '''
      说明:获取用户组信息接口
@@ -44,7 +44,7 @@ def info(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@usergroup.route("/post/", methods=["POST", "PUT"], defaults={"desc": "添加编辑用户组信息"})
+@usergroup.route("/post/", methods=["POST", "PUT"], defaults={"desc": {"interface_name": "添加编辑用户组信息","is_permission": True,"permission_belong": 3}})
 def post_group(desc):
     '''
      说明:添加编辑用户组接口
@@ -88,7 +88,7 @@ def post_group(desc):
     return resp_hanlder(code=999)
 
 
-@usergroup.route("/del/", methods=["DELETE"], defaults={"desc": "删除用户组"})
+@usergroup.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除用户组","is_permission": True,"permission_belong": 3}})
 def ugdel(desc):
     '''
      说明:删除用户组接口

@@ -22,6 +22,8 @@ class LoginVerify():
             # ValidationEmail().reactivate_email(user, email)
             return {-1: 'Login failed, The message is not activated,'
                         ' please contact your administrator to activate it'}
+        if user.is_deleted == True:
+            return {-1: 'This user has been deleted, please login again'}
         return
 
     @classmethod
