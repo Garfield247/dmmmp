@@ -201,6 +201,33 @@ def postfunc(meta):
         description=new_table.get("description")
     )
 
+def dlfunc(meta):
+    form_id = meta.get("form_id")
+    file_name = meta.get("file_name")
+    download_path = meta.get("download_path")
+    full_name = os.path.join(download_path,file_name)
+    ftp_url = meta.get("ftp_url")
+    files = [os.path.join(download_path, f) for f in os.listdir(download_path) if f.endswith(file_name)]
+    if len(files) == 1:
+        os.rename(files[0],full_name)
+    elif len(files) > 1:
+        with open(full_name,"wb") as fp:
+            for f in files:
+                data = open(f,"rb")
+                fp.write(data)
+                data.close()
+                os.remove(f)
+    else:
+        pass
+    approve_form = FromDownload.get(form_id)
+    approve_form.filepath = full_name
+    approve_form.ftp_url = ftp_url
+    approve_form.put()
+
+
+
+
+
 
 @form.route("/approve/", methods=["PUT"], defaults={"desc": "表单审批"})
 def approve(desc):
@@ -564,11 +591,16 @@ def approve(desc):
 
                     job_hanlder.delay(reader=reader, writer=writer)
                     ip = socket.gethostbyname(socket.gethostname())
-                    approve_form.ftp_url = "ftp://%s:21/%s" % (
+                    ftp_url = "ftp://%s:21/%s" % (
                         str(ip), str(os.path.join(approve_form.submit_users.dmp_username, file_name)))
-                    approve_form.ftp_pid = 4396
-                    approve_form.filepath = download_path
-                    job_hanlder.delay(reader=reader, writer=writer)
+
+                    meta = {
+                        "form_id":approve_form.id,
+                        "file_name" : file_name,
+                        "download_path":download_path,
+                        "ftp_url":ftp_url,
+                    }
+                    job_hanlder.delay(reader=reader, writer=writer,func=dlfunc,meta=meta)
                 approve_form.put()
 
                 return resp_hanlder(result="OK!")
