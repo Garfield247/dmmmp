@@ -15,7 +15,7 @@ file = Blueprint("file", __name__)
 def upload(desc):
     if request.method == 'POST':
         try:
-            current_app.logger.info(current_app.config)
+            # current_app.logger.info(current_app.config)
             upload_file = request.files['file']
             # 获取文件唯一标识符
             task = request.form.get('task_id')
@@ -28,7 +28,7 @@ def upload(desc):
             return resp_hanlder()
         except Exception as err:
             current_app.logger.error(err)
-            return resp_hanlder()
+            return resp_hanlder(err=err)
 
 
 @file.route("/success/", methods=["GET"], defaults={"desc": {"interface_name": "文件上传完成","is_permission": False,"permission_belong": None}})

@@ -11,7 +11,7 @@ from dmp.utils.engine import auto_connect
 database = Blueprint("database", __name__)
 
 
-@database.route("/info/", methods=["GET"], defaults={"desc": {"interface_name": "数据库信息","is_permission": True,"permission_belong": 1}})
+@database.route("/info/", methods=["GET"], defaults={"desc": {"interface_name": "数据库信息","is_permission": True,"permission_belong": 0}})
 def info(desc):
     if request.method == "GET":
         auth_token = request.headers.get('Authorization')
@@ -36,7 +36,7 @@ def info(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@database.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除数据库连接信息","is_permission": True,"permission_belong": 1}})
+@database.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除数据库连接信息","is_permission": True,"permission_belong": 0}})
 def dbdel(desc):
     if request.method == "DELETE":
         try:
@@ -113,7 +113,7 @@ def connect(desc):
         return resp_hanlder(result=res)
 
 
-@database.route("/table_list/", methods=["GET"], defaults={"desc": {"interface_name": "获取数据库的数据表","is_permission": True,"permission_belong": 1}})
+@database.route("/table_list/", methods=["GET"], defaults={"desc": {"interface_name": "获取数据库的数据表","is_permission": True,"permission_belong": 0}})
 def table_list(desc):
     if request.method == "GET":
         db_id = request.json.get("dmp_database_id")
@@ -123,7 +123,7 @@ def table_list(desc):
         return resp_hanlder(result=res)
 
 
-@database.route("/post/", methods=["POST", "PUT"], defaults={"desc": {"interface_name": "添加/修改数据库信息","is_permission": True,"permission_belong": 1}})
+@database.route("/post/", methods=["POST", "PUT"], defaults={"desc": {"interface_name": "添加/修改数据库信息","is_permission": True,"permission_belong": 0}})
 def post(desc):
     db_info = request.json
     current_app.looger.info(db_info)
