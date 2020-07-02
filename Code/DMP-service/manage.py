@@ -98,6 +98,13 @@ def test_hive():
     from dmp.test.hive_count_test import hct
     hct()
 
+@manager.option("-id",dest="pid")
+def test_per(pid):
+    from dmp.api.form import form_permission
+    res = form_permission(pid)
+    print(res)
+
+
 
 @manager.option('-n', '-dmp_username', dest='dmp_username')
 @manager.option('-r', '-real_name', dest='real_name')

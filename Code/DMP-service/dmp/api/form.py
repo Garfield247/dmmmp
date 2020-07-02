@@ -7,7 +7,10 @@ import socket
 
 import pandas as pd
 from flask import Blueprint, request, current_app
-from dmp.models import FromUpload, FromMigrate, FromDownload, FromAddDataTable, Users, DataTable, Database
+from sqlalchemy.sql import exists
+
+from dmp.extensions import db
+from dmp.models import FromUpload, FromMigrate, FromDownload, FromAddDataTable, Users, DataTable, Database,Permissions
 from dmp.utils import resp_hanlder
 from dmp.utils.datax_job_hanlder import mysql_reader, mysql_writer, mongodb_reader, mongodb_writer, hive_reader, \
     hive_writer, textfile_reader, textfile_writer
@@ -138,11 +141,14 @@ def download(desc):
 
 def form_permission(user_id):
     user = Users.get(user_id)
-    if user.groups.id == 1:
+    usergroup_id = user.groups.id
+    approve_id = Permissions.query.filter_by(route="/form/approve/").first().id
+    p_ids = [p.id for p in user.groups.permissions]
+    if usergroup_id == 1:
         return  3
-    elif user.groups.id ==2:
+    elif approve_id in p_ids:
         return 2
-    elif user.groups.id ==3:
+    elif approve_id not in p_ids:
         return 1
 
 
@@ -476,7 +482,7 @@ def approve(desc):
                                               )
                     elif destination_database_type == 3:
                         # mongo_writer
-                        column = [{"name": col.get("dmp_data_table_column_name")} for col in base_column]
+                        column = [{"name": col.get("dmp_data_table_column_name"),"type":"string"} for col in base_column]
                         writer = mongodb_writer(host=destination_db_host,
                                                 port=destination_db_port,
                                                 username=destination_db_username if destination_db_username else None,
