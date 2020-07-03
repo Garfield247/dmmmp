@@ -126,7 +126,6 @@ def table_list(desc):
 @database.route("/post/", methods=["POST", "PUT"], defaults={"desc": {"interface_name": "添加/修改数据库信息","is_permission": True,"permission_belong": 0}})
 def post(desc):
     db_info = request.json
-    current_app.looger.info(db_info)
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
     if request.method == "POST":
