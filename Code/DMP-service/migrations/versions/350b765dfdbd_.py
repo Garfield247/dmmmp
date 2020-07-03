@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: ce119968c46f
+Revision ID: 350b765dfdbd
 Revises: 
-Create Date: 2020-06-20 16:42:57.520607
+Create Date: 2020-07-02 18:34:02.498325
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ce119968c46f'
+revision = '350b765dfdbd'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -68,6 +68,7 @@ def upgrade():
     sa.Column('passwd', sa.String(length=512), nullable=False, comment='用户密码，加密储存'),
     sa.Column('confirmed', sa.Boolean(), nullable=True, comment='用户激活状态'),
     sa.Column('icon', sa.String(length=128), nullable=True, comment='用户头像'),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True, comment='用户逻辑删除'),
     sa.Column('dmp_user_info', sa.String(length=256), nullable=True, comment='个人简介'),
     sa.Column('last_login', sa.DateTime(), nullable=True, comment='最后登录时间'),
     sa.Column('created_on', sa.DateTime(), nullable=True, comment='创建时间'),
@@ -144,7 +145,6 @@ def upgrade():
     sa.Column('column_line', sa.Integer(), nullable=True, comment='列名行号'),
     sa.Column('column', sa.String(length=32), nullable=True, comment='自定义列名'),
     sa.Column('json_dimension_reduction', sa.Boolean(), nullable=True, comment='json数据是否遍历存储'),
-    sa.Column('new_table_name', sa.String(length=32), nullable=False, comment='表名'),
     sa.Column('method', sa.Integer(), nullable=True, comment='新建1、添加2或覆盖3'),
     sa.Column('description', sa.String(length=128), nullable=True, comment='说明'),
     sa.Column('submit_on', sa.DateTime(), nullable=False, comment='提交时间'),
@@ -152,7 +152,7 @@ def upgrade():
     sa.Column('approve_result', sa.Integer(), nullable=True, comment='审批结果,默认:0,通过:1,不通过:2'),
     sa.Column('answer', sa.String(length=32), nullable=True, comment='审批答复'),
     sa.Column('upload', sa.Boolean(), nullable=True, comment='是否成功'),
-    sa.Column('upload_result', sa.String(length=32), nullable=True, comment='数据上传结果'),
+    sa.Column('upload_result', sa.String(length=128), nullable=True, comment='数据上传结果'),
     sa.Column('created_on', sa.DateTime(), nullable=False, comment='创建时间'),
     sa.Column('changed_on', sa.DateTime(), nullable=True, comment='修改时间'),
     sa.Column('submit_dmp_user_id', sa.Integer(), nullable=False, comment='提交人'),
@@ -208,7 +208,6 @@ def upgrade():
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('rule', sa.String(length=64), nullable=True, comment='数据库提取规则'),
     sa.Column('new_table_name', sa.String(length=32), nullable=False, comment='新表名'),
-    sa.Column('method', sa.Integer(), nullable=True, comment='新建1、覆盖2或添加3'),
     sa.Column('description', sa.String(length=128), nullable=True, comment='说明'),
     sa.Column('submit_on', sa.DateTime(), nullable=False, comment='提交时间'),
     sa.Column('approve_on', sa.DateTime(), nullable=True, comment='审批时间'),

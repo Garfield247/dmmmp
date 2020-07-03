@@ -1,2 +1,3 @@
 #!/bin/sh
-celery -A dmp.extensions.celery worker
+cd /home/dmp/dmp-phase1/Code/DMP-service/
+celery multi start w1 w2 w3 -A dmp.extensions.celery -l info --logfile=/home/dmp/dmp_log/celery/celerylog.log
