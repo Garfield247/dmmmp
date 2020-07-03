@@ -32,7 +32,8 @@ class EnvelopedData():
     @staticmethod
     def __user_profile(current_obj, email, passwd, dmp_group_id, confirmed, dmp_username, real_name):
         current_obj.email = email
-        current_obj.password = passwd
+        if passwd.strip():
+            current_obj.password = passwd
         current_obj.dmp_group_id = dmp_group_id
         current_obj.confirmed = True if confirmed else False
         current_obj.dmp_username = dmp_username
