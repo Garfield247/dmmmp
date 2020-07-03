@@ -33,8 +33,8 @@ def upload(desc):
 
 @file.route("/success/", methods=["GET"], defaults={"desc": {"interface_name": "文件上传完成","is_permission": False,"permission_belong": None}})
 def success(desc):
-    target_filename = request.args.get('filename')
-    task = request.args.get('task_id')
+    target_filename = request.json.get('filename')
+    task = request.json.get('task_id')
     chunk = 0
     upload_path = current_app.config.get("UPLOADED_PATH")
     current_app.logger.info("%s%s%s" % (target_filename, task, upload_path))
