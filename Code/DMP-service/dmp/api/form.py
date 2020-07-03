@@ -286,12 +286,11 @@ def approve(desc):
                 destination_db_username = destination_database.db_username
                 destination_db_passwd = destination_database.db_passwd
                 destination_db_name = destination_database.db_name
-
-                reader = []
-                text_column = []
-                if file_type == 1:
-                    # csv
-                    try:
+                try:
+                    reader = []
+                    text_column = []
+                    if file_type == 1:
+                        # csv
                         csv_filepath = os.path.join(current_app.config.get("UPLOADED_PATH"), file_path)
                         dt = pd.read_csv(csv_filepath, header=column_line)
                         csv_column = list(dt.columns)
@@ -301,96 +300,97 @@ def approve(desc):
                             filepath=csv_filepath,
                             column=csv_column_d
                         )
-                    except Exception as err:
-                        approve_form.upload_result = str(err)
-                elif file_type == 2:
-                    # json
-                    pass
-                elif file_type == 3:
-                    # excel
-                    pass
-                writer = []
-                if destination_database_type == 1:
-                    # hive_writer
-                    hive_columns = [{"name": col, "type": "string"} for col in text_column]
-                    hive_path = "/user/hive/warehouse/%s.db/%s" % (destination_db_name, destination_db_table_name)
-                    hive_conn = auto_connect(destination_dmp_database_id)
-                    create_table_sql = create_table_query_handler(table_name=destination_db_table_name,
-                                                                  fields=text_column,
-                                                                  uniform_type="string",
-                                                                  id_primary_key=False,
-                                                                  semicolon=False,
-                                                                  fieldDelimiter=",")
-
-                    current_app.logger.info(create_table_sql)
-                    if method == 1:
-                        hive_conn.execsql(create_table_sql)
-                    elif method == 3:
-                        del_table_sql = "drop table {table_name}"
-                        hive_conn.execsql(del_table_sql.format(table_name=destination_db_table_name))
-                        hive_conn.execsql(create_table_sql)
-                    else:
+                    elif file_type == 2:
+                        # json
                         pass
-                    writer = hive_writer(host=destination_db_host,
-                                         port=8020,
-                                         path=hive_path,
-                                         filename=destination_db_table_name,
-                                         column=hive_columns,
-                                         fieldDelimiter=",",
-                                         )
-
-                elif destination_database_type == 2:
-                    # mysql_writer
-                    create_table_sql = create_table_query_handler(table_name=destination_db_table_name,
-                                                                  fields=text_column,
-                                                                  uniform_type="text",
-                                                                  id_primary_key=True,
-                                                                  semicolon=True,
-                                                                  fieldDelimiter=None)
-                    current_app.logger.info(create_table_sql)
-                    mysql_conn = auto_connect(destination_dmp_database_id)
-                    del_table_sql = "drop table {table_name};"
-                    preSQL = []
-                    if method == 1:
-                        mysql_conn.execsql(sql=create_table_sql)
-                    elif method == 2:
+                    elif file_type == 3:
+                        # excel
                         pass
-                    elif method == 3:
-                        mysql_conn.execsql(del_table_sql.format(table_name=destination_db_table_name))
-                        mysql_conn.execsql(create_table_sql)
-                    column = text_column
-                    writer = mysql_writer(model=1,
-                                          username=destination_db_username,
-                                          password=destination_db_passwd,
-                                          column=column,
-                                          host=destination_db_host,
-                                          port=destination_db_port,
-                                          db=destination_db_name,
-                                          table=destination_db_table_name,
-                                          )
-                elif destination_database_type == 3:
-                    # mongo_writer
-                    mongo_conn = auto_connect(destination_dmp_database_id)
-                    if method == 3:
-                        mongo_conn.del_table(table_name=destination_db_table_name)
-                    column = [{"name": col, "type": "string"} for col in text_column]
-                    writer = mongodb_writer(host=destination_db_host,
-                                            port=destination_db_port,
-                                            username=destination_db_username,
-                                            password=destination_db_passwd,
-                                            db_name=destination_db_name,
-                                            collection_name=destination_db_table_name,
-                                            column=column,
-                                            )
-                meta = {
-                    "dmp_data_table_name": dmp_data_table_name,
-                    "db_table_name": destination_db_table_name,
-                    "dmp_user_id": submit_dmp_user_id,
-                    "dmp_database_id": destination_dmp_database_id,
-                    "dmp_case_id": dmp_case_id,
-                    "description": description,
-                }
-                job_hanlder.delay(reader=reader, writer=writer, func=postfunc, meta=meta)
+                    writer = []
+                    if destination_database_type == 1:
+                        # hive_writer
+                        hive_columns = [{"name": col, "type": "string"} for col in text_column]
+                        hive_path = "/user/hive/warehouse/%s.db/%s" % (destination_db_name, destination_db_table_name)
+                        hive_conn = auto_connect(destination_dmp_database_id)
+                        create_table_sql = create_table_query_handler(table_name=destination_db_table_name,
+                                                                      fields=text_column,
+                                                                      uniform_type="string",
+                                                                      id_primary_key=False,
+                                                                      semicolon=False,
+                                                                      fieldDelimiter=",")
+
+                        current_app.logger.info(create_table_sql)
+                        if method == 1:
+                            hive_conn.execsql(create_table_sql)
+                        elif method == 3:
+                            del_table_sql = "drop table {table_name}"
+                            hive_conn.execsql(del_table_sql.format(table_name=destination_db_table_name))
+                            hive_conn.execsql(create_table_sql)
+                        else:
+                            pass
+                        writer = hive_writer(host=destination_db_host,
+                                             port=8020,
+                                             path=hive_path,
+                                             filename=destination_db_table_name,
+                                             column=hive_columns,
+                                             fieldDelimiter=",",
+                                             )
+
+                    elif destination_database_type == 2:
+                        # mysql_writer
+                        create_table_sql = create_table_query_handler(table_name=destination_db_table_name,
+                                                                      fields=text_column,
+                                                                      uniform_type="text",
+                                                                      id_primary_key=True,
+                                                                      semicolon=True,
+                                                                      fieldDelimiter=None)
+                        current_app.logger.info(create_table_sql)
+                        mysql_conn = auto_connect(destination_dmp_database_id)
+                        del_table_sql = "drop table {table_name};"
+                        preSQL = []
+                        if method == 1:
+                            mysql_conn.execsql(sql=create_table_sql)
+                        elif method == 2:
+                            pass
+                        elif method == 3:
+                            mysql_conn.execsql(del_table_sql.format(table_name=destination_db_table_name))
+                            mysql_conn.execsql(create_table_sql)
+                        column = text_column
+                        writer = mysql_writer(model=1,
+                                              username=destination_db_username,
+                                              password=destination_db_passwd,
+                                              column=column,
+                                              host=destination_db_host,
+                                              port=destination_db_port,
+                                              db=destination_db_name,
+                                              table=destination_db_table_name,
+                                              )
+                    elif destination_database_type == 3:
+                        # mongo_writer
+                        mongo_conn = auto_connect(destination_dmp_database_id)
+                        if method == 3:
+                            mongo_conn.del_table(table_name=destination_db_table_name)
+                        column = [{"name": col, "type": "string"} for col in text_column]
+                        writer = mongodb_writer(host=destination_db_host,
+                                                port=destination_db_port,
+                                                username=destination_db_username,
+                                                password=destination_db_passwd,
+                                                db_name=destination_db_name,
+                                                collection_name=destination_db_table_name,
+                                                column=column,
+                                                )
+                    meta = {
+                        "dmp_data_table_name": dmp_data_table_name,
+                        "db_table_name": destination_db_table_name,
+                        "dmp_user_id": submit_dmp_user_id,
+                        "dmp_database_id": destination_dmp_database_id,
+                        "dmp_case_id": dmp_case_id,
+                        "description": description,
+                    }
+                    job_hanlder.delay(reader=reader, writer=writer, func=postfunc, meta=meta)
+
+                except Exception as err:
+                    approve_form.upload_result = "CREATE UPLOAD JOB FAILED，ERROR MESSAGE："+str(err)
                 approve_form.put()
                 return resp_hanlder(result="OK!")
 
