@@ -195,7 +195,7 @@ def postfunc(meta):
     post(
         dmp_data_table_name=new_table.get("dmp_data_table_name"),
         db_table_name=new_table.get("db_table_name"),
-        dmp_user_id=new_table.get("submit_dmp_user_id"),
+        dmp_user_id=new_table.get("dmp_user_id"),
         dmp_database_id=new_table.get("dmp_database_id"),
         dmp_case_id=new_table.get("dmp_case_id"),
         description=new_table.get("description")
