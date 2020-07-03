@@ -88,7 +88,7 @@ def connect(desc):
                 conn.close()
                 res = {"connect": "ok!"}
             except Exception as err:
-                return resp_hanlder(code=303, err=err)
+                return resp_hanlder(code=303, msg=str(err))
         elif int(db_type) == 2:
             try:
                 import pymysql
@@ -99,7 +99,7 @@ def connect(desc):
                 conn.close()
                 res = {"connect": "ok!"}
             except Exception as err:
-                return resp_hanlder(code=303, err=err)
+                return resp_hanlder(code=303, msg=str(err))
         elif int(db_type) == 3:
             try:
                 from pymongo import MongoClient
@@ -109,7 +109,7 @@ def connect(desc):
                 res = {"connect": "ok!"}
 
             except Exception as err:
-                return resp_hanlder(code=303, err=err)
+                return resp_hanlder(code=303, msg=str(err))
         return resp_hanlder(result=res)
 
 
