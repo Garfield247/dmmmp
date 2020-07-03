@@ -401,8 +401,8 @@ def  udel(desc):
                 del_time = del_time.split(' ')[0] + "-" + del_time.split(' ')[1]
                 if '[' and ']' not in del_user_obj.dmp_username:
                     del_user_obj.is_deleted = True
-                    del_user_obj.dmp_username = del_user_obj.dmp_username + '[DELETE ON:'  + del_time + ']'
-                    del_user_obj.email = del_user_obj.email + '[DELETE ON:' + del_time + ']'
+                    del_user_obj.dmp_username = del_user_obj.dmp_username + '[DELETED ON:'  + del_time + ']'
+                    del_user_obj.email = del_user_obj.email + '[DELETED ON:' + del_time + ']'
                     db.session.commit()
                 else:
                     dn = del_user_obj.dmp_username.split('[')[0]
