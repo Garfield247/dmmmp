@@ -260,9 +260,10 @@ def icon(desc):
             icon_name = uuid_str() + '.jpg'
             save_url = current_app.config.get("SAVE_URL")
             origin_icon = current_obj.icon
-            origin_icon_path = os.path.join(save_url, origin_icon)
-            if os.path.exists(origin_icon_path):
-                os.remove(origin_icon_path)
+            if origin_icon:
+                origin_icon_path = os.path.join(save_url, origin_icon)
+                if os.path.exists(origin_icon_path):
+                    os.remove(origin_icon_path)
             new_icon_path = os.path.join(save_url, icon_name)
             with open(new_icon_path, 'wb') as new_icon:
                 new_icon.write(icon_data)
