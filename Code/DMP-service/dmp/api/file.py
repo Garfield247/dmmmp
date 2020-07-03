@@ -25,7 +25,7 @@ def upload(desc):
             filename = '%s%s' % (task, chunk)
             # 保存分片到本地
             upload_file.save(os.path.join(current_app.config.get("UPLOADED_PATH"), filename))
-            return resp_hanlder()
+            return resp_hanlder(result="chunk  %d OK"%chunk)
         except Exception as err:
             current_app.logger.error(err)
             return resp_hanlder(err=err)
@@ -33,7 +33,7 @@ def upload(desc):
 
 @file.route("/success/", methods=["GET"], defaults={"desc": {"interface_name": "文件上传完成","is_permission": False,"permission_belong": None}})
 def success(desc):
-    target_filename = request.json.get('filename')
+    target_filename = request.args.get('filename')
     task = request.args.get('task_id')
     chunk = 0
     upload_path = current_app.config.get("UPLOADED_PATH")

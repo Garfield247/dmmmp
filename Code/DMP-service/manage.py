@@ -13,7 +13,7 @@ from dmp.extensions import db
 # 创建命令起动控制对象
 
 # 获取配置
-config_name = os.environ.get('DMP_CONFIG') or 'default'
+config_name = os.environ.get('DMP_CONFIG') or 'testing'
 
 # 创建实例
 app = create_app(config_name)
