@@ -21,7 +21,7 @@
     $(document).ready(function() {
         var task_id = WebUploader.Base.guid();        //产生task_id
         var uploader = WebUploader.create({           //创建上传控件
-            server: 'http://127.0.0.1:7789/file/upload/',                 //接收每一个分片的服务器地址
+            server: 'http://192.168.3.87:7789/file/upload/',                 //接收每一个分片的服务器地址
             pick: '#picker',                          //填上传按钮的id选择器值
             auto: true,                               //选择文件后，是否自动上传
             chunked: true,                            //是否分片
@@ -46,8 +46,8 @@
 
         uploader.on('uploadSuccess', function(file) { //整个文件的所有分片都上传成功，调用该方法
             //上传的信息（文件唯一标识符，文件名）
-            var json = {'task_id': task_id, 'filename': file.source['name'] };
-            $.get('http://127.0.0.1:7789/file/success/', json);          //ajax携带data向该url发请求
+            var data = {'task_id': task_id, 'filename': file.source['name'] };
+            $.get('http://192.168.3.87:7789/file/success/', data);          //ajax携带data向该url发请求
             $('.progress-bar').css('width', '100%');
             $('.progress-bar').text('上传完成');
         });

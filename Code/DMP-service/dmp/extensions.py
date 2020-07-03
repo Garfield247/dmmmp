@@ -23,5 +23,5 @@ def config_extensions(app):
     db.init_app(app)
     mail.init_app(app)
     migrate.init_app(app)
-    cors.init_app(app)
+    cors.init_app(app,resources=r'/*')
     celery.init_app(app)

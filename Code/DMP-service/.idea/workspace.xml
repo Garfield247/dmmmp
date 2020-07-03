@@ -20,11 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="55926b46-4166-4f54-aa76-d03823dd1100" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/static/upload/e5a9f71abccaasxaxww.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/static/upload/hdy.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/static/upload/wu_1ec7dnpj51hiv1gn813f31mvb17sh00" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/static/upload/wu_1ec95h492qc21h5j3s51nilmr700" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dmp/test_html/fileuploaded2.html" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/test_html/fileuploaded2.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,7 +89,7 @@
       <workItem from="1592210716471" duration="25400000" />
       <workItem from="1592538543564" duration="368000" />
       <workItem from="1592539067248" duration="28000" />
-      <workItem from="1592539149729" duration="122452000" />
+      <workItem from="1592539149729" duration="123272000" />
     </task>
     <servers />
   </component>
