@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
-
+# @Author  : SHTD
 
 from flask import Blueprint, jsonify
 
 rights = Blueprint("rights", __name__)
 
 
-@rights.route("/all/", methods=["GET"], defaults={"desc": "获取所有权利"})
+@rights.route("/all/", methods=["GET"], defaults={"desc": {"interface_name": "获取所有权利","is_permission": True,"permission_belong": 0}})
 def all(desc):
     result = {
         "status": 0,

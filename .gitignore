@@ -112,3 +112,9 @@ venv.bak/
 .vscode/
 
 .DS_Store
+
+upload/
+migrations/
+
+*.db
+*.sqlite

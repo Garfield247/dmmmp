@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/9
-# @Author  : SHTD 
-
+# @Author  : SHTD
 
 from datetime import datetime
 

@@ -1,36 +1,38 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/6
-# @Author  : SHTD 
-
-
+# @Author  : SHTD
 import os
-from flask import jsonify
-from flask_script import Manager, Server
 
+from flask_script import Manager, Server
 from flask_migrate import MigrateCommand
-from dmp import app
+
+from dmp import create_app
 from dmp.extensions import db
-from dmp.utils.email import send_mail, EmailBody
-from dmp.utils.validation import ValidationEmail
 
 # 创建命令起动控制对象
-from dmp.models import Users, Groups, Permissions
-from dmp.utils.put_data import put_data
 
+# 获取配置
+config_name = os.environ.get('DMP_CONFIG') or 'testing'
+
+# 创建实例
+app = create_app(config_name)
 manager = Manager(app)
 # 添加数据库迁移命令
 manager.add_command('db', MigrateCommand)
 # 添加服务配置
 
-manager.add_command('runserver', Server(host='0.0.0.0', port=7789, use_debugger=True))
+
+manager.add_command('runserver', Server(host='0.0.0.0', port=7789))
 
 
 # 路由列表命令
 @manager.command
 def url_map():
-    for i in app.url_map.__dict__.get("_rules"):
-        app.logger.info(i)
+    permission_list = [{"route": r.rule, "desc": None if not r.defaults else r.defaults.get("desc")} for r in
+                       app.url_map.__dict__.get("_rules")]
+    for per in permission_list:
+        app.logger.info(per)
 
 
 # 删除所有表
@@ -53,6 +55,7 @@ def create_test_db_table_data():
     import random
     from dmp.models import Users, Case, Database
     from dmp.api.dbtable import post
+
     count = 30
     for i in range(count):
         new_test_table = post(
@@ -63,20 +66,44 @@ def create_test_db_table_data():
             dmp_database_id=random.choice(Database.query.all()).id,
             dmp_case_id=random.choice(Case.query.all()).id
         )
+
+        app.logger.info("add test data :" + str(new_test_table))
+
         app.logger.info("add test data :" + str(new_test_table))
 
 
 # 初始化
 @manager.command
 def sys_init():
-    db.drop_all()
-    db.create_all()
+    # db.drop_all()
+    # db.create_all()
     from dmp.models import Permissions
     Permissions.init_permission()
     from dmp.models import Groups
     Groups.init_group()
-    from dmp.models import Users
-    Users.create_test_user()
+    # from dmp.models import Users
+    # Users.create_test_user()
+
+
+@manager.command
+def test_datax():
+    from dmp.test.datax_test import test_csv2mysql,test_csv2hive,test_hive2csv
+    test_hive2csv()
+
+    # from dmp.models import Users
+    # Users.create_test_user()
+
+@manager.command
+def test_hive():
+    from dmp.test.hive_count_test import hct
+    hct()
+
+@manager.option("-id",dest="pid")
+def test_per(pid):
+    from dmp.api.form import form_permission
+    res = form_permission(pid)
+    print(res)
+
 
 
 @manager.option('-n', '-dmp_username', dest='dmp_username')
@@ -85,58 +112,26 @@ def sys_init():
 @manager.option('-e', '-email', dest='email')
 def createsuperuser(dmp_username, real_name, passwd, email):
     """创建管理员用户"""
+    from dmp.models import Users, Groups
+    from dmp.utils.ep_data import EnvelopedData
     if not all([dmp_username, real_name, passwd, email]):
-        return jsonify({
-            'status': -1,
-            'msg': 'Insufficient parameter, please recreate superuser',
-            'results': {}
-        })
+        return 'Insufficient parameter, please recreate superuser.'
 
-    user = Users(dmp_username=dmp_username, real_name=real_name, passwd=passwd, email=email)
-    user.dmp_group_id = 1
-    user_root_list = Users.query.filter(Users.dmp_group_id == 1).all()
-    rootgroup = Groups.query.filter(Groups.dmp_group_name == "root").first()
-
-    if len(user_root_list) == rootgroup.max_count == 3:
-        return jsonify({
-            'status': -1,
-            'msg': 'The maximum number of administrators has been reached',
-            'results': {}
-        })
-
-    elif len(user_root_list) == 0 and rootgroup.max_count == None:
+    db_user_count = Users.query.count()
+    if db_user_count == 0:
+        user = Users(dmp_username=dmp_username, real_name=real_name, password=passwd, email=email)
+        rootgroup = Groups.query.filter(Groups.id == 1).first()
+        user.dmp_group_id = 1
         user.leader_dmp_user_id = None
-        put_data(rootgroup, user)
-
-        # 给Group用户组的管理员添加权限
-        rootgroup_permissions_list = rootgroup.permissions
-        rootgroup_permissions_list.clear()
-        permissions_list = Permissions.query.all()
-        for p in permissions_list:
-            rootgroup_permissions_list.append(p)
-
-        ValidationEmail().activate_email(user, email)
-
-    elif len(user_root_list) == rootgroup.max_count and rootgroup.max_count <= 3 and rootgroup.max_count != None:
-        user.leader_dmp_user_id = 1
-        put_data(rootgroup, user)
-
-        # 给Group用户组的管理员添加权限
-        rootgroup_permissions_list = rootgroup.permissions
-        rootgroup_permissions_list.clear()
-        permissions_list = Permissions.query.all()
-        for p in permissions_list:
-            rootgroup_permissions_list.append(p)
-
-        ValidationEmail().activate_email(user, email)
-
+        user.confirmed = True
+        db.session.add(user)
+        db.session.commit()
+        res = EnvelopedData.create_root(rootgroup)
+        if isinstance(res, str):
+            return {'msg': res}
+        return {'msg': 'Super administrator has been created successfully.'}
     else:
-        if len(user_root_list) != rootgroup.max_count:
-            return jsonify({
-                'status': -1,
-                'msg': 'The data has been tampered with, please contact the administrator to view and fix it',
-                'results': {}
-            })
+        return {'msg': 'The super administrator already exists in the database, please do not add it again.'}
 
 
 if __name__ == '__main__':

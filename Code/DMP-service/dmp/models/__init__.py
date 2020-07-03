@@ -6,7 +6,7 @@
 from datetime import datetime, date
 
 from sqlalchemy import inspect
-from flask import json as _json
+from flask import json as _json, current_app
 
 from dmp.extensions import db
 from dmp.utils.wetime import default_date_format, default_datetime_format
@@ -53,6 +53,7 @@ class DMPModel(object):
         if hasattr(self, '_json_cache') and self._json_cache:
             _d = self._json_cache
         for k, v in vars(self).items():
+            print(k, v)
             if k.startswith('_'):
                 continue
             if isinstance(v, datetime):
@@ -60,6 +61,17 @@ class DMPModel(object):
             if isinstance(v, date):
                 v = v.strftime(default_date_format)
             _d[k] = v
+        current_app.logger.info(vars(self).keys())
+        if "dmp_user_id" in vars(self).keys():
+            _d["dmp_user_name"] = self.users.dmp_username if self.users else "None"
+        if "leader_dmp_user_id" in vars(self).keys():
+            _d["leader_dmp_username"] = self.leader.dmp_username if self.leader else "None"
+        if "approve_dmp_user_id" in vars(self).keys():
+            _d["approve_dmp_username"] = self.approve_users.dmp_username if self.approve_users else "None"
+        if "submit_dmp_user_id" in vars(self).keys():
+            _d["submit_dmp_username"] = self.submit_users.dmp_username if self.submit_users else "None"
+        if "dmp_database_id" in vars(self).keys():
+            _d["dmp_database_name"] = self.database.dmp_database_name if self.database else "None"
         return _d
 
     def __repr__(self):

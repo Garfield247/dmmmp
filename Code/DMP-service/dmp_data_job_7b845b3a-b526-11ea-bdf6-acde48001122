@@ -1,0 +1,40 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                "channel": 3
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                    "name": "hdfsreader",
+                    "parameter": {
+                        "path": "/user/hive/warehouse/test.db/test_hdy",
+                        "defaultFS": "hdfs://192.168.3.140:8020",
+                        "column": [
+                            "*"
+                        ],
+                        "fileType": "text",
+                        "encoding": "UTF-8",
+                        "fieldDelimiter": ",",
+                        "csvReaderConfig": {
+                            "safetySwitch": false,
+                            "skipEmptyRecords": false,
+                            "useTextQualifier": false
+                        }
+                    }
+                },
+                "writer": {
+                    "name": "txtfilewriter",
+                    "parameter": {
+                        "path": "./",
+                        "fileName": "hdy_test.csv",
+                        "writeMode": "truncate",
+                        "encoding": "UTF-8",
+                    }
+                }
+            }
+        ]
+    }
+}
