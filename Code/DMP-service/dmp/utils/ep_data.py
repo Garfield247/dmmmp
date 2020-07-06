@@ -103,7 +103,7 @@ class EnvelopedData():
         obj_dict_list = [u.__json__() for u in all_obj_list]
         # 逻辑删除的用户不显示
         for d in obj_dict_list:
-            if d.get('is_deleted') == True:
+            if d.get('is_deleted') == 1:
                 obj_dict_list.remove(d)
         new_obj_dict_list = []
         for per_obj in obj_dict_list:
