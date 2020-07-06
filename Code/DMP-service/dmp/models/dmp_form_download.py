@@ -13,7 +13,7 @@ class FromDownload(db.Model, DMPModel):
     __tablename__ = 'dmp_from_download'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     rule = db.Column(db.String(64), comment='数据库提取规则')
-    description = db.Column(db.String(128), comment='说明')
+    description = db.Column(db.Text, comment='说明')
     submit_on = db.Column(db.DateTime, default=datetime.datetime.now, nullable=False, comment='提交时间')
     approve_on = db.Column(db.DateTime, comment='审批时间')
     approve_result = db.Column(

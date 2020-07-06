@@ -65,7 +65,7 @@ def dbdel(desc):
             else:
                 return resp_hanlder(code=101)
         except Exception as err:
-            return resp_hanlder(err=err)
+            return resp_hanlder(code=999,err=err,msg=str(err))
 
 
 @database.route("/connect/", methods=["POST"], defaults={"desc": {"interface_name": "测试数据库连接","is_permission": False,"permission_belong": None}})

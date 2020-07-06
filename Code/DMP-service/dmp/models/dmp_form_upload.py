@@ -18,7 +18,7 @@ class FromUpload(db.Model, DMPModel):
     column = db.Column(db.String(32), comment='自定义列名')
     json_dimension_reduction = db.Column(db.Boolean, comment='json数据是否遍历存储')
     method = db.Column(db.Integer, default=1, comment='新建1、添加2或覆盖3')
-    description = db.Column(db.String(128), comment='说明')
+    description = db.Column(db.Text, comment='说明')
     submit_on = db.Column(db.DateTime, default=datetime.datetime.now, nullable=False, comment='提交时间')
     approve_on = db.Column(db.DateTime, onupdate=datetime.datetime.now, comment='审批时间')
     approve_result = db.Column(db.Integer, default=0, comment='审批结果,默认:0,通过:1,不通过:2')

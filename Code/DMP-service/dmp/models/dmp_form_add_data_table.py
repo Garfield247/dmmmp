@@ -15,7 +15,7 @@ class FromAddDataTable(db.Model, DMPModel):
     dmp_data_table_name = db.Column(db.String(64), comment='数据名称')
     db_table_name = db.Column(db.String(32), nullable=False, comment='数据库内数据表名称')
     submit_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now, comment='提交时间')
-    description = db.Column(db.String(128), comment='说明')
+    description = db.Column(db.Text, comment='说明')
     approve_on = db.Column(db.DateTime, comment='审批时间')
     approve_result = db.Column(db.Integer, default=0, comment='审批结果,默认:0,通过:1,不通过:2')
     answer = db.Column(db.String(32), comment='审批答复')

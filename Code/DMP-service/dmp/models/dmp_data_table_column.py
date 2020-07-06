@@ -17,7 +17,7 @@ class DataTableColumn(db.Model, DMPModel):
     groupby = db.Column(db.Boolean, default=False, comment='可以进行分组')
     wherein = db.Column(db.Boolean, default=False, comment='可以区间筛选')
     isdate = db.Column(db.Boolean, default=False, comment='是否为时间日期字段')
-    description = db.Column(db.String(128), comment='字段说明')
+    description = db.Column(db.Text, comment='字段说明')
     dmp_data_table_id = db.Column(db.Integer, db.ForeignKey('dmp_data_table.id'), nullable=False, comment='数据ID')
 
     # datatable = db.relationship('DataTable', backref='data_table_column')

@@ -16,7 +16,7 @@ class DataTable(db.Model, DMPModel):
     dmp_data_table_name = db.Column(db.String(32), unique=True, nullable=False, comment='数据名称')
     db_table_name = db.Column(db.String(32), nullable=False, comment='数据库内数据表名称')
     db_data_count = db.Column(db.Integer, default=0, comment='数据表内的数据量')
-    description = db.Column(db.String(128), comment='数据说明')
+    description = db.Column(db.Text, comment='数据说明')
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
     dmp_user_id = db.Column(db.Integer, db.ForeignKey('dmp_user.id'), nullable=False, comment='添加人')
