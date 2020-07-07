@@ -45,13 +45,13 @@ def cpost(desc):
             try:
                 modify_case = Case.query.get(case_info.get("case_id"))
                 current_app.logger.info(modify_case)
-                if case_info.get("dmp_case_name"):
+                if "dmp_case_name" in case_info.keys():
                     modify_case.dmp_case_name = case_info.get("dmp_case_name")
-                if case_info.get("description"):
+                if "description" in case_info.keys():
                     modify_case.description = case_info.get("description")
-                if case_info.get("url"):
+                if "url" in case_info.keys():
                     modify_case.url = case_info.get("url")
-                if case_info.get("url_name"):
+                if "url_name" in case_info.keys():
                     modify_case.url_name = case_info.get("url_name")
                 modify_case.put()
                 current_app.logger.info("修改完成")

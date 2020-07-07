@@ -75,17 +75,16 @@ def put(desc):
         current_user_id = Users.decode_auth_token(auth_token)
         dbt_info = request.json
         dbt_id = dbt_info.get("dmp_data_table_id")
-        dbt_name = dbt_info.get("dmp_data_table_name")
-        description = dbt_info.get("description")
+
         dbt = DataTable.get(dbt_id)
         if dbt:
             dmp_user_id = dbt.dmp_user_id
             if current_user_id == 1 or current_user_id == dmp_user_id or Users.get(
                     dmp_user_id).leader_dmp_user_id == current_user_id:
-                if dbt_name:
-                    dbt.dmp_data_table_name = dbt_name
-                if description:
-                    dbt.description = description
+                if "dmp_data_table_name" in dbt_info.keys():
+                    dbt.dmp_data_table_name = dbt_info.get("dmp_data_table_name")
+                if "description" in dbt_info.keys():
+                    dbt.description = dbt_info.get("description")
                 dbt.put()
                 return resp_hanlder(result="OK!")
             else:

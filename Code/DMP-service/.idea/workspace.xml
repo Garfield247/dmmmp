@@ -21,15 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="55926b46-4166-4f54-aa76-d03823dd1100" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_case.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_case.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_data_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_data_table.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_data_table_column.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_data_table_column.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_database.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_form_add_data_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_form_add_data_table.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_form_download.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_form_download.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_form_migrate.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_form_migrate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_form_upload.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_form_upload.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_user.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dmp/api/case.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/api/case.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +90,7 @@
       <workItem from="1592538543564" duration="368000" />
       <workItem from="1592539067248" duration="28000" />
       <workItem from="1592539149729" duration="128212000" />
-      <workItem from="1593997153075" duration="1934000" />
+      <workItem from="1593997153075" duration="2842000" />
     </task>
     <servers />
   </component>
