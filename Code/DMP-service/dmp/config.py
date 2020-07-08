@@ -24,8 +24,7 @@ class Config:
         r"^/user/activate/.*",
         r"^/user/changepwd/",
         r"^/user/forgetpwd/",
-        r"^/verifier/email/",
-        r"^/verifier/username/",
+        r"^/verifier/.*",
         r"^/file/upload/",
         r"^/file/success/",
         r"^/index/*"
@@ -89,7 +88,8 @@ class TestingConfig(Config):
     # db
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:shtd123.@192.168.3.87:3306/dmpdb?charset=utf8mb4"
     # UPLOADED
-    UPLOADED_PATH = os.environ.get("DMP_UPLOAD_PATH") or "/home/dmp/dmp_upload"
+    # UPLOADED_PATH = os.environ.get("DMP_UPLOAD_PATH") or "/home/dmp/dmp_upload"
+    UPLOADED_PATH = os.path.join(base_dir, "static/upload")
     DOWNLOAD_PATH = os.environ.get("DMP_DOWNLOAD_PATH") or "/home/dmp/dmp_download"
 
     # DataX

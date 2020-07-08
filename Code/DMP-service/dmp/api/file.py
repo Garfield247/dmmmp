@@ -4,6 +4,7 @@
 # @Author  : SHTD
 import os
 
+import pandas as pd
 from flask import Blueprint, jsonify, request, current_app
 from dmp.utils import resp_hanlder, uuid_str
 from dmp.models import FromDownload
@@ -35,11 +36,13 @@ def upload(desc):
 def success(desc):
     target_filename = request.args.get('filename')
     task = request.args.get('task_id')
+    filetype = request.args.get("filetype") or 1
     chunk = 0
     upload_path = current_app.config.get("UPLOADED_PATH")
     current_app.logger.info("%s%s%s" % (target_filename, task, upload_path))
+    tmp_filename = uuid_str() + "_TMP_" +target_filename
     finally_filename = uuid_str() + target_filename
-    with open(os.path.join(upload_path, finally_filename), 'wb') as target_file:
+    with open(os.path.join(upload_path, tmp_filename), 'wb') as target_file:
         while True:
             try:
                 filename = os.path.join(upload_path, '%s%d' % (task, chunk))
@@ -54,6 +57,14 @@ def success(desc):
             chunk += 1
             # 删除该分片，节约空间
             os.remove(filename)
+    if filetype == 1:
+        os.rename(os.path.join(upload_path, tmp_filename),os.path.join(upload_path, finally_filename))
+    elif filetype == 2:
+        data = pd.read_json(os.path.join(upload_path, tmp_filename))
+        data.to_csv(os.path.join(upload_path, finally_filename))
+    elif filetype == 3:
+        data = pd.read_excel(os.path.join(upload_path, tmp_filename))
+        data.to_csv(os.path.join(upload_path, finally_filename))
     current_app.logger.info(finally_filename)
     return resp_hanlder(result={"filename": finally_filename})
 

@@ -19,7 +19,13 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="55926b46-4166-4f54-aa76-d03823dd1100" name="Default Changelist" comment="" />
+    <list default="true" id="55926b46-4166-4f54-aa76-d03823dd1100" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dmp/api/file.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/api/file.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dmp/api/form.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/api/form.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dmp/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dmp/test_html/fileuploaded2.html" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/test_html/fileuploaded2.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -87,7 +93,7 @@
       <workItem from="1592538543564" duration="368000" />
       <workItem from="1592539067248" duration="28000" />
       <workItem from="1592539149729" duration="128212000" />
-      <workItem from="1593997153075" duration="4078000" />
+      <workItem from="1593997153075" duration="8845000" />
     </task>
     <servers />
   </component>
@@ -112,11 +118,11 @@
     </state>
     <state x="-967" y="368" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.900/-1080.0.1080.1920@-1080.0.1080.1920" timestamp="1592991325657" />
     <state x="-1360" y="207" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.900/-1920.0.1920.1080@-1920.0.1920.1080" timestamp="1588833250450" />
-    <state x="-1205" y="349" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1592879420942">
+    <state x="-1205" y="349" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1594178257503">
       <screen x="-1920" y="0" width="1920" height="1080" />
     </state>
     <state x="-678" y="620" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900/-1080.0.1080.1920@-1080.0.1080.1920" timestamp="1589269323634" />
-    <state x="-1205" y="349" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900/-1920.0.1920.1080@-1920.0.1920.1080" timestamp="1592879420942" />
+    <state x="-1205" y="349" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900/-1920.0.1920.1080@-1920.0.1920.1080" timestamp="1594178257503" />
     <state x="-1746" y="171" key="SettingsEditor" timestamp="1592538735736">
       <screen x="-1920" y="0" width="1920" height="1080" />
     </state>

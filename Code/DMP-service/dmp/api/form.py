@@ -8,7 +8,6 @@ import socket
 import pandas as pd
 from flask import Blueprint, request, current_app
 from sqlalchemy.sql import exists
-
 from dmp.extensions import db
 from dmp.models import FromUpload, FromMigrate, FromDownload, FromAddDataTable, Users, DataTable, Database, Permissions
 from dmp.utils import resp_hanlder,uuid_str
@@ -289,8 +288,8 @@ def approve(desc):
                 try:
                     reader = []
                     text_column = []
-                    if file_type == 1:
-                        # csv
+                    if file_type == 1 or file_type == 3:
+                        # csv、csv
                         csv_filepath = os.path.join(current_app.config.get("UPLOADED_PATH"), file_path)
                         dt = pd.read_csv(csv_filepath, header=column_line)
                         csv_column = list(dt.columns)
@@ -302,9 +301,15 @@ def approve(desc):
                         )
                     elif file_type == 2:
                         # json
-                        pass
-                    elif file_type == 3:
-                        # excel
+                        csv_filepath = os.path.join(current_app.config.get("UPLOADED_PATH"), file_path)
+                        dt = pd.read_csv(csv_filepath, header=0)
+                        csv_column = list(dt.columns)
+                        text_column = column if column and len(column) == len(csv_column) else csv_column
+                        csv_column_d = [{"index": i, "type": "string"} for i, cc in enumerate(text_column)]
+                        reader = textfile_reader(
+                            filepath=csv_filepath,
+                            column=csv_column_d
+                        )
                         pass
                     writer = []
                     if destination_database_type == 1:

@@ -6,7 +6,7 @@
 
 from flask import Blueprint, request
 from dmp.utils import resp_hanlder
-from dmp.models import Users
+from dmp.models import Users, Groups
 from dmp.utils.response_hanlder import resp_hanlder, RET
 
 verifier = Blueprint("verifier", __name__)
@@ -77,3 +77,14 @@ def table_name(desc):
                 return resp_hanlder(result={"exist": False, })
         except Exception as err:
             return resp_hanlder(err=err)
+
+
+@verifier.route("/groupname/", methods=["POST"], defaults={"desc": {"interface_name": "验证用户组名占用","is_permission": False,"permission_belong": None}})
+def groupname(desc):
+    if request.method == 'POST':
+        data = request.json
+        groupname = data.get('groupname')
+        group_obj = Groups.query.filter(Groups.dmp_group_name == groupname).first()
+        if group_obj:
+            return resp_hanlder(code=1016, msg=RET.alert_code[1016], result={"exist": True})
+        return resp_hanlder(code=1017, msg=RET.alert_code[1017], result={"exist": False})
