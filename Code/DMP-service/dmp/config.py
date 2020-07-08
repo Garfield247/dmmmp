@@ -21,6 +21,7 @@ class Config:
         r"^/user/login/",
         r"^/static/.*",
         r"^/user/register/$",
+        r"^/user/icon/$",
         r"^/user/activate/.*",
         r"^/user/changepwd/",
         r"^/user/forgetpwd/",
