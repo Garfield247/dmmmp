@@ -215,7 +215,7 @@ def dlfunc(meta):
                 data = open(f,"rb")
                 fp.write(data.read())
                 data.close()
-                os.remove(f)
+                # os.remove(f)
     else:
         pass
     approve_form = FromDownload.get(form_id)
