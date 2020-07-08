@@ -25,7 +25,7 @@ def upload(desc):
             filename = '%s%s' % (task, chunk)
             # 保存分片到本地
             upload_file.save(os.path.join(current_app.config.get("UPLOADED_PATH"), filename))
-            return resp_hanlder(result="chunk  %d OK"%chunk)
+            return resp_hanlder()
         except Exception as err:
             current_app.logger.error(err)
             return resp_hanlder(err=err)
