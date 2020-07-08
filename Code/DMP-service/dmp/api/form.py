@@ -203,8 +203,9 @@ def postfunc(meta):
 def dlfunc(meta):
     form_id = meta.get("form_id")
     file_name = meta.get("file_name")
+    finally_name = meta.get("finally_name")
     download_path = meta.get("download_path")
-    full_name = os.path.join(download_path,file_name)
+    full_name = os.path.join(download_path,finally_name)
     ftp_url = meta.get("ftp_url")
     files = [os.path.join(download_path, f) for f in os.listdir(download_path) if f.startswith(file_name)]
     if len(files) == 1:
@@ -215,7 +216,7 @@ def dlfunc(meta):
                 data = open(f,"rb")
                 fp.write(data.read())
                 data.close()
-                # os.remove(f)
+                os.remove(f)
     else:
         pass
     approve_form = FromDownload.get(form_id)
@@ -591,17 +592,19 @@ def approve(desc):
                     download_path = os.path.join(current_app.config.get("DOWNLOAD_PATH"),
                                                  approve_form.submit_users.dmp_username)
                     file_name = origin_db_table_name + uuid_str() +".csv"
+                    finally_name = origin_db_table_name + "-" +uuid_str() +".csv"
                     headers = [col.get("dmp_data_table_column_name") for col in base_column]
                     writer = textfile_writer(filepath=download_path, filename=file_name, header=headers)
 
                     job_hanlder.delay(reader=reader, writer=writer)
                     ip = socket.gethostbyname(socket.gethostname())
                     ftp_url = "ftp://%s:21/%s" % (
-                        str(ip), str(os.path.join(approve_form.submit_users.dmp_username, file_name)))
+                        str(ip), str(os.path.join(approve_form.submit_users.dmp_username, finally_name)))
 
                     meta = {
                         "form_id":approve_form.id,
                         "file_name" : file_name,
+                        "finally_name" : finally_name,
                         "download_path":download_path,
                         "ftp_url":ftp_url,
                     }
