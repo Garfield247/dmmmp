@@ -174,8 +174,7 @@ def info(desc):
                     committed.extend([f.__json__() for f in
                                       _form.query.filter_by(submit_dmp_user_id=user_id, approve_result=0).all()])
                     pending.extend(
-                        [f.__json__() for f in _form.query.filter_by(submit_dmp_user_id=u.id, approve_result=0).all()
-                         for u in Users.query.filter_by(leader_dmp_user_id=user_id).all()])
+                        [f.__json__()  for u in Users.query.filter_by(leader_dmp_user_id=user_id).all() for f in _form.query.filter_by(submit_dmp_user_id=u.id, approve_result=0).all()])
                     complete.extend([f.__json__() for f in _form.query.filter(
                         _form.submit_dmp_user_id == user_id or _form.approve_dmp_user_id == user_id,
                         _form.approve_result != 0).all()])
