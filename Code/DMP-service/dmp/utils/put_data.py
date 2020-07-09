@@ -52,14 +52,14 @@ class PuttingData():
             return resp
 
     @classmethod
-    def root_add_user(cls, data, res, user, dmp_username, real_name):
+    def root_add_user(cls, data, res_token, user, dmp_username, real_name):
         dmp_group_id = data.get('dmp_group_id')
-        if not isinstance(res, str):
+        if not isinstance(res_token, str):
             # 只有是超级管理员才能进行单一添加root、teacher及student
             # 用户名及邮箱已经通过接口验证-唯一性
-            if res.get('id') == 1:
-                res = cls.__add_info(user, dmp_group_id, dmp_username, real_name)
-                if res == True:
+            if res_token.get('id') == 1:
+                r = cls.__add_info(user, dmp_group_id, dmp_username, real_name)
+                if r == True:
                     # 返回字典表示单一添加成功
                     return {True: 'Super admin user single added successfully.'}
                 else:
@@ -67,25 +67,25 @@ class PuttingData():
 
             # 管理员单一添加teacher及student
             # 普通管理员无法单一添加管理员角色,需要超级管理员添加管理员角色
-            if res.get('dmp_group_id') == 1 and res.get('id') != 1:
+            if res_token.get('dmp_group_id') == 1 and res_token.get('id') != 1:
                 if dmp_group_id == 1:
                     return False
                 else:
-                    res = cls.__add_info(user, dmp_group_id, dmp_username, real_name)
-                    if res == True:
+                    r = cls.__add_info(user, dmp_group_id, dmp_username, real_name)
+                    if r == True:
                         return {True: 'Admin user single added successfully.'}
                     else:
                         return (-1, 'missing parameter.')
 
             # 教师可以单一添加教师
-            if res.get('dmp_group_id') == 2:
+            if res_token.get('dmp_group_id') == 2:
                 if dmp_group_id == 1:
                     return False
                 else:
-                    res = cls.__add_info(user, dmp_group_id, dmp_username, real_name)
-                    if res == True:
+                    r = cls.__add_info(user, dmp_group_id, dmp_username, real_name)
+                    if r == True:
                         return {True: 'Teacher user single added successfully.'}
                     else:
                         return (-1, 'missing parameter.')
         # 返回报错token字符串
-        return res
+        return res_token
