@@ -64,7 +64,7 @@ def register(desc):
         db.session.add(user)
         db.session.commit()
         ValidationEmail().activate_email(user, email)
-        return resp_hanlder(code=1001, msg=RET.alert_code[1001])
+        return resp_hanlder(code=1001, msg=RET.alert_code[1001]+"RES:"+str(res))
     except Exception as err:
         db.session.rollback()
         return resp_hanlder(code=101, err=err)
