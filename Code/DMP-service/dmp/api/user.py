@@ -35,7 +35,7 @@ def register(desc):
     '''
     try:
 
-        auth_token = session.get('Authorization')
+        auth_token = session.get('auth_token')
         res_token = PuttingData.get_obj_data(Users, auth_token)
         user_obj = Users.query.all()
         # 判断初始状态有没有超级用管理员，没有则不能创建用户，必须要先创建一个超级管理员
