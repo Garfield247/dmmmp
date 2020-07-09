@@ -211,12 +211,17 @@ def dlfunc(meta):
     if len(files) == 1:
         os.rename(files[0],full_name)
     elif len(files) > 1:
-        with open(full_name,"wb") as fp:
-            for f in files:
-                data = open(f,"rb")
-                fp.write(data.read())
-                data.close()
-                # os.remove(f)
+        os.rename(files[0],full_name)
+
+        # with open(full_name,"wb") as fp:
+        #     for f in files:
+        #         data = open(f,"rb")
+        #         fp.write(data.read())
+        #         data.close()
+
+        for file in files[1:]:
+            if os.path.exists(file):
+                os.remove(file)
     else:
         pass
     approve_form = FromDownload.get(form_id)

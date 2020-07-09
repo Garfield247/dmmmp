@@ -23,7 +23,7 @@ def job_hanlder(reader, writer, func=None, meta=None):
         "job": {
             "setting": {
                 "speed": {
-                    "channel": 1
+                    "channel": 3
                 }
             },
             "content": [{
