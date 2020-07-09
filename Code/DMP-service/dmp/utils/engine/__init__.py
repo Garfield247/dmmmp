@@ -33,7 +33,7 @@ def create_table_query_handler(table_name, fields, uniform_type, id_primary_key=
     col = "{columns})"
     Delimiter = "row format delimited fields terminated by '{fieldDelimiter}'"
     columns = ",".join(
-        ["%s %s" % (col, uniform_type) if col.strip() or col == "id" else ",None_" + col + "_%d text" % i for i, col in
+        ["%s %s" % (col, uniform_type) if col.strip() or col != "id" else ",None_" + col + "_%d text" % i for i, col in
          enumerate(fields)])
     p1 = id_pri if id_primary_key else ""
     p2 = Delimiter.format(fieldDelimiter=fieldDelimiter) if fieldDelimiter else ""
