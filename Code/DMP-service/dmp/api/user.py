@@ -34,7 +34,8 @@ def register(desc):
     返回值:成功与失败返回对应的状态码及提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
     '''
     try:
-        auth_token = request.headers.get('Authorization')
+
+        auth_token = session.get('Authorization')
         res_token = PuttingData.get_obj_data(Users, auth_token)
         user_obj = Users.query.all()
         # 判断初始状态有没有超级用管理员，没有则不能创建用户，必须要先创建一个超级管理员
@@ -117,6 +118,7 @@ def login(desc):
                 if r == True:
                     auth_token = user.encode_auth_token()
                     if auth_token:
+                        session['auth_token'] = auth_token.decode('utf-8')
                         return resp_hanlder(code=1003, msg=RET.alert_code[1003], result=auth_token.decode('utf-8'))
                     return resp_hanlder(code=201)
                 else:
@@ -128,6 +130,7 @@ def login(desc):
                 if r == True:
                     auth_token = user.encode_auth_token()
                     if auth_token:
+                        session['auth_token'] = auth_token.decode('utf-8')
                         return resp_hanlder(code=1003, msg=RET.alert_code[1003], result=auth_token.decode('utf-8'))
                     return resp_hanlder(code=201)
                 else:
