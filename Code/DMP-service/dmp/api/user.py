@@ -26,7 +26,7 @@ from dmp.utils.ep_data import EnvelopedData
 user = Blueprint("user", __name__, static_folder='Code/DMP-service/')
 
 
-@user.route("/register/", methods=["POST"], defaults={"desc": {"interface_name": "用户注册","is_permission": False,"permission_belong": None}})
+@user.route("/register/", methods=["POST"], defaults={"desc": {"interface_name": "用户注册", "is_permission": False, "permission_belong": None}})
 def register(desc):
     '''
     说明:用户注册及超级管理员单一添加用户接口
@@ -34,40 +34,45 @@ def register(desc):
     返回值:成功与失败返回对应的状态码及提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
     '''
     try:
+        auth_token = request.headers.get('Authorization')
+        res_token = PuttingData.get_obj_data(Users, auth_token)
         user_obj = Users.query.all()
         # 判断初始状态有没有超级用管理员，没有则不能创建用户，必须要先创建一个超级管理员
         ret = UserVerify.judge_superuser(user_obj)
         if ret:
             return resp_hanlder(code=999, msg=ret)
         data = request.json
+        if data == None:
+            return resp_hanlder(code=999)
         dmp_username = data.get('dmp_username')
         real_name = data.get('real_name')
         passwd = data.get('password')
         email = data.get('email')
         user = Users(dmp_username=dmp_username, real_name=real_name, password=passwd,
                      email=email, leader_dmp_user_id=1)
-        res = PuttingData.root_add_user(user, dmp_username, real_name)
+        if auth_token != None and isinstance(res_token, dict):
+            res = PuttingData.root_add_user(data, res_token, user, dmp_username, real_name)
 
-        # 返回字典-管理员单一添加成功
-        if isinstance(res, dict):
-            return resp_hanlder(code=0, msg=res)
+            # 返回字典-管理员单一添加成功
+            if isinstance(res, dict):
+                return resp_hanlder(code=0, msg=res)
 
-        # 返回元组-管理员/教师单一添加缺少参数
-        elif isinstance(res, tuple):
-            return resp_hanlder(code=999, msg=res[1])
+            # 返回元组-管理员/教师单一添加缺少参数
+            elif isinstance(res, tuple):
+                return resp_hanlder(code=999, msg=res[1])
 
-        # 普通管理员和教师无法添加管理员角色，需要超级管理员添加
-        elif res == False:
-            return resp_hanlder(code=999, msg='Could not add an administrator user.')
-
+            # 普通管理员和教师无法添加管理员角色，需要超级管理员添加
+            elif res == False:
+                return resp_hanlder(code=999, msg='Could not add an administrator user.')
         # 返回token错误的字符串-注册成功(注册时无token)
         db.session.add(user)
         db.session.commit()
         ValidationEmail().activate_email(user, email)
-        return resp_hanlder(code=1001, msg=RET.alert_code[1001]+"RES:"+str(res))
+        return resp_hanlder(code=1001, msg=RET.alert_code[1001])
     except Exception as err:
         db.session.rollback()
-        return resp_hanlder(code=101, err=err)
+        return resp_hanlder(code=999, err=err)
+
 
 
 @user.route("/activate/", methods=["POST"], defaults={"desc": {"interface_name": "用户激活","is_permission": False,"permission_belong": None}})

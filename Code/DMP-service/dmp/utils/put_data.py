@@ -52,12 +52,7 @@ class PuttingData():
             return resp
 
     @classmethod
-    def root_add_user(cls, user, dmp_username, real_name):
-        auth_token = request.headers.get('Authorization')
-        res = PuttingData.get_obj_data(Users, auth_token)
-        data = request.json
-        if data == None:
-            return resp_hanlder(code=999)
+    def root_add_user(cls, data, res, user, dmp_username, real_name):
         dmp_group_id = data.get('dmp_group_id')
         if not isinstance(res, str):
             # 只有是超级管理员才能进行单一添加root、teacher及student
