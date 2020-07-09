@@ -533,7 +533,7 @@ def approve(desc):
 
                     job_hanlder.delay(reader=reader, writer=writer)
                 approve_form.put()
-                return resp_hanlder(result="OK!")
+                return resp_hanlder(result={"res":"ok","sql":create_table_sql})
             elif form_type == 4:
                 # 数据导出表单
                 approve_form = FromDownload.get(form_id)
