@@ -185,11 +185,9 @@ def ulist(desc):
             auth_token = request.headers.get('Authorization')
             res = PuttingData.get_obj_data(Users, auth_token)
             if res.get('dmp_group_id') == 1:
-                # all_user_obj_list = Users.query.all()
-                # new_user_obj_dict_list = EnvelopedData.ulist(all_user_obj_list, res=None)
-                all_user_obj_list =[u.__json__() for u in Users.query.filter_by(is_deleted=0).all()]
-                # new_user_obj_dict_list
-                return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=all_user_obj_list)
+                all_user_obj_list = Users.query.all()
+                new_user_obj_dict_list = EnvelopedData.ulist(all_user_obj_list, res=None)
+                return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
             # 教师登录，只需要显示用户的直属管理者是谁即可
             else:
                 all_students_list = Users.query.filter(Users.leader_dmp_user_id == res['id']).all()
