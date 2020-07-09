@@ -68,7 +68,7 @@ def register(desc):
         db.session.add(user)
         db.session.commit()
         ValidationEmail().activate_email(user, email)
-        return resp_hanlder(code=1001, msg=RET.alert_code[1001],result={"auth_token":auth_token,"res_token":res_token,"header":request.headers})
+        return resp_hanlder(code=1001, msg=RET.alert_code[1001],result={"auth_token":auth_token,"res_token":res_token,"header":dict(request.headers)})
     except Exception as err:
         db.session.rollback()
         return resp_hanlder(code=999, err=err)
