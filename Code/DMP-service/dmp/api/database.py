@@ -27,10 +27,10 @@ def info(desc):
                 else:
                     user_ids = [u.id for u in Users.query.filter_by(leader_dmp_user_id=current_user_id).all()]
                     user_ids.append(current_user_id)
-                    current_app.logger.info(user_ids)
+                    # current_app.logger.info(user_ids)
                     data = [d.__json__() for d in
                             Database.query.filter(Database.dmp_user_id.in_(user_ids) | Database.ispublic == True).all()]
-                current_app.logger.info(data)
+                # current_app.logger.info(data)
             return resp_hanlder(result=data)
         except Exception as err:
             return resp_hanlder(code=999, err=err)
@@ -51,7 +51,6 @@ def dbdel(desc):
                         Database.get(del_database_id).dmp_user_id).leader_dmp_user_id == current_user_id
                     is_admin = Users.get(current_user_id).dmp_group_id == 1
                     if is_user or is_user_leader or is_admin:
-                        # current_app.logger.info(DataTable.query.filter_by(dmp_database_id=current_user_id).count())
                         if DataTable.query.filter_by(dmp_database_id=del_database_id).count() == 0:
                             del_database.delete()
                             current_app.logger.info("del db complete!")
@@ -84,7 +83,7 @@ def connect(desc):
                 from pyhive import hive
                 conn = hive.Connection(host=db_host, port=db_port, username=db_user, password=db_password,
                                        database=db_name)
-                current_app.logger.info(conn.__dict__)
+                # current_app.logger.info(conn.__dict__)
                 conn.close()
                 res = {"connect": "ok!"}
             except Exception as err:

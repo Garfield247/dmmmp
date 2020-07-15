@@ -7,7 +7,7 @@ import os
 import pandas as pd
 from flask import Blueprint, jsonify, request, current_app
 from dmp.utils import resp_hanlder, uuid_str
-from dmp.models import FromDownload
+from dmp.models import FormDownload
 
 file = Blueprint("file", __name__)
 
@@ -78,7 +78,7 @@ def dlcomplete(desc):
     if request.method == "GET":
         try:
             form_id = request.json.get("form_id")
-            form_ = FromDownload.get(form_id)
+            form_ = FormDownload.get(form_id)
             rm_filepath = form_.filepath
             os.remove(rm_filepath)
             return resp_hanlder(result="OK")

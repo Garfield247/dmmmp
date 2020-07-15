@@ -81,13 +81,13 @@ def resp_hanlder(**option):
     if msg:
         response_body = {
             "status": code,
-            "msg": msg,
-            "results": result if not err else {"error_msg": str(err)}
+            "msg": str(err) or msg,
+            "results": result
         }
     else:
         response_body = {
             "status": code,
-            "msg": RET.alert_code.get(code),
-            "results": result if not err else {"error_msg": str(err)}
+            "msg": str(err) or RET.alert_code.get(code),
+            "results": result
         }
     return jsonify(response_body)

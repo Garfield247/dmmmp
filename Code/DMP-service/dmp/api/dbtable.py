@@ -7,7 +7,6 @@
 from flask import Blueprint, request, current_app
 from dmp.models import DataTable, Users, Database, DataTableColumn
 from dmp.utils import resp_hanlder
-from dmp.utils.engine import MongodbEngine, MysqlEngine
 from dmp.utils.engine import auto_connect
 
 dbtable = Blueprint("dbtable", __name__)
@@ -21,11 +20,11 @@ def info(desc):
             dmp_case_id = request.json.get("dmp_case_id")
             if dmp_case_id and not dmp_data_table_id:
                 dbtables = [dtb.__json__() for dtb in DataTable.query.filter_by(dmp_case_id=dmp_case_id).all()]
-                current_app.logger.info(dbtables)
+                # current_app.logger.info(dbtables)
                 return resp_hanlder(result=dbtables)
             elif dmp_data_table_id and not dmp_case_id:
                 db_table = DataTable.get(dmp_data_table_id).__json__()
-                current_app.logger.info(db_table)
+                # current_app.logger.info(db_table)
                 return resp_hanlder(result=db_table)
         except Exception as err:
             return resp_hanlder(err=err)
@@ -35,14 +34,7 @@ def info(desc):
 def all(desc):
     if request.method == "GET":
         try:
-            dbtables = []
-            for dtb in DataTable.query.all():
-                dtb_d = dtb.__json__()
-                dtb_d["case_name"] = dtb.case.dmp_case_name
-                dtb_d["database_name"] = dtb.database.dmp_database_name
-                dtb_d["user_name"] = dtb.users.dmp_username
-                dbtables.append(dtb_d)
-                current_app.logger.info(dbtables)
+            dbtables = [dtb.__json__() for dtb in DataTable.query.all()]
             return resp_hanlder(result=dbtables)
         except Exception as err:
             return resp_hanlder(err=err)
@@ -99,10 +91,10 @@ def column(desc):
         try:
             dmp_data_table_id = request.json.get("dmp_data_table_id")
             data_table_info = DataTable.get(dmp_data_table_id)
-            current_app.logger.info(data_table_info.__json__())
+            # current_app.logger.info(data_table_info.__json__())
             db_table_name = data_table_info.db_table_name
             database_info = Database.get(data_table_info.dmp_database_id)
-            current_app.logger.info(database_info.__json__())
+            # current_app.logger.info(database_info.__json__())
             db_type = database_info.db_type
             db_host = database_info.db_host
             db_port = database_info.db_port
@@ -139,7 +131,7 @@ def column(desc):
                         mark = False
                 if mark:
                     columns.append(i)
-            current_app.logger.info(columns)
+            # current_app.logger.info(columns)
             return resp_hanlder(result=columns)
         except Exception as err:
             current_app.logger.error(err)
@@ -196,7 +188,7 @@ def retrieve(desc):
         db_table_name = dmp_data_table.db_table_name
         conn = auto_connect(db_id=database_id)
         data = conn.retrieve(table_name=db_table_name)
-        current_app.logger.info(data)
+        # current_app.logger.info(data)
         return resp_hanlder(result=data)
 
 

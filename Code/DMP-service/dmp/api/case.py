@@ -16,8 +16,6 @@ case = Blueprint("case", __name__)
 def all(desc):
     """获取案例信息"""
     cases = list([c.__json__() for c in Case.query.all()])
-    current_app.logger.info(dir(cases))
-    # current_app.logger.info(cases.__json__())
     return resp_hanlder(result=cases)
 
 
@@ -36,15 +34,15 @@ def cpost(desc):
                     url_name=case_info.get("url_name")
                 )
                 new_case.save()
-                current_app.logger.info("add case")
+                # current_app.logger.info("add case")
                 return resp_hanlder(result="OK")
             except Exception as err:
-                return resp_hanlder(code=202, err=err)
+                return resp_hanlder(code=202,err=err)
     elif request.method == "PUT":
         if case_info.get("case_id"):
             try:
                 modify_case = Case.query.get(case_info.get("case_id"))
-                current_app.logger.info(modify_case)
+                # current_app.logger.info(modify_case)
                 if "dmp_case_name" in case_info.keys():
                     modify_case.dmp_case_name = case_info.get("dmp_case_name")
                 if "description" in case_info.keys():
@@ -54,7 +52,7 @@ def cpost(desc):
                 if "url_name" in case_info.keys():
                     modify_case.url_name = case_info.get("url_name")
                 modify_case.put()
-                current_app.logger.info("修改完成")
+                # current_app.logger.info("修改完成")
                 return resp_hanlder(result={"update": "OK!"})
             except Exception as err:
                 return resp_hanlder(cdoe=203, err=err)
@@ -65,9 +63,8 @@ def cdel(desc):
     del_case_id = request.json.get("case_id")
     current_app.logger.info("del case , case_id :%d" % del_case_id)
     try:
-        if DataTable.query.filter_by(dmp_case_id=del_case_id).count() <= 0:
-            del_case = Case.query.get(del_case_id)
-            del_case.delete()
+        del_case = Case.query.get(del_case_id)
+        del_case.delete()
         return resp_hanlder(result="OK")
     except Exception as err:
         return resp_hanlder(code=203, err=err)

@@ -70,7 +70,7 @@ class DevelopmentConfig(Config):
 
     # ICON_URL
     SAVE_URL = 'dmp/static/icon/'
-    ICON_URL = 'http://192.168.3.87:7789/static/icon/'
+    ICON_URL = 'http://192.168.3.85:7789/static/icon/'
 
 
 # 测试环境
@@ -85,10 +85,10 @@ class TestingConfig(Config):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'dmp.service@shtdtech.com'
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'shtd.123'
     # Celery
-    CELERY_RESULT_BACKEND = "redis://192.168.3.87:6379/1"
-    CELERY_BROKER_URL = "amqp://dmp:dmp123.@192.168.3.87:5672/dmpvhost"
+    CELERY_RESULT_BACKEND = "redis://192.168.3.85:6379/1"
+    CELERY_BROKER_URL = "amqp://dmp:dmp123.@192.168.3.85:5672/dmpvhost"
     # db
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:shtd123.@192.168.3.87:3306/dmpdb?charset=utf8mb4"
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:shtd123.@192.168.3.85:3306/dmp_db?charset=utf8mb4"
     # UPLOADED
     # UPLOADED_PATH = os.environ.get("DMP_UPLOAD_PATH") or "/home/dmp/dmp_upload"
     UPLOADED_PATH = os.path.join(base_dir, "static/upload")
@@ -122,5 +122,5 @@ config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
-    'default': DevelopmentConfig,
+    'default': TestingConfig,
 }

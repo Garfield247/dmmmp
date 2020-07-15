@@ -18,14 +18,14 @@ class DataTableColumn(db.Model, DMPModel):
     wherein = db.Column(db.Boolean, default=False, comment='可以区间筛选')
     isdate = db.Column(db.Boolean, default=False, comment='是否为时间日期字段')
     description = db.Column(db.Text, comment='字段说明')
-    dmp_data_table_id = db.Column(db.Integer, db.ForeignKey('dmp_data_table.id'), nullable=False, comment='数据ID')
+    dmp_data_table_id = db.Column(db.Integer, nullable=False, comment='数据ID')
 
-    # datatable = db.relationship('DataTable', backref='data_table_column')
+
     def delete(self):
         from dmp.models import DataTableColumnRange
         data_table_columns_range = DataTableColumnRange.query.filter_by(
             dmp_data_table_column_id=self.id).all()
         for dtc in data_table_columns_range:
-            current_app.logger.info(dtc.__json__())
+            # current_app.logger.info(dtc.__json__())
             dtc.delete()
         db.session.delete(self)

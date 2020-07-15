@@ -18,3 +18,11 @@ class Case(db.Model, DMPModel):
     url = db.Column(db.String(64), comment='网址')
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
+
+    def delete(self):
+        from dmp.models import DataTable
+        case_table_count = DataTable.query.filter_by(dmp_case_id = self.id).count()
+        if case_table_count == 0:
+            db.session.delete(self)
+        elif case_table_count > 0 :
+            raise Exception("This case contains a data table and cannot be deleted!")

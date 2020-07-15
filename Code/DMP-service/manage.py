@@ -23,7 +23,7 @@ manager.add_command('db', MigrateCommand)
 # 添加服务配置
 
 
-manager.add_command('runserver', Server(host='0.0.0.0', port=7789))
+manager.add_command('runserver', Server(host='0.0.0.0', port=7789,use_debugger=True))
 
 
 # 路由列表命令
@@ -94,6 +94,17 @@ def test_datax():
     # Users.create_test_user()
 
 @manager.command
+def sqla():
+    from dmp.models import FromDownload,FromUpload,FromAddDataTable,FromMigrate
+    from dmp.extensions import db
+    # print(dir(DataTable))
+    query1 = FromDownload.query.with_entities(FromDownload.id,FromDownload.form_type,FromDownload.submit_dmp_user_id,FromDownload.approve_result).filter_by(submit_dmp_user_id=1, approve_result=0)
+    query2 = FromUpload.query.with_entities(FromUpload.id,FromUpload.form_type,FromUpload.submit_dmp_user_id,FromUpload.approve_result).filter_by(submit_dmp_user_id=1, approve_result=0)
+    query3 = FromAddDataTable.query.with_entities(FromAddDataTable.id,FromAddDataTable.form_type,FromAddDataTable.submit_dmp_user_id,FromAddDataTable.approve_result).filter_by(submit_dmp_user_id=1, approve_result=0)
+    query4 = FromMigrate.query.with_entities(FromMigrate.id,FromMigrate.form_type,FromMigrate.submit_dmp_user_id,FromMigrate.approve_result).filter_by(submit_dmp_user_id=1, approve_result=0)
+
+    qall = query1.union(query2).union(query3).union(query4).all()
+    app.logger.info(qall)
 def test_hive():
     from dmp.test.hive_count_test import hct
     hct()
