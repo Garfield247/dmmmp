@@ -19,6 +19,7 @@ class MysqlEngine():
         except Exception as e:
             current_app.logger.error(e)
 
+    @property
     def tables_list(self):
         cursor = self.conn.cursor()
         sql = """

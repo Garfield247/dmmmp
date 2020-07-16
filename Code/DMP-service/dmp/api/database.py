@@ -117,7 +117,7 @@ def table_list(desc):
     if request.method == "GET":
         db_id = request.json.get("dmp_database_id")
         conn = auto_connect(db_id=db_id)
-        res = conn.tables_list()
+        res = conn.tables_list
         current_app.logger.info(res)
         return resp_hanlder(result=res)
 
