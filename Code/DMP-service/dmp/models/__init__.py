@@ -24,8 +24,12 @@ class DMPModel(object):
     def put(self):
         if self.persistent:
             self._json_cache = self.__json__()
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception:
+            self.rollback()
+            raise
 
     def delete(self):
         db.session.delete(self)
