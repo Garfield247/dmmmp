@@ -73,8 +73,8 @@ def db_table_name(desc):
             db_ = auto_connect(dmp_database_id)
             tbl = db_.tables_list
             from dmp.models import FormMigrate,FormUpload
-            count1 = FormUpload.query.filter_by(new_table_name = db_table_name_).count()
-            count2 = FormMigrate.query.filter_by(destination_db_table_name = db_table_name_).count()
+            count1 = FormUpload.query.filter_by(destination_db_table_name = db_table_name_).count()
+            count2 = FormMigrate.query.filter_by(new_table_name = db_table_name_).count()
             if db_table_name_ in tbl or count1>0 or count2>0:
                 return resp_hanlder(result={"exist": True, })
             else:
