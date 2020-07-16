@@ -25,6 +25,7 @@ class DMPModel(object):
         if self.persistent:
             self._json_cache = self.__json__()
         db.session.add(self)
+        db.session.commit()
 
     def delete(self):
         db.session.delete(self)

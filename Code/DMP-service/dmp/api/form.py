@@ -309,7 +309,7 @@ def approve(desc):
             approve_form.approve_result = approve_result
             approve_form.approve_on = datetime.datetime.now
             approve_form.answer = answer
-            approve_form.put()
+
             # 执行审批动作
             if form_type == 1:
                 # 从数据库添加数据表单
