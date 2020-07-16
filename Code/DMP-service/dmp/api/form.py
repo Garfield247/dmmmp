@@ -205,7 +205,7 @@ def info(desc):
                     committed["page_num"] = page_num
                     committed["forms"] = [f.__json__() for f in committed_query.limit(page_limit).offset((page_num-1)*page_limit)]
                 if form_status == 2 or form_status == 0:
-                    pending_query = Forms.query.filter(tuple_(Forms.submit_dmp_user_id,).in_(Users.query.with_entities(Users.id).filter_by(leader_dmp_user_id=user_id).all()), approve_result=0)
+                    pending_query = Forms.query.filter(and_(tuple_(Forms.submit_dmp_user_id,).in_(Users.query.with_entities(Users.id).filter_by(leader_dmp_user_id=user_id).all()), Forms.approve_result==0))
                     pending["form_count"] = pending_query.count()
                     pending["page_num"] = page_num
                     pending["forms"] = [f.__json__() for f in pending_query.limit(page_limit).offset((page_num-1)*page_limit)]

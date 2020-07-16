@@ -3,7 +3,8 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 import os
-
+import json
+import datetime
 from flask_script import Manager, Server
 from flask_migrate import MigrateCommand
 
@@ -95,19 +96,50 @@ def test_datax():
 
 @manager.command
 def sqla():
-    from dmp.models import FromDownload,FromUpload,FromAddDataTable,FromMigrate
+    from dmp.models import Forms,FormUpload,FormMigrate,FormDownload,FormAddDataTable
     from dmp.extensions import db
     # print(dir(DataTable))
-    query1 = FromDownload.query.with_entities(FromDownload.id,FromDownload.form_type,FromDownload.submit_dmp_user_id,FromDownload.approve_result).filter_by(submit_dmp_user_id=1, approve_result=0)
-    query2 = FromUpload.query.with_entities(FromUpload.id,FromUpload.form_type,FromUpload.submit_dmp_user_id,FromUpload.approve_result).filter_by(submit_dmp_user_id=1, approve_result=0)
-    query3 = FromAddDataTable.query.with_entities(FromAddDataTable.id,FromAddDataTable.form_type,FromAddDataTable.submit_dmp_user_id,FromAddDataTable.approve_result).filter_by(submit_dmp_user_id=1, approve_result=0)
-    query4 = FromMigrate.query.with_entities(FromMigrate.id,FromMigrate.form_type,FromMigrate.submit_dmp_user_id,FromMigrate.approve_result).filter_by(submit_dmp_user_id=1, approve_result=0)
+    ta = json.load(open("/Users/catman/Desktop/dmp_from_add_data_table.json", "r"))
+    tm = json.load(open("/Users/catman/Desktop/dmp_from_migrate.json", "r"))
+    tu = json.load(open("/Users/catman/Desktop/dmp_from_upload.json", "r"))
+    td = json.load(open("/Users/catman/Desktop/dmp_from_download.json", "r"))
+    for a in tu.get("RECORDS"):
+        new_form_info = FormUpload(
 
-    qall = query1.union(query2).union(query3).union(query4).all()
-    app.logger.info(qall)
-def test_hive():
-    from dmp.test.hive_count_test import hct
-    hct()
+
+            filetype=a.get("filetype"),
+            filepath=a.get("filepath"),
+            column_line=a.get("column_line"),
+            column=a.get("column"),
+            method=a.get("method"),
+            destination_dmp_database_id=a.get("destination_dmp_database_id"),
+            destination_db_table_name=a.get("destination_db_table_name"),
+            dmp_case_id=a.get("dmp_case_id"),
+            dmp_data_table_name=a.get("dmp_data_table_name"),
+
+        )
+        new_form_info.save()
+        new_form = Forms(
+            form_info_id=new_form_info.fid,
+            submit_dmp_user_id=a.get("submit_dmp_user_id"),
+            submit_on = datetime.datetime.strptime(a.get("submit_on"), "%d/%m/%Y %H:%M:%S") if a.get("submit_on") else None,
+            description = a.get("description"),
+            approve_dmp_user_id = a.get("approve_dmp_user_id",1) if a.get("approve_dmp_user_id",1).strip() else None,
+            approve_on = datetime.datetime.strptime(a.get("approve_on"), "%d/%m/%Y %H:%M:%S") if a.get(
+                "approve_on") else None,
+            approve_result = a.get("approve_result"),
+            answer = a.get("answer"),
+            created_on = datetime.datetime.strptime(a.get("created_on"), "%d/%m/%Y %H:%M:%S") if a.get(
+                "created_on") else None,
+            changed_on = datetime.datetime.strptime(a.get("changed_on"), "%d/%m/%Y %H:%M:%S") if a.get(
+                "changed_on") else None,
+            form_type = a.get("form_type"),
+            # finish = a.get("finish"),
+            # result = a.get("result"),
+        )
+        new_form.save()
+
+
 
 @manager.option("-id",dest="pid")
 def test_per(pid):

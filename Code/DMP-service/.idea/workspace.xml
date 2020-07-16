@@ -21,24 +21,8 @@
   <component name="ChangeListManager">
     <list default="true" id="55926b46-4166-4f54-aa76-d03823dd1100" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/api/case.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/api/case.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/api/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/api/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/api/dbtable.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/api/dbtable.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/api/file.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/api/file.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/api/form.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/api/form.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_case.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_case.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_data_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_data_table.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_data_table_column.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_data_table_column.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_data_table_column_range.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_data_table_column_range.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_database.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_form_add_data_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_form_add_data_table.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_form_download.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_form_download.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_form_migrate.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_form_migrate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/models/dmp_form_upload.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/models/dmp_form_upload.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmp/utils/response_hanlder.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/utils/response_hanlder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/manage.py" beforeDir="false" afterPath="$PROJECT_DIR$/manage.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../DOC/SHTD-DMP设计文档.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../DOC/SHTD-DMP设计文档.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +92,7 @@
       <workItem from="1592539067248" duration="28000" />
       <workItem from="1592539149729" duration="128212000" />
       <workItem from="1593997153075" duration="55874000" />
-      <workItem from="1594708114583" duration="12723000" />
+      <workItem from="1594708114583" duration="16815000" />
     </task>
     <servers />
   </component>
