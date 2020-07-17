@@ -38,7 +38,7 @@ class FormUpload(db.Model, DMPModel):
         return c_name
 
     @property
-    def _json_cache(self):
+    def _json_tmp(self):
         _d = {
             "dmp_case_name":self.dmp_case_name,
             "destination_database_name":self.destination_database_name,

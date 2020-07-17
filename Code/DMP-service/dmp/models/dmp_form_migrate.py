@@ -31,7 +31,7 @@ class FormMigrate(db.Model, DMPModel):
         return t_name
 
     @property
-    def _json_cache(self):
+    def _json_tmp(self):
         _d = {
             "origin_data_table_name":self.origin_data_table_name,
             "destination_dmp_database_name":self.destination_dmp_database_name,

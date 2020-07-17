@@ -56,7 +56,9 @@ class DMPModel(object):
     def __json__(self):
         _d = {}
         if hasattr(self, '_json_cache') and self._json_cache:
-            _d = self._json_cache
+            _d.update(self._json_cache)
+        if hasattr(self, '_json_tmp') and self._json_tmp:
+            _d.update(self._json_tmp)
         # current_app.logger.info(vars(self).keys())
         for k, v in vars(self).items():
             print(k, v)

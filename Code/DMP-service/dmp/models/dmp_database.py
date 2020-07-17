@@ -42,7 +42,7 @@ class Database(db.Model, DMPModel):
             raise Exception("The database already has data association and cannot be deleted")
 
     @property
-    def _json_cache(self):
+    def _json_tmp(self):
         _d = {
             "dmp_user_name":self.dmp_user_name,
         }

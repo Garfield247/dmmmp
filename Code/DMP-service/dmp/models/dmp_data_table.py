@@ -67,7 +67,7 @@ class DataTable(db.Model, DMPModel):
             raise err
 
     @property
-    def _json_cache(self):
+    def _json_tmp(self):
         _d = {
             "dmp_user_name":self.dmp_user_name,
             "dmp_case_name":self.dmp_case_name,

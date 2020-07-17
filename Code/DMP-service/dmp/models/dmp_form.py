@@ -62,7 +62,7 @@ class Forms(db.Model, DMPModel):
         return form_info
 
     @property
-    def _json_cache(self):
+    def _json_tmp(self):
         _d = {
             "submit_dmp_username":self.submit_dmp_username,
             "approve_dmp_username": self.approve_dmp_username,
