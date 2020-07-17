@@ -80,10 +80,13 @@ def connect(desc):
         db_name = db_info.get("db_name")
         if int(db_type) == 1:
             try:
-                from pyhive import hive
-                conn = hive.Connection(host=db_host, port=db_port, username=db_user, password=db_password,
-                                       database=db_name)
-                current_app.logger.info(conn.client)
+                # from pyhive import hive
+                # conn = hive.Connection(host=db_host, port=db_port, username=db_user, password=db_password,
+                #                        database=db_name)
+                # current_app.logger.info(conn.client)
+                from dmp.utils.engine import HiveEngone
+                hive_conn = HiveEngone(host=db_host, port=db_port, user=db_user, passwd=db_password, db=db_name)
+                hive_conn.close_conn()
                 res = {"connect": "ok!"}
             except Exception as err:
                 return resp_hanlder(code=303, msg=str(err))
