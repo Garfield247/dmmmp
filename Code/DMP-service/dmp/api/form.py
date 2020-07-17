@@ -595,7 +595,7 @@ def approve(desc):
                 # 数据导出表单
                 if approve_result == 1:
                     origin_data_table = DataTable.get(approve_form.info_form.dmp_data_table_id)
-                    origin_database = Database.get(origin_data_table.info_form.dmp_database_id)
+                    origin_database = Database.get(origin_data_table .dmp_database_id)
                     origin_database_type = origin_database.db_type
                     origin_db_host = origin_database.db_host
                     origin_db_port = origin_database.db_port
