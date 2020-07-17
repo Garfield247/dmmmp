@@ -672,4 +672,5 @@ def approve(desc):
             approve_form.put()
             return resp_hanlder(result="OK!")
         except Exception as err:
+            raise err
             return resp_hanlder(code=999, err=err, msg=str(err))
