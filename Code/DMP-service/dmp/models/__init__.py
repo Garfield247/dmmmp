@@ -61,7 +61,7 @@ class DMPModel(object):
             _d.update(self._json_tmp)
         # current_app.logger.info(vars(self).keys())
         for k, v in vars(self).items():
-            print(k, v)
+            # print(k, v)
             if k.startswith('_'):
                 continue
             if isinstance(v, datetime):

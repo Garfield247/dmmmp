@@ -83,8 +83,7 @@ def connect(desc):
                 from pyhive import hive
                 conn = hive.Connection(host=db_host, port=db_port, username=db_user, password=db_password,
                                        database=db_name)
-                # current_app.logger.info(conn.__dict__)
-                conn.close()
+                current_app.logger.info(conn.client)
                 res = {"connect": "ok!"}
             except Exception as err:
                 return resp_hanlder(code=303, msg=str(err))
