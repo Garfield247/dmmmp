@@ -307,7 +307,7 @@ def approve(desc):
             approve_form = Forms.get(form_id)
             approve_form.approve_dmp_user_id = approve_user_id
             approve_form.approve_result = approve_result
-            approve_form.approve_on = datetime.datetime.now
+            approve_form.approve_on = datetime.datetime.now()
             approve_form.answer = answer
             # approve_form.put()
             # 执行审批动作
