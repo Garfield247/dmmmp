@@ -536,7 +536,7 @@ def approve(desc):
                             hive_col = [col.get("dmp_data_table_column_name") for col in base_column]
                             hive_columns = [{"name": col, "type": "string"} for col in hive_col]
                             hive_path = "/user/hive/warehouse/%s.db/%s" % (destination_db_name, destination_db_table_name)
-                            hive_conn = auto_connect(approve_form.destination_dmp_database_id)
+                            hive_conn = auto_connect(approve_form.info_form.destination_dmp_database_id)
                             create_table_sql = create_table_query_handler(table_name=destination_db_table_name,
                                                                           fields=hive_col,
                                                                           uniform_type="string",
@@ -562,7 +562,7 @@ def approve(desc):
                                                                           id_primary_key=True,
                                                                           semicolon=True,
                                                                           fieldDelimiter=None)
-                            mysql_conn = auto_connect(approve_form.destination_dmp_database_id)
+                            mysql_conn = auto_connect(approve_form.info_form.destination_dmp_database_id)
                             mysql_conn.execsql(sql=create_table_sql)
                             preSQL = []
                             writer = mysql_writer(model=1,
@@ -647,7 +647,7 @@ def approve(desc):
                             pass
                         writer = []
                         download_path = os.path.join(current_app.config.get("DOWNLOAD_PATH"),
-                                                     approve_form.submit_users.dmp_username)
+                                                     approve_form.submit_dmp_username)
                         file_name = origin_db_table_name + uuid_str() + ".csv"
                         finally_name = origin_db_table_name + "-" + uuid_str() + ".csv"
                         headers = [col.get("dmp_data_table_column_name") for col in base_column]
@@ -656,7 +656,7 @@ def approve(desc):
                         job_hanlder.delay(reader=reader, writer=writer)
                         ip = socket.gethostbyname(socket.gethostname())
                         ftp_url = "ftp://%s:21/%s" % (
-                            str(ip), str(os.path.join(approve_form.submit_users.dmp_username, finally_name)))
+                            str(ip), str(os.path.join(approve_form.submit_dmp_username, finally_name)))
 
                         meta = {
                             "form_id": approve_form.id,
