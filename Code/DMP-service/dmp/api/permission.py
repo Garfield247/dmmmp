@@ -11,7 +11,7 @@ from dmp.utils.response_hanlder import resp_hanlder, RET
 permission = Blueprint("permission", __name__)
 
 
-@permission.route("/all/", methods=["GET"], defaults={"desc": {"interface_name": "获取所有权限","is_permission": True,"permission_belong": 0}})
+@permission.route("/all/", methods=["GET"], defaults={"desc": {"interface_name": "获取权限列表","is_permission": True,"permission_belong": 0}})
 def all(desc):
     if request.method == 'GET':
         # 获取当前所有权限信息

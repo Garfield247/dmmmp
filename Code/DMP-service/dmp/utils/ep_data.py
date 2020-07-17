@@ -130,8 +130,8 @@ class EnvelopedData():
         if current_obj.leader_dmp_user_id == None:
             current_obj.leader_dmp_user_id = None
         else:
-            choose_leader_obj = Users.query.filter(Users.id == leader_dmp_user_id).first()
-            current_obj.leader_dmp_user_id = choose_leader_obj.id
+            # choose_leader_obj = Users.query.filter(Users.id == leader_dmp_user_id).first()
+            # current_obj.leader_dmp_user_id = choose_leader_obj.id
             current_obj.leader_dmp_user_id = leader_dmp_user_id
         db.session.commit()
         return

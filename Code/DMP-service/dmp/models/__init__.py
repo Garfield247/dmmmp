@@ -69,9 +69,6 @@ class DMPModel(object):
             if isinstance(v, date):
                 v = v.strftime(default_date_format)
             _d[k] = v
-        if "leader_dmp_user_id" in vars(self).keys():
-            _d["leader_dmp_username"] = self.leader.dmp_username if self.leader else "None"
-        # current_app.logger.info(_d)
         return _d
 
     def __repr__(self):

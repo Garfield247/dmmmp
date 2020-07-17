@@ -8,9 +8,8 @@ import os
 import time
 
 from flask import Blueprint, request, session, current_app
-from operator import or_
+from operator import or_, and_
 
-from dmp.config import config
 from dmp.extensions import db
 from dmp.models import Users, Groups
 from dmp.utils.rbac.middlewares import rbac_middleware
@@ -34,9 +33,7 @@ def register(desc):
     返回值:成功与失败返回对应的状态码及提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
     '''
     try:
-        auth_token = request.headers.get('Authorization')
-        res_token = PuttingData.get_obj_data(Users, auth_token)
-        user_obj = Users.query.all()
+        user_obj = Users.query.filter_by(id=1).first()
         # 判断初始状态有没有超级用管理员，没有则不能创建用户，必须要先创建一个超级管理员
         ret = UserVerify.judge_superuser(user_obj)
         if ret:
@@ -44,15 +41,16 @@ def register(desc):
         data = request.json
         if data == None:
             return resp_hanlder(code=999)
+        auth_token = data.get('Authorization')
         dmp_username = data.get('dmp_username')
         real_name = data.get('real_name')
         passwd = data.get('password')
         email = data.get('email')
         user = Users(dmp_username=dmp_username, real_name=real_name, password=passwd,
                      email=email, leader_dmp_user_id=1)
+        res_token = PuttingData.get_obj_data(Users, auth_token)
         if auth_token != None and isinstance(res_token, dict):
             res = PuttingData.root_add_user(data, res_token, user, dmp_username, real_name)
-
             # 返回字典-管理员单一添加成功
             if isinstance(res, dict):
                 return resp_hanlder(code=0, msg=res)
@@ -68,14 +66,13 @@ def register(desc):
         db.session.add(user)
         db.session.commit()
         ValidationEmail().activate_email(user, email)
-        return resp_hanlder(code=1001, msg=RET.alert_code[1001],result={"auth_token":auth_token,"res_token":res_token,"header":dict(request.headers)})
+        return resp_hanlder(code=1001, msg=RET.alert_code[1001])
     except Exception as err:
         db.session.rollback()
-        return resp_hanlder(code=999, err=err)
+        return resp_hanlder(code=999, msg=str(err))
 
 
-
-@user.route("/activate/", methods=["POST"], defaults={"desc": {"interface_name": "用户激活","is_permission": False,"permission_belong": None}})
+@user.route("/activate/", methods=["POST"], defaults={"desc": {"interface_name": "用户激活", "is_permission": False, "permission_belong": None}})
 def activate(desc):
     '''
     说明:用户邮箱激活接口
@@ -99,7 +96,7 @@ def activate(desc):
         return resp_hanlder(code=999, msg=err)
 
 
-@user.route("/login/", methods=["POST"], defaults={"desc": {"interface_name": "用户登录","is_permission": False,"permission_belong": None}})
+@user.route("/login/", methods=["POST"], defaults={"desc": {"interface_name": "用户登录", "is_permission": False, "permission_belong": None}})
 def login(desc):
     '''
     说明:用户登陆接口
@@ -109,14 +106,15 @@ def login(desc):
     if request.method == 'POST':
         try:
             data = request.json
-            dmp_username = data.get('dmp_username')
             email = data.get('email')
+            dmp_username = data.get('dmp_username')
             if dmp_username and not email:
                 user = Users.query.filter(Users.dmp_username == dmp_username).first()
                 r = LoginVerify.login_username_verify_init(user)
                 if r == True:
                     auth_token = user.encode_auth_token()
                     if auth_token:
+                        # session['auth_token'] = auth_token.decode('utf-8')
                         return resp_hanlder(code=1003, msg=RET.alert_code[1003], result=auth_token.decode('utf-8'))
                     return resp_hanlder(code=201)
                 else:
@@ -128,6 +126,7 @@ def login(desc):
                 if r == True:
                     auth_token = user.encode_auth_token()
                     if auth_token:
+                        # session['auth_token'] = auth_token.decode('utf-8')
                         return resp_hanlder(code=1003, msg=RET.alert_code[1003], result=auth_token.decode('utf-8'))
                     return resp_hanlder(code=201)
                 else:
@@ -138,9 +137,7 @@ def login(desc):
             return resp_hanlder(code=1004, msg=RET.alert_code[1004], err=err)
 
 
-
-
-@user.route("/forgetpwd/", methods=["POST"], defaults={"desc": {"interface_name": "找回密码","is_permission": False,"permission_belong": None}})
+@user.route("/forgetpwd/", methods=["POST"], defaults={"desc": {"interface_name": "找回密码", "is_permission": False, "permission_belong": None}})
 def forgetpwd(desc):
     '''
      说明:用户找回密码接口
@@ -158,7 +155,7 @@ def forgetpwd(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@user.route('/changepwd/', methods=['PUT'], defaults={"desc": {"interface_name": "重设密码","is_permission": False,"permission_belong": None}})
+@user.route('/changepwd/', methods=['PUT'], defaults={"desc": {"interface_name": "重设密码", "is_permission": False, "permission_belong": None}})
 def changepwd(desc):
     '''
      说明:用户重设密码接口
@@ -177,7 +174,7 @@ def changepwd(desc):
             return resp_hanlder(code=1007, msg=res)
 
 
-@user.route("/list/", methods=["GET"], defaults={"desc": {"interface_name": "用户列表","is_permission": True,"permission_belong": 1}})
+@user.route("/list/", methods=["GET"], defaults={"desc": {"interface_name": "用户列表", "is_permission": True, "permission_belong": 1}})
 def ulist(desc):
     '''
      说明:获取用户列表接口,管理员显示所有用户,教师显示直属管理者是自己的用户
@@ -196,14 +193,14 @@ def ulist(desc):
                 return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
             # 教师登录，只需要显示用户的直属管理者是谁即可
             else:
-                all_students_list = Users.query.filter(Users.leader_dmp_user_id == res['id']).all()
+                all_students_list = Users.query.filter(and_((Users.leader_dmp_user_id == res['id']), (Users.is_deleted == 0))).all()
                 new_stu_obj_dict_list = EnvelopedData.ulist(all_students_list, res)
                 return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_stu_obj_dict_list)
         except Exception as err:
             return resp_hanlder(code=999, err=err)
 
 
-@user.route("/info/", methods=["GET"], defaults={"desc": {"interface_name": "用户资料","is_permission": True,"permission_belong": 0}})
+@user.route("/info/", methods=["GET"], defaults={"desc": {"interface_name": "用户资料", "is_permission": True, "permission_belong": 0}})
 def info(desc):
     '''
      说明:获取用户资料接口
@@ -245,7 +242,7 @@ def info(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@user.route("/icon/", methods=["POST"], defaults={"desc": {"interface_name": "修改头像","is_permission": False,"permission_belong": None}})
+@user.route("/icon/", methods=["POST"], defaults={"desc": {"interface_name": "修改头像", "is_permission": False, "permission_belong": None}})
 def icon(desc):
     '''
      说明:修改用户头像接口
@@ -282,7 +279,7 @@ def icon(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@user.route("/changeprofile/", methods=["PUT"], defaults={"desc": {"interface_name": "修改资料","is_permission": True,"permission_belong": 0}})
+@user.route("/changeprofile/", methods=["PUT"], defaults={"desc": {"interface_name": "修改资料", "is_permission": True, "permission_belong": 0}})
 def changeprofile(desc):
     '''
      说明:修改用户资料接口
@@ -292,71 +289,75 @@ def changeprofile(desc):
      返回值:成功返回状态码、对应提示信息及修改后的用户资料信息,数据类型:JSON,数据格式:{'msg':'...','results':{'x':'x'},'status':xxx}
      '''
     if request.method == 'PUT':
-        # 修改信息-不允许修改权限信息(与用户组关联),展示的时候默认阴影，不能勾选；要是想修改权限，只能修改用户组权限
-        data = request.json
-        if data == None:
-            return resp_hanlder(code=999)
-        dmp_user_id = data.get('dmp_user_id')
-        passwd = data.get('password')
-        email = data.get('email')
-        confirmed = data.get('confirmed')
-        dmp_group_id = data.get('dmp_group_id')
-        leader_dmp_user_id = data.get('leader_dmp_user_id')
-        dmp_username = data.get('dmp_username')
-        real_name = data.get('real_name')
-        dmp_user_info = data.get('dmp_user_info')
-        auth_token = request.headers.get('Authorization')
-        res = PuttingData.get_obj_data(Users, auth_token)
-        current_obj = Users.query.filter(Users.id == res['id']).first()
-        if not dmp_user_id:
-            try:
-                # 管理员、教师、学生--只修改dmp_username、real_name、password和email四个字段信息
-                # 修改邮箱时，发送邮件进行验证
-                if confirmed == None and dmp_group_id == None and leader_dmp_user_id == None:
-                    # 单独修改用户简介的信息
-                    if dmp_user_info != None and not dmp_username and not real_name and not passwd and not email:
-                        current_obj.dmp_user_info = dmp_user_info
-                        db.session.commit()
-                        return resp_hanlder(code=1015, msg=RET.alert_code[1015])
-                    # 单独修改密码的信息
-                    elif passwd and not dmp_username and not real_name and not email and not dmp_user_info:
-                        current_obj.password = passwd
-                        db.session.commit()
-                        return resp_hanlder(code=1015, msg=RET.alert_code[1015])
-                    # 获取当前登录用户信息(同时修改4个参数信息-新邮箱需要重新发送邮箱校验)，并进行修改--root、teacher、student都可
-                    else:
-                        ret = EnvelopedData.edit_private_info(current_obj, email, passwd, dmp_username, real_name)
-                        if isinstance(ret, str):
-                            return resp_hanlder(code=0, msg=ret)
-                        else:
-                            return resp_hanlder(code=999, msg=ret)
-                current_obj = Users.query.filter(Users.id == res['id']).first()
-                EnvelopedData.changeprofile(current_obj, email, passwd, dmp_group_id,
-                                            confirmed, leader_dmp_user_id, dmp_username, real_name)
-                # 构建返回数据:包括用户对应的用户组及用户组权限
-                select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
-                ret_obj = Users.query.filter(Users.id == res['id']).first()
-                ret_obj_dict = ret_obj.__json__()
-                ret_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, ret_obj_dict)
-                return resp_hanlder(code=3004, msg=RET.alert_code[3004], result=ret_obj_dict)
-            except:
-                db.session.rollback()
-                return resp_hanlder(code=3005, msg=RET.alert_code[3005])
+        # + try
         try:
-            choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
-            choose_user_obj_dict = choose_user_obj.__json__()
-            EnvelopedData.changeprofile(choose_user_obj, email, passwd, dmp_group_id,
-                                        confirmed, leader_dmp_user_id, dmp_username, real_name)
-            select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
-            choose_user_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, choose_user_obj_dict)
-
-            return resp_hanlder(code=3006, msg=RET.alert_code[3006], result=choose_user_obj_dict)
+            # 修改信息-不允许修改权限信息(与用户组关联),展示的时候默认阴影，不能勾选；要是想修改权限，只能修改用户组权限
+            data = request.json
+            if data == None:
+                return resp_hanlder(code=999)
+            dmp_user_id = data.get('dmp_user_id')
+            passwd = data.get('password')
+            email = data.get('email')
+            confirmed = data.get('confirmed')
+            dmp_group_id = data.get('dmp_group_id')
+            leader_dmp_user_id = data.get('leader_dmp_user_id')
+            dmp_username = data.get('dmp_username')
+            real_name = data.get('real_name')
+            dmp_user_info = data.get('dmp_user_info')
+            auth_token = request.headers.get('Authorization')
+            res = PuttingData.get_obj_data(Users, auth_token)
+            current_obj = Users.query.filter(Users.id == res['id']).first()
+            if not dmp_user_id:
+                try:
+                    # 管理员、教师、学生--只修改dmp_username、real_name、password和email四个字段信息
+                    # 修改邮箱时，发送邮件进行验证
+                    if confirmed == None and dmp_group_id == None and leader_dmp_user_id == None:
+                        # 单独修改用户简介的信息
+                        if dmp_user_info != None and not dmp_username and not real_name and not passwd and not email:
+                            current_obj.dmp_user_info = dmp_user_info
+                            db.session.commit()
+                            return resp_hanlder(code=1015, msg=RET.alert_code[1015])
+                        # 单独修改密码的信息
+                        elif passwd and not dmp_username and not real_name and not email and not dmp_user_info:
+                            current_obj.password = passwd
+                            db.session.commit()
+                            return resp_hanlder(code=1015, msg=RET.alert_code[1015])
+                        # 获取当前登录用户信息(同时修改4个参数信息-新邮箱需要重新发送邮箱校验)，并进行修改--root、teacher、student都可
+                        else:
+                            ret = EnvelopedData.edit_private_info(current_obj, email, passwd, dmp_username, real_name)
+                            if isinstance(ret, str):
+                                return resp_hanlder(code=0, msg=ret)
+                            else:
+                                return resp_hanlder(code=999, msg=ret)
+                    current_obj = Users.query.filter(Users.id == res['id']).first()
+                    EnvelopedData.changeprofile(current_obj, email, passwd, dmp_group_id,
+                                                confirmed, leader_dmp_user_id, dmp_username, real_name)
+                    # 构建返回数据:包括用户对应的用户组及用户组权限
+                    select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
+                    ret_obj = Users.query.filter(Users.id == res['id']).first()
+                    ret_obj_dict = ret_obj.__json__()
+                    ret_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, ret_obj_dict)
+                    return resp_hanlder(code=3004, msg=RET.alert_code[3004], result=ret_obj_dict)
+                except:
+                    db.session.rollback()
+                    return resp_hanlder(code=3005, msg=RET.alert_code[3005])
+            try:
+                choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
+                choose_user_obj_dict = choose_user_obj.__json__()
+                EnvelopedData.changeprofile(choose_user_obj, email, passwd, dmp_group_id,
+                                            confirmed, leader_dmp_user_id, dmp_username, real_name)
+                select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
+                choose_user_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, choose_user_obj_dict)
+                return resp_hanlder(code=3006, msg=RET.alert_code[3006], result=choose_user_obj_dict)
+            except Exception as err:
+                db.session.rollback()
+                return resp_hanlder(code=3005, msg=RET.alert_code[3005], err=err)
         except Exception as err:
             db.session.rollback()
-            return resp_hanlder(code=3005, msg=RET.alert_code[3005], err=err)
+            return resp_hanlder(code=999, err=err)
 
 
-@user.route("/frozen/", methods=["POST"], defaults={"desc": {"interface_name": "冻结用户","is_permission": True,"permission_belong": 1}})
+@user.route("/frozen/", methods=["POST"], defaults={"desc": {"interface_name": "冻结用户", "is_permission": True, "permission_belong": 1}})
 def frozen_user(desc):
     '''
      说明:冻结用户接口
@@ -384,8 +385,8 @@ def frozen_user(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@user.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除用户","is_permission": True,"permission_belong": 1}})
-def  udel(desc):
+@user.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除用户", "is_permission": True, "permission_belong": 1}})
+def udel(desc):
     '''
     说明:删除用户接口
     参数:Authorization,dmp_user_id,说明:指定用户标识token,超级管理员无法删除,根据dmp_user_id删除指定的用户信息,数据类型:JSON
@@ -393,6 +394,11 @@ def  udel(desc):
     '''
     if request.method == 'DELETE':
         try:
+            # +
+            auth_token = request.headers.get('Authorization')
+            res = PuttingData.get_obj_data(Users, auth_token)
+            if not isinstance(res, dict):
+                return resp_hanlder(code=999)
             data = request.json
             if data == None:
                 return resp_hanlder(code=999)
@@ -407,7 +413,7 @@ def  udel(desc):
                 del_time = del_time.split(' ')[0] + "-" + del_time.split(' ')[1]
                 if '[' and ']' not in del_user_obj.dmp_username:
                     del_user_obj.is_deleted = True
-                    del_user_obj.dmp_username = del_user_obj.dmp_username + '[DELETED ON:'  + del_time + ']'
+                    del_user_obj.dmp_username = del_user_obj.dmp_username + '[DELETED ON:' + del_time + ']'
                     del_user_obj.email = del_user_obj.email + '[DELETED ON:' + del_time + ']'
                     db.session.commit()
                 else:
