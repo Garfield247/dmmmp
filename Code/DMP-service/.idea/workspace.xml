@@ -21,6 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="55926b46-4166-4f54-aa76-d03823dd1100" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dmp/api/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/api/database.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,9 +45,7 @@
   </component>
   <component name="JupyterTrust" id="d7ae4084-e9d3-428c-93b7-a4d3b17fd4f6" />
   <component name="ProjectId" id="1bFP9DUBCxxPrN6Vom0FKiZJZrr" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
-    <ConfirmationsSetting value="1" id="Add" />
-  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -59,7 +58,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -90,7 +89,13 @@
       <workItem from="1592539067248" duration="28000" />
       <workItem from="1592539149729" duration="128212000" />
       <workItem from="1593997153075" duration="55874000" />
-      <workItem from="1594708114583" duration="26636000" />
+      <workItem from="1594708114583" duration="27043000" />
+      <workItem from="1595207041633" duration="137000" />
+      <workItem from="1595207203135" duration="316000" />
+      <workItem from="1595209750762" duration="311000" />
+      <workItem from="1595210191767" duration="19000" />
+      <workItem from="1595210234187" duration="119000" />
+      <workItem from="1595210378997" duration="1048000" />
     </task>
     <servers />
   </component>
@@ -110,6 +115,10 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="-1348" y="425" key="#Custom_Plugin_Repositories" timestamp="1595210328766">
+      <screen x="-1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="-1348" y="425" key="#Custom_Plugin_Repositories/0.0.1440.900/-1920.0.1920.1080@-1920.0.1920.1080" timestamp="1595210328766" />
     <state x="-967" y="368" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592991325657">
       <screen x="-1080" y="0" width="1080" height="1920" />
     </state>
@@ -120,12 +129,12 @@
     </state>
     <state x="-678" y="620" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900/-1080.0.1080.1920@-1080.0.1080.1920" timestamp="1589269323634" />
     <state x="-1205" y="349" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900/-1920.0.1920.1080@-1920.0.1920.1080" timestamp="1594178257503" />
-    <state x="-1746" y="171" key="SettingsEditor" timestamp="1592538735736">
+    <state x="-1746" y="171" key="SettingsEditor" timestamp="1595210353974">
       <screen x="-1920" y="0" width="1920" height="1080" />
     </state>
     <state x="42" y="46" key="SettingsEditor/0.0.1024.768@0.0.1024.768" timestamp="1589422381198" />
     <state x="-982" y="304" key="SettingsEditor/0.0.1440.900/-1080.0.1080.1920@-1080.0.1080.1920" timestamp="1589436901680" />
-    <state x="-1746" y="171" key="SettingsEditor/0.0.1440.900/-1920.0.1920.1080@-1920.0.1920.1080" timestamp="1592538735736" />
+    <state x="-1746" y="171" key="SettingsEditor/0.0.1440.900/-1920.0.1920.1080@-1920.0.1920.1080" timestamp="1595210353974" />
     <state x="-1451" y="190" key="SettingsEditor/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1588743544914" />
     <state x="-1253" y="129" width="586" height="822" key="find.popup" timestamp="1594893215619">
       <screen x="-1920" y="0" width="1920" height="1080" />

@@ -46,17 +46,16 @@ def dbdel(desc):
             if del_database_id:
                 del_database = Database.get(del_database_id)
                 if del_database:
-                    is_user = Users.get(Database.get(del_database_id).dmp_user_id).id == current_user_id
-                    is_user_leader = Users.get(
-                        Database.get(del_database_id).dmp_user_id).leader_dmp_user_id == current_user_id
+                    is_user = Database.get(del_database_id).dmp_user_id == current_user_id
+                    is_user_leader = Users.get(Database.get(del_database_id).dmp_user_id).leader_dmp_user_id == current_user_id
                     is_admin = Users.get(current_user_id).dmp_group_id == 1
                     if is_user or is_user_leader or is_admin:
-                        if DataTable.query.filter_by(dmp_database_id=del_database_id).count() == 0:
+                        try:
                             del_database.delete()
                             current_app.logger.info("del db complete!")
                             return resp_hanlder(result="OK")
-                        else:
-                            return resp_hanlder(code=502)
+                        except Exception as err:
+                            return resp_hanlder(code=502,msg=str(err))
                     else:
                         return resp_hanlder(code=301)
                 else:
