@@ -330,7 +330,7 @@ def approve(desc):
                     approve_form.result = "SUCCEED！"
                 except Exception as err:
                     approve_form.result = "ASSOCIATION FAILED，ERROR_MSG:%s"%str(err)
-                approve_form.finish = True
+
 
             elif form_type == 2:
                 # 文件上传添加数据表单
@@ -465,6 +465,7 @@ def approve(desc):
                     approve_form.result = "SUCCEED!"
                 except Exception as err:
                     approve_form.result = "CREATE UPLOAD JOB FAILED，ERROR MESSAGE：%s"%str(err)
+                    approve_form.finish = True
 
 
 
@@ -594,6 +595,7 @@ def approve(desc):
                         job_hanlder.delay(reader=reader, writer=writer)
                     except Exception as err:
                         approve_form.result = "CREATE MIGRATE JOB FAILED，ERROR MESSAGE：%s"%str(err)
+                        approve_form.finish = True
 
             elif form_type == 4:
                 # 数据导出表单
@@ -672,9 +674,10 @@ def approve(desc):
                         job_hanlder.delay(reader=reader, writer=writer, func=dlfunc, meta=meta)
                     except Exception as err:
                         approve_form.result = "CREATE DOWNLOAD JOB FAILED，ERROR MESSAGE：%s"%str(err)
+                        approve_form.finish = True
 
             approve_form.put()
             return resp_hanlder(result="OK!")
         except Exception as err:
-            raise err
+            # raise err
             return resp_hanlder(code=999, err=err, msg=str(err))
