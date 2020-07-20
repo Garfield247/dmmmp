@@ -55,8 +55,8 @@ def dbdel(desc):
                             current_app.logger.info("del db complete!")
                             return resp_hanlder(result="OK")
                         except Exception as err:
-                            msg = "The database already has data association and cannot be deleted"
-                            return resp_hanlder(code=502,msg=msg)
+                            err = "The database already has data association and cannot be deleted"
+                            return resp_hanlder(code=999,msg=err)
                     else:
                         return resp_hanlder(code=301)
                 else:
