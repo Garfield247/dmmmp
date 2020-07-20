@@ -47,7 +47,8 @@ def from_db(desc):
             new_form = Forms(
                 submit_dmp_user_id=submit_dmp_user_id,
                 description=description,
-                form_info_id=new_form_info.fid
+                form_info_id=new_form_info.fid,
+                form_type =1
             )
             new_form.save()
             return resp_hanlder(result="OK")
@@ -92,7 +93,8 @@ def from_file(desc):
             new_form = Forms(
                 submit_dmp_user_id=submit_dmp_user_id,
                 description=description,
-                form_info_id=new_form_info.fid
+                form_info_id=new_form_info.fid,
+                form_type = 2,
             )
             new_form.save()
 
@@ -125,7 +127,8 @@ def migration(desc):
             new_form = Forms(
                 submit_dmp_user_id=submit_dmp_user_id,
                 description=description,
-                form_info_id=new_form_info.fid
+                form_info_id=new_form_info.fid,
+                form_type=3
             )
             new_form.save()
             current_app.logger.info(new_form.id)
@@ -152,7 +155,8 @@ def download(desc):
             new_form = Forms(
                 submit_dmp_user_id=submit_dmp_user_id,
                 description=description,
-                form_info_id=new_form_info.fid
+                form_info_id=new_form_info.fid,
+                form_type=4
             )
             new_form.save()
             current_app.logger.info(new_form.id)
