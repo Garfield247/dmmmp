@@ -19,7 +19,7 @@ class RET():
         404: "Item_Does_Not_Exist",
         # 数据库类错误
         501: "Connection_Failed",
-        502: "Database_In_Use",
+        502: "The database already has data association and cannot be deleted",
         # 其他错误
         999: "Other_Error",
 
@@ -76,18 +76,18 @@ class RET():
 def resp_hanlder(**option):
     msg = option.get("msg")
     result = option.get("result")
-    err = option.get("err")
+    err = option.get("err",None)
     code = 999 if err and not option.get("code") else option.get("code", 0)
     if msg:
         response_body = {
             "status": code,
-            "msg": str(err) or msg,
+            "msg": str(err) if err else msg,
             "results": result
         }
     else:
         response_body = {
             "status": code,
-            "msg": str(err) or RET.alert_code.get(code),
+            "msg": str(err) if err else  RET.alert_code.get(code),
             "results": result
         }
     return jsonify(response_body)
