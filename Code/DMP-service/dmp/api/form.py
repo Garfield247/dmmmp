@@ -461,7 +461,7 @@ def approve(desc):
                         "dmp_case_id": dmp_case_id,
                         "description": description,
                     }
-                    job_hanlder.delay(reader=reader, writer=writer, func=postfunc, meta=meta)
+                    job_hanlder.delay(reader=reader, writer=writer, channel=3,func=postfunc, meta=meta)
                     approve_form.result = "SUCCEED!"
                 except Exception as err:
                     approve_form.result = "CREATE UPLOAD JOB FAILED，ERROR MESSAGE：%s"%str(err)
@@ -592,7 +592,7 @@ def approve(desc):
                                                     column=column,
                                                     )
 
-                        job_hanlder.delay(reader=reader, writer=writer)
+                        job_hanlder.delay(reader=reader, writer=writer, channel=3)
                     except Exception as err:
                         approve_form.result = "CREATE MIGRATE JOB FAILED，ERROR MESSAGE：%s"%str(err)
                         approve_form.finish = True
@@ -659,8 +659,6 @@ def approve(desc):
                             finally_name = origin_db_table_name + "-" + uuid_str() + ".csv"
                             headers = [col.get("dmp_data_table_column_name") for col in base_column]
                             writer = textfile_writer(filepath=download_path, filename=file_name, header=headers)
-
-                            job_hanlder.delay(reader=reader, writer=writer)
                             ip = socket.gethostbyname(socket.gethostname())
                             ftp_url = "ftp://%s:21/%s" % (
                                 str(ip), str(os.path.join(approve_form.submit_dmp_username, finally_name)))
@@ -672,7 +670,7 @@ def approve(desc):
                                 "download_path": download_path,
                                 "ftp_url": ftp_url,
                             }
-                            job_hanlder.delay(reader=reader, writer=writer, func=dlfunc, meta=meta)
+                            job_hanlder.delay(reader=reader, writer=writer, channel=1, func=dlfunc, meta=meta)
                         except Exception as err:
                             approve_form.result = "CREATE DOWNLOAD JOB FAILED，ERROR MESSAGE：%s"%str(err)
                             approve_form.finish = True
