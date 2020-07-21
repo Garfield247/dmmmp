@@ -601,81 +601,84 @@ def approve(desc):
                 # 数据导出表单
                 if approve_result == 1:
                     origin_data_table = DataTable.get(approve_form.info_form.dmp_data_table_id)
-                    origin_database = Database.get(origin_data_table .dmp_database_id)
-                    origin_database_type = origin_database.db_type
-                    origin_db_host = origin_database.db_host
-                    origin_db_port = origin_database.db_port
-                    origin_db_username = origin_database.db_username
-                    origin_db_passwd = origin_database.db_passwd
-                    origin_db_name = origin_database.db_name
-                    origin_db_table_name = origin_data_table.db_table_name
-                    try:
-                        base_column = auto_connect(origin_data_table.dmp_database_id).columns(
-                            origin_data_table.db_table_name)
+                    if origin_data_table:
+                        origin_database = Database.get(origin_data_table.dmp_database_id)
+                        origin_database_type = origin_database.db_type
+                        origin_db_host = origin_database.db_host
+                        origin_db_port = origin_database.db_port
+                        origin_db_username = origin_database.db_username
+                        origin_db_passwd = origin_database.db_passwd
+                        origin_db_name = origin_database.db_name
+                        origin_db_table_name = origin_data_table.db_table_name
+                        try:
+                            base_column = auto_connect(origin_data_table.dmp_database_id).columns(
+                                origin_data_table.db_table_name)
 
-                        reader = []
-                        if origin_database_type == 1:
-                            # hive_reader
-                            reader = hive_reader(host=origin_db_host,
-                                                 port=8020,
-                                                 path="/user/hive/warehouse/%s.db/%s" % (
-                                                     origin_db_name, origin_db_table_name),
-                                                 fileType="text",
-                                                 column=["*"],
-                                                 fieldDelimiter=',',
-                                                 encoding="utf-8"
-                                                 )
-                        elif origin_database_type == 2:
-                            # mysql_reader
-                            column = [col.get("dmp_data_table_column_name") for col in base_column]
-                            reader = mysql_reader(username=origin_db_username,
-                                                  password=origin_db_passwd,
-                                                  column=column,
-                                                  host=origin_db_host,
-                                                  port=origin_db_port,
-                                                  db=origin_db_name,
-                                                  table=origin_db_table_name,
-                                                  where=None,
-                                                  )
+                            reader = []
+                            if origin_database_type == 1:
+                                # hive_reader
+                                reader = hive_reader(host=origin_db_host,
+                                                     port=8020,
+                                                     path="/user/hive/warehouse/%s.db/%s" % (
+                                                         origin_db_name, origin_db_table_name),
+                                                     fileType="text",
+                                                     column=["*"],
+                                                     fieldDelimiter=',',
+                                                     encoding="utf-8"
+                                                     )
+                            elif origin_database_type == 2:
+                                # mysql_reader
+                                column = [col.get("dmp_data_table_column_name") for col in base_column]
+                                reader = mysql_reader(username=origin_db_username,
+                                                      password=origin_db_passwd,
+                                                      column=column,
+                                                      host=origin_db_host,
+                                                      port=origin_db_port,
+                                                      db=origin_db_name,
+                                                      table=origin_db_table_name,
+                                                      where=None,
+                                                      )
 
-                        elif origin_database_type == 3:
-                            # mongodb
-                            column = [{"index": i + 1, "name": col.get("dmp_data_table_column_name"),
-                                       "type": col.get("dmp_data_table_column_type")} for i, col in enumerate(base_column)]
-                            reader = mongodb_reader(host=origin_db_host,
-                                                    port=origin_db_port,
-                                                    db_name=origin_db_name,
-                                                    collection_name=origin_db_table_name,
-                                                    column=column,
-                                                    username=origin_db_username,
-                                                    password=origin_db_passwd
-                                                    )
-                            pass
-                        writer = []
-                        download_path = os.path.join(current_app.config.get("DOWNLOAD_PATH"),
-                                                     approve_form.submit_dmp_username)
-                        file_name = origin_db_table_name + uuid_str() + ".csv"
-                        finally_name = origin_db_table_name + "-" + uuid_str() + ".csv"
-                        headers = [col.get("dmp_data_table_column_name") for col in base_column]
-                        writer = textfile_writer(filepath=download_path, filename=file_name, header=headers)
+                            elif origin_database_type == 3:
+                                # mongodb
+                                column = [{"index": i + 1, "name": col.get("dmp_data_table_column_name"),
+                                           "type": col.get("dmp_data_table_column_type")} for i, col in enumerate(base_column)]
+                                reader = mongodb_reader(host=origin_db_host,
+                                                        port=origin_db_port,
+                                                        db_name=origin_db_name,
+                                                        collection_name=origin_db_table_name,
+                                                        column=column,
+                                                        username=origin_db_username,
+                                                        password=origin_db_passwd
+                                                        )
+                                pass
+                            writer = []
+                            download_path = os.path.join(current_app.config.get("DOWNLOAD_PATH"),
+                                                         approve_form.submit_dmp_username)
+                            file_name = origin_db_table_name + uuid_str() + ".csv"
+                            finally_name = origin_db_table_name + "-" + uuid_str() + ".csv"
+                            headers = [col.get("dmp_data_table_column_name") for col in base_column]
+                            writer = textfile_writer(filepath=download_path, filename=file_name, header=headers)
 
-                        job_hanlder.delay(reader=reader, writer=writer)
-                        ip = socket.gethostbyname(socket.gethostname())
-                        ftp_url = "ftp://%s:21/%s" % (
-                            str(ip), str(os.path.join(approve_form.submit_dmp_username, finally_name)))
+                            job_hanlder.delay(reader=reader, writer=writer)
+                            ip = socket.gethostbyname(socket.gethostname())
+                            ftp_url = "ftp://%s:21/%s" % (
+                                str(ip), str(os.path.join(approve_form.submit_dmp_username, finally_name)))
 
-                        meta = {
-                            "form_id": approve_form.id,
-                            "file_name": file_name,
-                            "finally_name": finally_name,
-                            "download_path": download_path,
-                            "ftp_url": ftp_url,
-                        }
-                        job_hanlder.delay(reader=reader, writer=writer, func=dlfunc, meta=meta)
-                    except Exception as err:
-                        approve_form.result = "CREATE DOWNLOAD JOB FAILED，ERROR MESSAGE：%s"%str(err)
+                            meta = {
+                                "form_id": approve_form.id,
+                                "file_name": file_name,
+                                "finally_name": finally_name,
+                                "download_path": download_path,
+                                "ftp_url": ftp_url,
+                            }
+                            job_hanlder.delay(reader=reader, writer=writer, func=dlfunc, meta=meta)
+                        except Exception as err:
+                            approve_form.result = "CREATE DOWNLOAD JOB FAILED，ERROR MESSAGE：%s"%str(err)
+                            approve_form.finish = True
+                    else:
+                        approve_form.result = "The original data sheet information is not obtained"
                         approve_form.finish = True
-
             approve_form.put()
             return resp_hanlder(result="OK!")
         except Exception as err:
