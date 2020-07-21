@@ -174,7 +174,7 @@ def changepwd(desc):
             else:
                 return resp_hanlder(code=1007, msg=res + token + '[' + data + ']')
         except Exception as err:
-            return resp_hanlder(code=999, msg=str(err))
+            return resp_hanlder(code=999, msg=str(err)+ token + '[' + data + ']')
 
 
 @user.route("/list/", methods=["GET"], defaults={"desc": {"interface_name": "用户列表", "is_permission": True, "permission_belong": 1}})

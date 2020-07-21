@@ -19,7 +19,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="55926b46-4166-4f54-aa76-d03823dd1100" name="Default Changelist" comment="" />
+    <list default="true" id="55926b46-4166-4f54-aa76-d03823dd1100" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/dmp/test/datax_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/test/datax_test.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -92,7 +94,7 @@
       <workItem from="1595209750762" duration="311000" />
       <workItem from="1595210191767" duration="19000" />
       <workItem from="1595210234187" duration="119000" />
-      <workItem from="1595210378997" duration="11457000" />
+      <workItem from="1595210378997" duration="12011000" />
     </task>
     <servers />
   </component>
