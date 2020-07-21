@@ -163,15 +163,18 @@ def changepwd(desc):
      返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
      '''
     if request.method == 'PUT':
-        data = request.json
-        token = data.get('Authorization')
-        newpassword = data.get('newpassword')
-        res = Users.reset_password(token, newpassword)
-        if res == True:
-            session.clear()
-            return resp_hanlder(code=1006, msg=RET.alert_code[1006] + token + '[' + data + ']')
-        else:
-            return resp_hanlder(code=1007, msg=res + token + '[' + data + ']')
+        try:
+            data = request.json
+            token = data.get('Authorization')
+            newpassword = data.get('newpassword')
+            res = Users.reset_password(token, newpassword)
+            if res == True:
+                session.clear()
+                return resp_hanlder(code=1006, msg=RET.alert_code[1006] + token + '[' + data + ']')
+            else:
+                return resp_hanlder(code=1007, msg=res + token + '[' + data + ']')
+        except Exception as err:
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @user.route("/list/", methods=["GET"], defaults={"desc": {"interface_name": "用户列表", "is_permission": True, "permission_belong": 1}})
