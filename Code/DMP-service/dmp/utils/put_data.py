@@ -3,11 +3,8 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 
-from flask import request
-
 from dmp.extensions import db
 from dmp.models import Users, Groups
-from dmp.utils.response_hanlder import resp_hanlder
 
 
 class PuttingData():
@@ -33,6 +30,8 @@ class PuttingData():
         # 用户名和真实姓名必填
         if dmp_group_name and len(dmp_username) != 0 and len(real_name) != 0:
             dmp_group_obj = Groups.query.filter(Groups.dmp_group_name == dmp_group_name).first()
+            if dmp_group_obj == None:
+                return False
             user.dmp_group_id = dmp_group_obj.id
             user.confirmed = True
             user.leader_dmp_user_id = res_token.get('id')
@@ -66,7 +65,7 @@ class PuttingData():
                     # 返回字典表示单一添加成功
                     return {True: 'Super admin user single added successfully.'}
                 else:
-                    return (-1, 'missing parameter.')
+                    return (-1, 'Missing parameter or incorrect user group name.')
 
             # 管理员单一添加teacher及student
             # 普通管理员无法单一添加管理员角色,需要超级管理员添加管理员角色
@@ -80,7 +79,7 @@ class PuttingData():
                     if r == True:
                         return {True: 'Admin user single added successfully.'}
                     else:
-                        return (-1, 'missing parameter.')
+                        return (-1, 'Missing parameter or incorrect user group name.')
 
             # 教师可以单一添加教师
             if res_token.get('dmp_group_id') == 2:
@@ -93,6 +92,6 @@ class PuttingData():
                     if r == True:
                         return {True: 'Teacher user single added successfully.'}
                     else:
-                        return (-1, 'missing parameter.')
+                        return (-1, 'Missing parameter or incorrect user group name.')
         # 返回报错token字符串
         return res_token

@@ -93,7 +93,7 @@ def activate(desc):
         else:
             return resp_hanlder(code=2002, msg=RET.alert_code[2002])
     except Exception as err:
-        return resp_hanlder(code=999, msg=err)
+        return resp_hanlder(code=999, msg=str(err))
 
 
 @user.route("/login/", methods=["POST"], defaults={"desc": {"interface_name": "用户登录", "is_permission": False, "permission_belong": None}})
@@ -152,7 +152,7 @@ def forgetpwd(desc):
             ValidationEmail().change_pwd(user, email)
             return resp_hanlder(code=1002, msg=RET.alert_code[1002])
         except Exception as err:
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @user.route('/changepwd/', methods=['PUT'], defaults={"desc": {"interface_name": "重设密码", "is_permission": False, "permission_belong": None}})
@@ -197,7 +197,7 @@ def ulist(desc):
                 new_stu_obj_dict_list = EnvelopedData.ulist(all_students_list, res)
                 return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_stu_obj_dict_list)
         except Exception as err:
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @user.route("/info/", methods=["GET"], defaults={"desc": {"interface_name": "用户资料", "is_permission": True, "permission_belong": 0}})
@@ -239,7 +239,7 @@ def info(desc):
             return resp_hanlder(code=3003, msg=RET.alert_code[3003], result=new_ret)
 
         except Exception as err:
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @user.route("/icon/", methods=["POST"], defaults={"desc": {"interface_name": "修改头像", "is_permission": False, "permission_belong": None}})
@@ -276,7 +276,7 @@ def icon(desc):
             return resp_hanlder(code=4001, msg=RET.alert_code[4001], result=icon_url)
         except Exception as err:
             db.session.rollback()
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @user.route("/changeprofile/", methods=["PUT"], defaults={"desc": {"interface_name": "修改资料", "is_permission": True, "permission_belong": 0}})
@@ -354,7 +354,7 @@ def changeprofile(desc):
                 return resp_hanlder(code=3005, msg=RET.alert_code[3005], err=err)
         except Exception as err:
             db.session.rollback()
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @user.route("/frozen/", methods=["POST"], defaults={"desc": {"interface_name": "冻结用户", "is_permission": True, "permission_belong": 1}})
@@ -382,7 +382,7 @@ def frozen_user(desc):
             db.session.commit()
             return resp_hanlder(code=4004, msg=RET.alert_code[4004])
         except Exception as err:
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @user.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除用户", "is_permission": True, "permission_belong": 1}})
@@ -422,7 +422,7 @@ def udel(desc):
                     db.session.commit()
                 return resp_hanlder(code=4006, msg=RET.alert_code[4006])
         except Exception as err:
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @user.before_request

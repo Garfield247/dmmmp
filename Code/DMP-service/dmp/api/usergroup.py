@@ -23,16 +23,32 @@ def info(desc):
      '''
     if request.method == 'GET':
         try:
+            # +
+            auth_token = request.headers.get('Authorization')
+            res = PuttingData.get_obj_data(Users, auth_token)
+            if not isinstance(res, dict):
+                return resp_hanlder(code=999)
             data = request.json
             if data == None:
-                # 获取所有用户组信息及用户组对应的权限
-                groups_all = Groups.query.all()
-                res_group_list, d = EnvelopedData.usergroup_info(groups_all)
-                for g in res_group_list:
-                    for key in d.keys():
-                        if g.get('id') == key:
-                            g['dmp_permission'] = d[key]
-                return resp_hanlder(code=5001, msg=RET.alert_code[5001], result=res_group_list)
+                if res.get('id') == 1:
+                    # 超级管理员可以获取所有用户组信息及用户组对应的权限，并选择添加
+                    groups_all = Groups.query.all()
+                    res_group_list, d = EnvelopedData.usergroup_info(groups_all)
+                    for g in res_group_list:
+                        for key in d.keys():
+                            if g.get('id') == key:
+                                g['dmp_permission'] = d[key]
+                    return resp_hanlder(code=5001, msg=RET.alert_code[5001], result=res_group_list)
+                else:
+                    # 管理员、教师及其他有该权限的用户组--获取除了管理员以外的用户组信息及用户组对应的权限，并选择添加
+                    # groups_all = Groups.query.all()
+                    groups_all = Groups.query.filter(Groups.id != 1).all()
+                    res_group_list, d = EnvelopedData.usergroup_info(groups_all)
+                    for g in res_group_list:
+                        for key in d.keys():
+                            if g.get('id') == key:
+                                g['dmp_permission'] = d[key]
+                    return resp_hanlder(code=5001, msg=RET.alert_code[5001], result=res_group_list)
             else:
                 dmp_group_id = data.get('dmp_group_id')
                 current_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
@@ -41,7 +57,7 @@ def info(desc):
                 return resp_hanlder(code=5002, msg=RET.alert_code[5002], result=current_group_obj_dict)
 
         except Exception as err:
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @usergroup.route("/post/", methods=["POST", "PUT"], defaults={"desc": {"interface_name": "添加编辑用户组信息","is_permission": True,"permission_belong": 3}})
@@ -73,7 +89,7 @@ def post_group(desc):
             return resp_hanlder(code=5005, msg=RET.alert_code[5005], result=ret_data)
         except Exception as err:
             db.session.rollback()
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
 
     # 编辑用户组信息
     elif request.method == 'PUT' and dmp_group_id != None:
@@ -84,7 +100,7 @@ def post_group(desc):
             return resp_hanlder(code=5004, msg=RET.alert_code[5004], result=ret_data)
         except Exception as err:
             db.session.rollback()
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
     return resp_hanlder(code=999)
 
 
@@ -99,6 +115,11 @@ def ugdel(desc):
     if request.method == 'DELETE':
         # 删除用户组
         try:
+            # +
+            auth_token = request.headers.get('Authorization')
+            res = PuttingData.get_obj_data(Users, auth_token)
+            if not isinstance(res, dict):
+                return resp_hanlder(code=999)
             data = request.json
             dmp_group_id = data.get('dmp_group_id')
             del_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
@@ -106,4 +127,4 @@ def ugdel(desc):
             db.session.commit()
             return resp_hanlder(code=5007, msg=RET.alert_code[5007])
         except Exception as err:
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
