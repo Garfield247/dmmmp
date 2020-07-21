@@ -169,12 +169,12 @@ def changepwd(desc):
             newpassword = data.get('newpassword')
             res = Users.reset_password(token, newpassword)
             if res == True:
-                session.clear()
-                return resp_hanlder(code=1006, msg=RET.alert_code[1006] + token + '[' + data + ']')
+                # session.clear()
+                return resp_hanlder(code=1006, msg=RET.alert_code[1006] + token )
             else:
-                return resp_hanlder(code=1007, msg=res + token + '[' + data + ']')
+                return resp_hanlder(code=1007, msg=res + token)
         except Exception as err:
-            return resp_hanlder(code=999, msg=str(err)+ token + '[' + data + ']')
+            return resp_hanlder(code=999, msg=str(err)+ token )
 
 
 @user.route("/list/", methods=["GET"], defaults={"desc": {"interface_name": "用户列表", "is_permission": True, "permission_belong": 1}})
