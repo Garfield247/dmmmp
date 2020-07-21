@@ -30,25 +30,14 @@ def info(desc):
                 return resp_hanlder(code=999)
             data = request.json
             if data == None:
-                if res.get('id') == 1:
-                    # 超级管理员可以获取所有用户组信息及用户组对应的权限，并选择添加
-                    groups_all = Groups.query.all()
-                    res_group_list, d = EnvelopedData.usergroup_info(groups_all)
-                    for g in res_group_list:
-                        for key in d.keys():
-                            if g.get('id') == key:
-                                g['dmp_permission'] = d[key]
-                    return resp_hanlder(code=5001, msg=RET.alert_code[5001], result=res_group_list)
-                else:
-                    # 管理员、教师及其他有该权限的用户组--获取除了管理员以外的用户组信息及用户组对应的权限，并选择添加
-                    # groups_all = Groups.query.all()
-                    groups_all = Groups.query.filter(Groups.id != 1).all()
-                    res_group_list, d = EnvelopedData.usergroup_info(groups_all)
-                    for g in res_group_list:
-                        for key in d.keys():
-                            if g.get('id') == key:
-                                g['dmp_permission'] = d[key]
-                    return resp_hanlder(code=5001, msg=RET.alert_code[5001], result=res_group_list)
+                # 超级管理员可以获取所有用户组信息及用户组对应的权限，并选择添加
+                groups_all = Groups.query.all()
+                res_group_list, d = EnvelopedData.usergroup_info(groups_all)
+                for g in res_group_list:
+                    for key in d.keys():
+                        if g.get('id') == key:
+                            g['dmp_permission'] = d[key]
+                return resp_hanlder(code=5001, msg=RET.alert_code[5001], result=res_group_list)
             else:
                 dmp_group_id = data.get('dmp_group_id')
                 current_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()

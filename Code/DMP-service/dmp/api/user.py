@@ -169,9 +169,9 @@ def changepwd(desc):
         res = Users.reset_password(token, newpassword)
         if res == True:
             session.clear()
-            return resp_hanlder(code=1006, msg=RET.alert_code[1006])
+            return resp_hanlder(code=1006, msg=RET.alert_code[1006] + token + '[' + data + ']')
         else:
-            return resp_hanlder(code=1007, msg=res)
+            return resp_hanlder(code=1007, msg=res + token + '[' + data + ']')
 
 
 @user.route("/list/", methods=["GET"], defaults={"desc": {"interface_name": "用户列表", "is_permission": True, "permission_belong": 1}})
@@ -307,51 +307,63 @@ def changeprofile(desc):
             auth_token = request.headers.get('Authorization')
             res = PuttingData.get_obj_data(Users, auth_token)
             current_obj = Users.query.filter(Users.id == res['id']).first()
+
             if not dmp_user_id:
-                try:
-                    # 管理员、教师、学生--只修改dmp_username、real_name、password和email四个字段信息
-                    # 修改邮箱时，发送邮件进行验证
-                    if confirmed == None and dmp_group_id == None and leader_dmp_user_id == None:
-                        # 单独修改用户简介的信息
-                        if dmp_user_info != None and not dmp_username and not real_name and not passwd and not email:
-                            current_obj.dmp_user_info = dmp_user_info
-                            db.session.commit()
-                            return resp_hanlder(code=1015, msg=RET.alert_code[1015])
-                        # 单独修改密码的信息
-                        elif passwd and not dmp_username and not real_name and not email and not dmp_user_info:
-                            current_obj.password = passwd
-                            db.session.commit()
-                            return resp_hanlder(code=1015, msg=RET.alert_code[1015])
-                        # 获取当前登录用户信息(同时修改4个参数信息-新邮箱需要重新发送邮箱校验)，并进行修改--root、teacher、student都可
+                # 管理员、教师、学生--只修改dmp_username、real_name、password和email四个字段信息
+                # 修改邮箱时，发送邮件进行验证
+                if confirmed == None and dmp_group_id == None and leader_dmp_user_id == None:
+                    # 单独修改用户简介的信息
+                    if dmp_user_info != None and not dmp_username and not real_name and not passwd and not email:
+                        current_obj.dmp_user_info = dmp_user_info
+                        db.session.commit()
+                        return resp_hanlder(code=1015, msg=RET.alert_code[1015])
+                    # 单独修改密码的信息
+                    elif passwd and not dmp_username and not real_name and not email and not dmp_user_info:
+                        current_obj.password = passwd
+                        db.session.commit()
+                        return resp_hanlder(code=1015, msg=RET.alert_code[1015])
+                    # 获取当前登录用户信息(同时修改4个参数信息-新邮箱需要重新发送邮箱校验)，并进行修改--root、teacher、student都可
+                    else:
+                        ret = EnvelopedData.edit_private_info(current_obj, email, passwd, dmp_username, real_name)
+                        if isinstance(ret, str):
+                            return resp_hanlder(code=0, msg=ret)
                         else:
-                            ret = EnvelopedData.edit_private_info(current_obj, email, passwd, dmp_username, real_name)
-                            if isinstance(ret, str):
-                                return resp_hanlder(code=0, msg=ret)
-                            else:
-                                return resp_hanlder(code=999, msg=ret)
-                    current_obj = Users.query.filter(Users.id == res['id']).first()
-                    EnvelopedData.changeprofile(current_obj, email, passwd, dmp_group_id,
-                                                confirmed, leader_dmp_user_id, dmp_username, real_name)
-                    # 构建返回数据:包括用户对应的用户组及用户组权限
-                    select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
-                    ret_obj = Users.query.filter(Users.id == res['id']).first()
-                    ret_obj_dict = ret_obj.__json__()
-                    ret_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, ret_obj_dict)
-                    return resp_hanlder(code=3004, msg=RET.alert_code[3004], result=ret_obj_dict)
-                except:
-                    db.session.rollback()
-                    return resp_hanlder(code=3005, msg=RET.alert_code[3005])
-            try:
+                            return resp_hanlder(code=999, msg=ret[1])
+                EnvelopedData.changeprofile(current_obj, email, passwd, dmp_group_id,
+                                            confirmed, leader_dmp_user_id, dmp_username, real_name)
+                # 构建返回数据:包括用户对应的用户组及用户组权限
+                select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
+                ret_obj = Users.query.filter(Users.id == res['id']).first()
+                ret_obj_dict = ret_obj.user_to_dict()
+                ret_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, ret_obj_dict)
+                return resp_hanlder(code=3004, msg=RET.alert_code[3004], result=ret_obj_dict)
+
+            # 超级管理员--可修改任何用户资料信息
+            if res.get('id') == 1:
                 choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
-                choose_user_obj_dict = choose_user_obj.__json__()
+                choose_user_obj_dict = choose_user_obj.user_to_dict()
                 EnvelopedData.changeprofile(choose_user_obj, email, passwd, dmp_group_id,
                                             confirmed, leader_dmp_user_id, dmp_username, real_name)
                 select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
                 choose_user_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, choose_user_obj_dict)
                 return resp_hanlder(code=3006, msg=RET.alert_code[3006], result=choose_user_obj_dict)
-            except Exception as err:
-                db.session.rollback()
-                return resp_hanlder(code=3005, msg=RET.alert_code[3005], err=err)
+            # 普通管理员和教师--可修改除了管理员角色以外的任何用户资料信息
+            if current_obj.dmp_group_id == 1 or current_obj.dmp_group_id == 2:
+                # 选择修改的用户
+                choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
+                # 管理员：包括超管和普通管理员
+                if choose_user_obj.dmp_group_id == 1:
+                    return resp_hanlder(code=999, msg='Unable to modify the profile information for the specified user.')
+                # 普通管理员和教师可以修改学生等的用户组(不可修改为管理员用户组，管理员用户组只有超管分配/修改)
+                if dmp_group_id == 1:
+                    return resp_hanlder(code=999, msg='The administrator user group could not be assigned.')
+                choose_user_obj_dict = choose_user_obj.user_to_dict()
+                EnvelopedData.changeprofile(choose_user_obj, email, passwd, dmp_group_id,
+                                            confirmed, leader_dmp_user_id, dmp_username, real_name)
+                select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
+                choose_user_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, choose_user_obj_dict)
+                return resp_hanlder(code=3006, msg=RET.alert_code[3006], result=choose_user_obj_dict)
+
         except Exception as err:
             db.session.rollback()
             return resp_hanlder(code=999, msg=str(err))
