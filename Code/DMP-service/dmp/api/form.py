@@ -330,7 +330,7 @@ def approve(desc):
                     approve_form.result = "SUCCEED！"
                 except Exception as err:
                     approve_form.result = "ASSOCIATION FAILED，ERROR_MSG:%s"%str(err)
-
+                approve_form.finish = True
 
             elif form_type == 2:
                 # 文件上传添加数据表单
