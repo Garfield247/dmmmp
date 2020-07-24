@@ -15,6 +15,7 @@ class RET():
         # 权限类错误
         201: "Invalid_Token",
         301: "Permission_Denied",
+        302: "No right to delete this data sheet",
         # 对象类错误
         404: "Item_Does_Not_Exist",
         # 数据库类错误
