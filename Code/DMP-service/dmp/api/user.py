@@ -165,16 +165,15 @@ def changepwd(desc):
     if request.method == 'PUT':
         try:
             data = request.json
-            token = data.get('Authorization')
+            token = data.get('authorization')
             newpassword = data.get('newpassword')
             res = Users.reset_password(token, newpassword)
             if res == True:
-                # session.clear()
-                return resp_hanlder(code=1006, msg=RET.alert_code[1006] + str(token) )
+                return resp_hanlder(code=1006, msg=RET.alert_code[1006])
             else:
-                return resp_hanlder(code=1007, msg=str(res) + str(token))
+                return resp_hanlder(code=1007, msg=res)
         except Exception as err:
-            return resp_hanlder(code=999, msg=str(err)+ str(token) )
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @user.route("/list/", methods=["GET"], defaults={"desc": {"interface_name": "用户列表", "is_permission": True, "permission_belong": 1}})
@@ -189,16 +188,112 @@ def ulist(desc):
         try:
             auth_token = request.headers.get('Authorization')
             res = PuttingData.get_obj_data(Users, auth_token)
-            if res.get('dmp_group_id') == 1:
-                # all_user_obj_list = Users.query.all()
+            # 超级管理员显示所有的用户
+            if res.get('id') == 1:
                 all_user_obj_list = Users.query.filter(Users.is_deleted == 0).all()
                 new_user_obj_dict_list = EnvelopedData.ulist(all_user_obj_list, res=None)
                 return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
-            # 教师登录，只需要显示用户的直属管理者是谁即可
-            else:
+            # 普通管理员只显示管理员级别以下的所有用户(teacher/student或者一些属于新添加用户组的用户等)，
+            # 即只拥有用户管理或用户组管理(理论上，实际不可能单独拥有用户组管理权限)之一的权限
+            if res.get('dmp_group_id') == 1 and res.get('id') != 1:
+                # 新添加用户组的所有用户对象
+                add_user_obj = Users.query.filter(
+                                    Users.dmp_group_id != 1,
+                                    Users.dmp_group_id != 2,
+                                    Users.dmp_group_id != 3).all()
+                user_dict = EnvelopedData.build_data_structures_ulist(add_user_obj)
+                show_user_list = []
+                for k, v in user_dict.items():
+                    is_show = EnvelopedData.estimate_classify(v)
+                    # 新添加的用户组 没有同时 拥有用户管理和用户组管理权限，则普通管理员显示
+                    if is_show != 1:
+                        show_user_list.append(Users.query.filter(Users.id == k).first())
+                # 普通管理员默认只展示教师和学生，不展示新添加的用户组用户，需要判断才能决定是否展示
+                all_user_obj_list = Users.query.filter(Users.is_deleted == 0, or_((Users.dmp_group_id == 2), (Users.dmp_group_id == 3)) ).all()
+                # 将默认初始化的可以展示的用户和新添加判断后可以展示的用户 相加
+                all_user_obj_list = all_user_obj_list + show_user_list
+                new_user_obj_dict_list = EnvelopedData.ulist(all_user_obj_list, res=None)
+                return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
+            # 教师登录，只显示直属管理者是自己的学生
+            # else:
+            if res.get('dmp_group_id') == 2:
+                # 新添加用户组的所有用户对象
+                add_user_obj = Users.query.filter(
+                                    Users.dmp_group_id != 1,
+                                    Users.dmp_group_id != 2,
+                                    Users.dmp_group_id != 3).all()
+                user_dict = EnvelopedData.build_data_structures_ulist(add_user_obj)
+                show_user_list = []
+                for k, v in user_dict.items():
+                    is_show = EnvelopedData.estimate_classify(v)
+                    # 新添加的用户组 同时没有 拥有用户管理和用户组管理权限，则教师显示
+                    # 相当于is_show==3
+                    if is_show != 1 and is_show != 2 and is_show != 4:
+                        show_user_list.append(Users.query.filter(Users.id == k).first())
+                # 教师默认只展示直属领导的学生，不展示新添加的用户组用户，需要判断同时没有那两种权限才能展示
                 all_students_list = Users.query.filter(and_((Users.leader_dmp_user_id == res['id']), (Users.is_deleted == 0))).all()
+                all_students_list = all_students_list + show_user_list
                 new_stu_obj_dict_list = EnvelopedData.ulist(all_students_list, res)
                 return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_stu_obj_dict_list)
+            else:
+                # 针对新添加的用户组
+                # 用户属于新添加的用户组，拿到用户对应的新用户组--对应的新用户组权限--判断权限中有无/user/list/,/usergroup/info/权限
+                # 判断is_show的值，如果为1，则相当于管理员，如果为2，则相当于教师，如果为3，则相当于学生，没权限访问ulist接口
+                new_obj = Users.query.filter(Users.id == res.get('id')).first()
+                new_group = new_obj.groups
+                new_permission_list = new_group.permissions
+                l = []
+                for p in new_permission_list:
+                    l.append({'route': p.route})
+                is_show = EnvelopedData.estimate_classify(l)
+                # 相当于普通管理员，能够看到普通管理员用户组级别以下的所有用户信息(过滤掉管理员、及同级别的新用户组用户)
+                if is_show == 1:
+                    all_user_obj_list = Users.query.filter(
+                        Users.is_deleted == 0,
+                        Users.dmp_group_id != 1,
+                        Users.dmp_group_id != res.get('dmp_group_id')).all()
+                    new_user_obj_dict_list = EnvelopedData.ulist(all_user_obj_list, res=None)
+                    g = EnvelopedData.glist(new_user_obj_dict_list)
+                    # 进行新添用户组的is_show判断
+                    for u in g:
+                        u_p = u.get('u_group_permission')
+                        is_show = EnvelopedData.estimate_classify(u_p)
+                        # 判断新添加的用户组的is_show，如果新添加的用户组is_show等于1，相当于管理员权限，不显示，删掉
+                        if is_show == 1:
+                            new_user_obj_dict_list.remove(u)
+                    print('-----', len(new_user_obj_dict_list))
+                    return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
+                # 相当于教师，能够看到教师用户组级别以下的所有用户组信息，用户组只有/user/list/及其他，没有/usergroup/info/
+                # 将管理员用户组、教师用户组及同级别的新用户组的用户信息过滤掉,
+                # 还得判断新添加其他的用户组的is_show,is_show=3才能给教师权限类别 显示
+                if is_show == 2:
+                    all_user_list = Users.query.filter(
+                        Users.is_deleted == 0,
+                        Users.dmp_group_id != 1,
+                        Users.dmp_group_id != 2,
+                        Users.dmp_group_id != res.get('dmp_group_id')).all()
+                    new_user_obj_dict_list = EnvelopedData.ulist(all_user_list, res)
+                    g = EnvelopedData.glist(new_user_obj_dict_list)
+                    for u in g:
+                        u_p = u.get('u_group_permission')
+                        is_show = EnvelopedData.estimate_classify(u_p)
+                        # 判断新添加的用户组的is_show，如果is_show等于1或2，相对于教师权限来说就不显示，删掉
+                        if is_show == 1 or is_show == 2:
+                            new_user_obj_dict_list.remove(u)
+                    return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
+                # 下面两个条件无法进入
+                if is_show == 3:
+                    # 没有权限进入此路由
+                    return resp_hanlder(code=999, msg='You do not have permission to access this route, '
+                                                      'or the permissions are incorrectly assigned, '
+                                                      'please contact the administrator')
+                if is_show == 4:
+                    return resp_hanlder(code=999, msg='There is a problem with user rights allocation, '
+                                                      'please contact the administrator to resolve it')
+                else:
+                    return resp_hanlder(code=999, msg='There is a problem with user rights allocation, '
+                                                      'please contact the administrator to resolve it')
+
         except Exception as err:
             return resp_hanlder(code=999, msg=str(err))
 
@@ -219,8 +314,10 @@ def info(desc):
             res = PuttingData.get_obj_data(Users, auth_token)
             # 没有dmp_user_id:表示当前用户信息
             if data == None:
+                # 当前用户
                 current_obj = Users.query.filter(Users.id == res['id']).first()
                 dmp_group_name = Groups.query.filter(Groups.id == res['dmp_group_id']).first().dmp_group_name
+                # 当前用户所对应的用户组
                 u_group = current_obj.groups
                 ret = EnvelopedData.info_s2_data(u_group, res, dmp_group_name)
 
@@ -341,31 +438,13 @@ def changeprofile(desc):
                 ret_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, ret_obj_dict)
                 return resp_hanlder(code=3004, msg=RET.alert_code[3004], result=ret_obj_dict)
 
-            # 超级管理员--可修改任何用户资料信息
-            if res.get('id') == 1:
-                choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
-                choose_user_obj_dict = choose_user_obj.user_to_dict()
-                EnvelopedData.changeprofile(choose_user_obj, email, passwd, dmp_group_id,
-                                            confirmed, leader_dmp_user_id, dmp_username, real_name)
-                select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
-                choose_user_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, choose_user_obj_dict)
-                return resp_hanlder(code=3006, msg=RET.alert_code[3006], result=choose_user_obj_dict)
-            # 普通管理员和教师--可修改除了管理员角色以外的任何用户资料信息
-            if current_obj.dmp_group_id == 1 or current_obj.dmp_group_id == 2:
-                # 选择修改的用户
-                choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
-                # 管理员：包括超管和普通管理员
-                if choose_user_obj.dmp_group_id == 1:
-                    return resp_hanlder(code=999, msg='Unable to modify the profile information for the specified user.')
-                # 普通管理员和教师可以修改学生等的用户组(不可修改为管理员用户组，管理员用户组只有超管分配/修改)
-                if dmp_group_id == 1:
-                    return resp_hanlder(code=999, msg='The administrator user group could not be assigned.')
-                choose_user_obj_dict = choose_user_obj.user_to_dict()
-                EnvelopedData.changeprofile(choose_user_obj, email, passwd, dmp_group_id,
-                                            confirmed, leader_dmp_user_id, dmp_username, real_name)
-                select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
-                choose_user_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, choose_user_obj_dict)
-                return resp_hanlder(code=3006, msg=RET.alert_code[3006], result=choose_user_obj_dict)
+            choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
+            choose_user_obj_dict = choose_user_obj.user_to_dict()
+            EnvelopedData.changeprofile(choose_user_obj, email, passwd, dmp_group_id,
+                                        confirmed, leader_dmp_user_id, dmp_username, real_name)
+            select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
+            choose_user_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, choose_user_obj_dict)
+            return resp_hanlder(code=3006, msg=RET.alert_code[3006], result=choose_user_obj_dict)
 
         except Exception as err:
             db.session.rollback()

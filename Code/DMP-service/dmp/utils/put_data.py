@@ -51,7 +51,6 @@ class PuttingData():
         # token失效或者错误
         else:
             return resp
-
     @classmethod
     def root_add_user(cls, data, res_token, user, dmp_username, real_name):
         # dmp_group_id = data.get('dmp_group_id')

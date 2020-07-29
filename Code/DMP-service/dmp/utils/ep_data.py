@@ -30,11 +30,13 @@ class EnvelopedData():
         return dict_list
 
     @staticmethod
-    def __user_profile(current_obj, email, passwd, dmp_group_id, confirmed, dmp_username, real_name):
+    def __user_profile(current_obj, email, passwd, confirmed, dmp_username, real_name, dmp_group_id):
         current_obj.email = email
         if passwd.strip():
             current_obj.password = passwd
-        current_obj.dmp_group_id = dmp_group_id
+        # current_obj.dmp_group_id = dmp_group_id
+        if dmp_group_id:
+            current_obj.dmp_group_id = dmp_group_id
         current_obj.confirmed = True if confirmed else False
         current_obj.dmp_username = dmp_username
         current_obj.real_name = real_name
@@ -55,23 +57,45 @@ class EnvelopedData():
         db.session.commit()
         return
 
-    @staticmethod
-    def info_s1_data(list_obj, res):
-        lr_list = []
-        # 判断用户是否显示  --用户管理或者用户组管理tag(可根据给用户组分配权限决定，有/user/list/权限的用户组则显示)
-        is_show = False
-        for p in res['group_permission']:
+    @classmethod
+    def estimate_classify(cls, permission_list):
+        '''判断is_show的值，并决定tag是否显示'''
+        tag = {}
+        for p in permission_list:
             if p.get('route') == '/user/list/':
-                is_show = True
-                break
+                tag['userlist'] = p.get('route')
+                continue
+            if p.get('route') == '/usergroup/info/':
+                tag['usergroup'] = '/usergroup/info/'
+                continue
+        if len(tag) == 2:
+            is_show = 1
+            return is_show
+        if tag.get('userlist') and not tag.get('usergroup'):
+            is_show = 2
+            return is_show
+        if len(tag) == 0:
+            is_show = 3
+            return is_show
+        # 基本不出现此可能
+        if tag.get('usergroup') and not tag.get('userlist'):
+            is_show = 4
+            return is_show
+
+    @staticmethod
+    def info_s1_data(list_obj, ret):
+        lr_list = []
+        permission_list = ret['group_permission']
+        # 判断用户是否显示分类
+        is_show = EnvelopedData.estimate_classify(permission_list)
         for u in list_obj:
             l_dict = {}
             l_dict['id'] = u.id
             l_dict['dmp_username'] = u.dmp_username
             lr_list.append(l_dict)
-        res['leader_list'] = lr_list
-        res['is_show'] = is_show
-        return res
+        ret['leader_list'] = lr_list
+        ret['is_show'] = is_show
+        return ret
 
     @staticmethod
     def info_s2_data(u_group, ret_obj_dict, dmp_group_name):
@@ -100,7 +124,14 @@ class EnvelopedData():
 
     @classmethod
     def ulist(cls, all_obj_list, res):
-        obj_dict_list = [u.__json__() for u in all_obj_list]
+        obj_dict_list = [u.user_to_dict() for u in all_obj_list]
+        # # 教师登录出了显示自己的所属用户，还显示自己的信息，方便修改用户自己的资料
+        # all_dict_list = []
+        # for i in all_obj_list:
+        #     all_dict_list.append(i.user_to_dict())
+        # for k in show_user_list:
+        #     all_dict_list.append(k.user_to_dict())
+        # all_dict_list.append(res)
         new_obj_dict_list = []
         for per_obj in obj_dict_list:
             dmp_group_obj = Groups.query.filter(Groups.id == per_obj['dmp_group_id']).first()
@@ -118,9 +149,9 @@ class EnvelopedData():
         return new_obj_dict_list
 
     @classmethod
-    def changeprofile(cls, current_obj, email, passwd, dmp_group_id, confirmed, leader_dmp_user_id, dmp_username,
-                      real_name):
-        cls.__user_profile(current_obj, email, passwd, dmp_group_id, confirmed, dmp_username, real_name)
+    def changeprofile(cls, current_obj, email, passwd, confirmed, leader_dmp_user_id, dmp_username,
+                      real_name, dmp_group_id):
+        cls.__user_profile(current_obj, email, passwd, confirmed, dmp_username, real_name, dmp_group_id)
 
         # 如果leader_dmp_user_id为空，表示的是超级管理员，不直属与任何一个用户
         if current_obj.leader_dmp_user_id == None:
@@ -160,7 +191,7 @@ class EnvelopedData():
         groups_list = []
         for per_group_obj in groups_all:
             groups_list.append(per_group_obj)
-        res_group_list = [g.__json__() for g in groups_list]
+        res_group_list = [g.group_to_dict() for g in groups_list]
         d = {}
         for item in groups_all:
             dmp_permission_list = []
@@ -233,3 +264,48 @@ class EnvelopedData():
             return
         except Exception as err:
             return err
+
+    @classmethod
+    def build_data_structures(cls, add_groups_list):
+        # 构建数据结构，便于获得is_show的值
+        ag_dict = {}  # add_group
+        for ag in add_groups_list:
+            l = []
+            for p in ag.permissions:
+                d = {}
+                d['id'] = p.id
+                d['route'] = p.route
+                l.append(d)
+            ag_dict[ag.id] = l
+        return ag_dict
+
+    @classmethod
+    def build_data_structures_ulist(cls, add_user_obj):
+        # 构造数据结构，方便判断is_show的值
+        user_dict = {}
+        for u in add_user_obj:
+            l = []
+            u_p = u.groups.permissions
+            for p in u_p:
+                l.append({'id': p.id, 'route': p.route})
+            user_dict[u.id] = l
+        return user_dict
+
+    @classmethod
+    def return_group_list(cls, groups_list):
+        res_group_list, d = cls.usergroup_info(groups_list)
+        for g in res_group_list:
+            for key in d.keys():
+                if g.get('id') == key:
+                    g['dmp_permission'] = d[key]
+        return res_group_list
+
+    @classmethod
+    def glist(cls, new_user_obj_dict_list):
+        # 判断新用户组的is_show值，并根据条件作出判断筛选
+        g = []
+        for i in new_user_obj_dict_list:
+            # 表示新添加的用户组id，并判断其is_show的值是多少
+            if i.get('dmp_group_id') != 1 and i.get('dmp_group_id') != 2 and i.get('dmp_group_id') != 3:
+                g.append(i)
+        return g
