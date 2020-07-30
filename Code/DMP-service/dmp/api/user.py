@@ -207,14 +207,21 @@ def ulist(desc):
                     is_show = EnvelopedData.estimate_classify(v)
                     # 新添加的用户组 没有同时 拥有用户管理和用户组管理权限，则普通管理员显示
                     if is_show != 1:
-                        show_user_list.append(Users.query.filter(Users.id == k).first())
+                        add_show_user_obj = Users.query.filter(Users.id == k, Users.is_deleted == 0).first()
+                        if add_show_user_obj:
+                            show_user_list.append(add_show_user_obj)
+                        else:
+                            continue
                 # 普通管理员默认只展示教师和学生，不展示新添加的用户组用户，需要判断才能决定是否展示
-                all_user_obj_list = Users.query.filter(Users.is_deleted == 0, or_((Users.dmp_group_id == 2), (Users.dmp_group_id == 3)) ).all()
+                all_user_obj_list = Users.query.filter(
+                    Users.is_deleted == 0,
+                    or_((Users.dmp_group_id == 2), (Users.dmp_group_id == 3))).all()
                 # 将默认初始化的可以展示的用户和新添加判断后可以展示的用户 相加
                 all_user_obj_list = all_user_obj_list + show_user_list
                 new_user_obj_dict_list = EnvelopedData.ulist(all_user_obj_list, res=None)
+
                 return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
-            # 教师登录，只显示直属管理者是自己的学生
+            # 教师登录，只显示直属管理者是自己的学生,且排除逻辑删除的学生
             # else:
             if res.get('dmp_group_id') == 2:
                 # 新添加用户组的所有用户对象
@@ -223,18 +230,28 @@ def ulist(desc):
                                     Users.dmp_group_id != 2,
                                     Users.dmp_group_id != 3).all()
                 user_dict = EnvelopedData.build_data_structures_ulist(add_user_obj)
-                show_user_list = []
+                show_child_user_list = []
                 for k, v in user_dict.items():
                     is_show = EnvelopedData.estimate_classify(v)
                     # 新添加的用户组 同时没有 拥有用户管理和用户组管理权限，则教师显示
-                    # 相当于is_show==3
+                    # 相当于is_show==3,先判断是属于学生用户组类别
                     if is_show != 1 and is_show != 2 and is_show != 4:
-                        show_user_list.append(Users.query.filter(Users.id == k).first())
+                        add_show_user_obj = Users.query.filter(Users.id == k, Users.is_deleted == 0).first()
+                        if add_show_user_obj.leader_dmp_user_id == res.get('id'):
+                            show_child_user_list.append(add_show_user_obj)
+                        else:
+                            continue
                 # 教师默认只展示直属领导的学生，不展示新添加的用户组用户，需要判断同时没有那两种权限才能展示
-                all_students_list = Users.query.filter(and_((Users.leader_dmp_user_id == res['id']), (Users.is_deleted == 0))).all()
-                all_students_list = all_students_list + show_user_list
+                # all_students_list = Users.query.filter(and_((Users.leader_dmp_user_id == res['id']), (Users.is_deleted == 0))).all()
+                # 筛选默认用户组中：剔除逻辑删除用户、学生属于当前老师的
+                all_students_list = Users.query.filter(
+                    and_(Users.dmp_group_id > 0, Users.dmp_group_id < 4),
+                    Users.leader_dmp_user_id == res['id'],
+                    Users.is_deleted == 0).all()
+                all_students_list = all_students_list + show_child_user_list
                 new_stu_obj_dict_list = EnvelopedData.ulist(all_students_list, res)
                 return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_stu_obj_dict_list)
+            # 属于新添加的用户组用户登录
             else:
                 # 针对新添加的用户组
                 # 用户属于新添加的用户组，拿到用户对应的新用户组--对应的新用户组权限--判断权限中有无/user/list/,/usergroup/info/权限
@@ -261,7 +278,6 @@ def ulist(desc):
                         # 判断新添加的用户组的is_show，如果新添加的用户组is_show等于1，相当于管理员权限，不显示，删掉
                         if is_show == 1:
                             new_user_obj_dict_list.remove(u)
-                    print('-----', len(new_user_obj_dict_list))
                     return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
                 # 相当于教师，能够看到教师用户组级别以下的所有用户组信息，用户组只有/user/list/及其他，没有/usergroup/info/
                 # 将管理员用户组、教师用户组及同级别的新用户组的用户信息过滤掉,
@@ -437,7 +453,6 @@ def changeprofile(desc):
                 ret_obj_dict = ret_obj.user_to_dict()
                 ret_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, ret_obj_dict)
                 return resp_hanlder(code=3004, msg=RET.alert_code[3004], result=ret_obj_dict)
-
             choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
             choose_user_obj_dict = choose_user_obj.user_to_dict()
             EnvelopedData.changeprofile(choose_user_obj, email, passwd, dmp_group_id,
