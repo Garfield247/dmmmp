@@ -82,7 +82,7 @@ def dlcomplete(desc):
             if os.path.exists(rm_filepath):
                 os.remove(rm_filepath)
                 dlform = form_.info_form
-                dlform.ftp_url = "已失效！"
+                dlform.ftp_url = ""
                 dlform.put()
             return resp_hanlder(result="OK")
 
