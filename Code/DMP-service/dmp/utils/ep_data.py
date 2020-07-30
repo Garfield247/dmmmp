@@ -30,7 +30,7 @@ class EnvelopedData():
         return dict_list
 
     @staticmethod
-    def __user_profile(current_obj, email, passwd, confirmed, dmp_username, real_name, dmp_group_id):
+    def __user_profile(current_obj, email, passwd, dmp_group_id, confirmed, dmp_username, real_name):
         current_obj.email = email
         if passwd.strip():
             current_obj.password = passwd
@@ -149,9 +149,9 @@ class EnvelopedData():
         return new_obj_dict_list
 
     @classmethod
-    def changeprofile(cls, current_obj, email, passwd, confirmed, leader_dmp_user_id, dmp_username,
-                      real_name, dmp_group_id):
-        cls.__user_profile(current_obj, email, passwd, confirmed, dmp_username, real_name, dmp_group_id)
+    def changeprofile(cls, current_obj, email, passwd,dmp_group_id ,confirmed, leader_dmp_user_id, dmp_username,
+                      real_name ):
+        cls.__user_profile(current_obj, email, passwd,dmp_group_id, confirmed, dmp_username, real_name )
 
         # 如果leader_dmp_user_id为空，表示的是超级管理员，不直属与任何一个用户
         if current_obj.leader_dmp_user_id == None:
