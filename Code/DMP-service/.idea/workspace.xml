@@ -21,6 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="55926b46-4166-4f54-aa76-d03823dd1100" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dmp/api/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmp/api/user.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,7 +97,7 @@
       <workItem from="1595210234187" duration="119000" />
       <workItem from="1595210378997" duration="13712000" />
       <workItem from="1595412148206" duration="3948000" />
-      <workItem from="1595903190306" duration="2365000" />
+      <workItem from="1595903190306" duration="4593000" />
     </task>
     <servers />
   </component>
@@ -142,11 +143,11 @@
       <screen x="-1920" y="0" width="1920" height="1080" />
     </state>
     <state x="-1253" y="129" width="586" height="822" key="find.popup/0.0.1440.900/-1920.0.1920.1080@-1920.0.1920.1080" timestamp="1594893215619" />
-    <state x="-1556" y="254" width="1192" height="381" key="search.everywhere.popup" timestamp="1594174573838">
+    <state x="-1556" y="254" width="1192" height="381" key="search.everywhere.popup" timestamp="1596158612183">
       <screen x="-1920" y="0" width="1920" height="1080" />
     </state>
     <state x="-875" y="451" width="670" height="676" key="search.everywhere.popup/0.0.1440.900/-1080.0.1080.1920@-1080.0.1080.1920" timestamp="1592961775951" />
-    <state x="-1556" y="254" width="1192" height="381" key="search.everywhere.popup/0.0.1440.900/-1920.0.1920.1080@-1920.0.1920.1080" timestamp="1594174573838" />
+    <state x="-1556" y="254" width="1192" height="381" key="search.everywhere.popup/0.0.1440.900/-1920.0.1920.1080@-1920.0.1920.1080" timestamp="1596158612183" />
     <state x="-1556" y="271" width="1192" height="373" key="search.everywhere.popup/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1590386979105" />
   </component>
   <component name="XDebuggerManager">

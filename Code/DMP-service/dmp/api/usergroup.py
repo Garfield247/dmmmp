@@ -108,11 +108,11 @@ def belong(desc):
                             # 不进行操作
                             continue
                     res_group_list = EnvelopedData.return_group_list(except_admin_groups_list)
-                    return resp_hanlder(code=0, msg='Display all user group information successfully.', result=res_group_list)
+                    return resp_hanlder(code=5001, msg='Display all user group information successfully.', result=res_group_list)
 
                 else:
                     res_group_list = EnvelopedData.return_group_list(except_admin_groups_list)
-                    return resp_hanlder(code=0, msg='Display all user group information successfully.', result=res_group_list)
+                    return resp_hanlder(code=5001, msg='Display all user group information successfully.', result=res_group_list)
             # 教师展示可分配用户组--展示教师用户组以下级别的用户组(student)，以及新添加的用户组is_show=0
             if res.get('dmp_group_id') == 2:
                 except_teacher_groups_list = Groups.query.filter(Groups.id != 1, Groups.id != 2).all()  # 排除管理员、教师的用户组列表
@@ -132,11 +132,11 @@ def belong(desc):
                             # 不进行操作
                             continue
                     res_group_list = EnvelopedData.return_group_list(except_teacher_groups_list)
-                    return resp_hanlder(code=0, msg='Display all user group information successfully.', result=res_group_list)
+                    return resp_hanlder(code=5001, msg='Display all user group information successfully.', result=res_group_list)
                 else:
                     # 没有新添加的用户组，默认仅展示学生用户组
                     res_group_list = EnvelopedData.return_group_list(except_teacher_groups_list)
-                    return resp_hanlder(code=0, msg='Display all user group information successfully.', result=res_group_list)
+                    return resp_hanlder(code=5001, msg='Display all user group information successfully.', result=res_group_list)
             # 属于新添加用户组的用户登录--判断新添加的用户组的is_show的值，如果is_show=2--普通管理员，如果is_show=1--教师，如果is_show=3--学生，不考虑
             if res.get('dmp_group_id') != 1 and res.get('dmp_group_id') != 2 and res.get('dmp_group_id') != 3:
                 add_group_obj = Groups.query.filter(Groups.id == res.get('dmp_group_id')).first()
@@ -162,7 +162,7 @@ def belong(desc):
                                 # 不进行操作
                                 continue
                         res_group_list = EnvelopedData.return_group_list(except_admin_groups_list)
-                        return resp_hanlder(code=0, msg='Display all user group information successfully.', result=res_group_list)
+                        return resp_hanlder(code=5001, msg='Display all user group information successfully.', result=res_group_list)
 
                     if is_show == 2:
                         except_teacher_groups_list = Groups.query.filter(Groups.id != 1, Groups.id != 2).all()  # 排除管理员、教师的用户组列表
@@ -179,7 +179,7 @@ def belong(desc):
                                 # 不进行操作
                                 continue
                         res_group_list = EnvelopedData.return_group_list(except_teacher_groups_list)
-                        return resp_hanlder(code=0, msg='Display all user group information successfully.',
+                        return resp_hanlder(code=5001, msg='Display all user group information successfully.',
                                             result=res_group_list)
                     else:
                         return resp_hanlder(code=999, msg='The permissions of the user group are displayed incorrectly. '

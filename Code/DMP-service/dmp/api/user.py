@@ -208,6 +208,8 @@ def ulist(desc):
                     # 新添加的用户组 没有同时 拥有用户管理和用户组管理权限，则普通管理员显示
                     if is_show != 1:
                         add_show_user_obj = Users.query.filter(Users.id == k, Users.is_deleted == 0).first()
+                        if add_show_user_obj == None:
+                            continue
                         if add_show_user_obj:
                             show_user_list.append(add_show_user_obj)
                         else:
@@ -237,6 +239,8 @@ def ulist(desc):
                     # 相当于is_show==3,先判断是属于学生用户组类别
                     if is_show != 1 and is_show != 2 and is_show != 4:
                         add_show_user_obj = Users.query.filter(Users.id == k, Users.is_deleted == 0).first()
+                        if add_show_user_obj == None:
+                            continue
                         if add_show_user_obj.leader_dmp_user_id == res.get('id'):
                             show_child_user_list.append(add_show_user_obj)
                         else:
