@@ -25,7 +25,7 @@ class Users(db.Model, DMPModel):
     confirmed = db.Column(db.Boolean, default=False, comment='用户激活状态')
     icon = db.Column(db.String(128), default=None, comment='用户头像')
     is_deleted = db.Column(db.Boolean, default=False, comment="用户逻辑删除")
-    dmp_user_info = db.Column(db.Text, default=None, comment='个人简介')
+    dmp_user_info = db.Column(db.String(256), default=None, comment='个人简介')
     last_login = db.Column(db.DateTime, default=datetime.datetime.now, comment='最后登录时间')
     created_on = db.Column(db.DateTime, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='修改时间')
@@ -50,9 +50,9 @@ class Users(db.Model, DMPModel):
             'confirmed': self.confirmed,
             'icon': self.icon,
             'dmp_user_info': self.dmp_user_info,
-            'last_login': self.last_login,
-            'created_on': self.created_on,
-            'changed_on': self.changed_on,
+            'last_login': self.last_login.strftime("%Y-%m-%d %H:%M:%S"),
+            'created_on': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
+            'changed_on': self.changed_on.strftime("%Y-%m-%d %H:%M:%S"),
             'dmp_group_id': self.dmp_group_id,
             'leader_dmp_user_id': self.leader_dmp_user_id,
         }

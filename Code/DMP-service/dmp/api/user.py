@@ -61,7 +61,7 @@ def register(desc):
 
             # 普通管理员和教师无法添加管理员角色，需要超级管理员添加
             elif res == False:
-                return resp_hanlder(code=999, msg='Could not add an administrator user.')
+                return resp_hanlder(code=999, msg='无法添加管理员用户组用户,请联系管理员添加.')
         # 返回token错误的字符串-注册成功(注册时无token)
         db.session.add(user)
         db.session.commit()
@@ -254,6 +254,12 @@ def ulist(desc):
                     Users.is_deleted == 0).all()
                 all_students_list = all_students_list + show_child_user_list
                 new_stu_obj_dict_list = EnvelopedData.ulist(all_students_list, res)
+                # 教师类用户组登录时，如果超级管理员将当前登录用户的直属领导划分为自己，则展示页不展示自己
+                for user_obj in new_stu_obj_dict_list:
+                    if user_obj.get('dmp_username') == res.get('dmp_username'):
+                        new_stu_obj_dict_list.remove(user_obj)
+                    else:
+                        continue
                 return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_stu_obj_dict_list)
             # 属于新添加的用户组用户登录
             else:
@@ -341,20 +347,52 @@ def info(desc):
                 u_group = current_obj.groups
                 ret = EnvelopedData.info_s2_data(u_group, res, dmp_group_name)
 
-                # 教师及管理员登录时，则展示所有管理员及教师--直属管理者
-                user_obj_list = Users.query.filter(or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
+                # 教师及管理员登录时，则展示所有管理员及教师--直属管理者,以及展示属于is_show=1或者is_show=2的用户组用户
+                user_obj_list = Users.query.filter(
+                    Users.is_deleted == 0,
+                    or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
+                # 判断属于新添加用户组的用户，如果他们的用户组的is_show=1或者is_show=2，则append进入
+                add_user_list = Users.query.filter(
+                                   Users.is_deleted == 0,
+                                   Users.dmp_group_id != 1,
+                                   Users.dmp_group_id != 2,
+                                   Users.dmp_group_id != 3).all()
+                user_dict = EnvelopedData.build_data_structures_ulist(add_user_list)
+                show_class_root_teacher_list = []
+                for k, v in user_dict.items():
+                    is_show = EnvelopedData.estimate_classify(v)
+                    if is_show == 1 or is_show == 2:
+                        add_show_user_obj = Users.query.filter(Users.id == k).first()
+                        show_class_root_teacher_list.append(add_show_user_obj)
+                user_obj_list = user_obj_list + show_class_root_teacher_list
                 new_res = EnvelopedData.info_s1_data(user_obj_list, ret)
                 return resp_hanlder(code=3002, msg=RET.alert_code[3002], result=new_res)
 
             dmp_user_id = data.get('dmp_user_id')
             get_user_info_obj = Users.query.filter(Users.id == dmp_user_id).first()
-            get_user_info_dict = get_user_info_obj.__json__()
+            get_user_info_dict = get_user_info_obj.user_to_dict()
             u_group = get_user_info_obj.groups
             dmp_group_name = Groups.query.filter(Groups.id == get_user_info_dict['dmp_group_id']).first().dmp_group_name
             ret = EnvelopedData.info_s2_data(u_group, get_user_info_dict, dmp_group_name)
 
             # 展示所有管理员及教师
-            user_obj_list = Users.query.filter(or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
+            user_obj_list = Users.query.filter(
+                            Users.is_deleted == 0,
+                            or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
+            # 判断属于新添加用户组的用户，如果他们的用户组的is_show=1或者is_show=2，则append进入
+            add_user_list = Users.query.filter(
+                Users.is_deleted == 0,
+                Users.dmp_group_id != 1,
+                Users.dmp_group_id != 2,
+                Users.dmp_group_id != 3).all()
+            user_dict = EnvelopedData.build_data_structures_ulist(add_user_list)
+            show_class_root_teacher_list = []
+            for k, v in user_dict.items():
+                is_show = EnvelopedData.estimate_classify(v)
+                if is_show == 1 or is_show == 2:
+                    add_show_user_obj = Users.query.filter(Users.id == k).first()
+                    show_class_root_teacher_list.append(add_show_user_obj)
+            user_obj_list = user_obj_list + show_class_root_teacher_list
             new_ret = EnvelopedData.info_s1_data(user_obj_list, ret)
             return resp_hanlder(code=3003, msg=RET.alert_code[3003], result=new_ret)
 
@@ -457,8 +495,10 @@ def changeprofile(desc):
                 ret_obj_dict = ret_obj.user_to_dict()
                 ret_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, ret_obj_dict)
                 return resp_hanlder(code=3004, msg=RET.alert_code[3004], result=ret_obj_dict)
+
             choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
             choose_user_obj_dict = choose_user_obj.user_to_dict()
+            # ori_dmp_group_id = choose_user_obj_dict.get('dmp_group_id')
             EnvelopedData.changeprofile(choose_user_obj, email, passwd, dmp_group_id,
                                         confirmed, leader_dmp_user_id, dmp_username, real_name)
             select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()

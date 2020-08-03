@@ -33,8 +33,8 @@ class Groups(db.Model, DMPModel):
             'id': self.id,
             'dmp_group_name': self.dmp_group_name,
             'max_count': self.max_count,
-            'created_on': self.created_on,
-            'changed_on': self.changed_on,
+            'created_on': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
+            'changed_on': self.changed_on.strftime("%Y-%m-%d %H:%M:%S"),
         }
         return group_dict
 

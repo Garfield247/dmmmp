@@ -149,16 +149,16 @@ class EnvelopedData():
         return new_obj_dict_list
 
     @classmethod
-    def changeprofile(cls, current_obj, email, passwd,dmp_group_id ,confirmed, leader_dmp_user_id, dmp_username,
-                      real_name ):
-        cls.__user_profile(current_obj, email, passwd,dmp_group_id, confirmed, dmp_username, real_name )
+    def changeprofile(cls, current_obj, email, passwd, dmp_group_id, confirmed, leader_dmp_user_id, dmp_username,
+                      real_name):
+        cls.__user_profile(current_obj, email, passwd, dmp_group_id, confirmed, dmp_username, real_name)
 
+        # if dmp_group_id:
+        #     current_obj.dmp_group_id = dmp_group_id
         # 如果leader_dmp_user_id为空，表示的是超级管理员，不直属与任何一个用户
         if current_obj.leader_dmp_user_id == None:
             current_obj.leader_dmp_user_id = None
         else:
-            # choose_leader_obj = Users.query.filter(Users.id == leader_dmp_user_id).first()
-            # current_obj.leader_dmp_user_id = choose_leader_obj.id
             current_obj.leader_dmp_user_id = leader_dmp_user_id
         db.session.commit()
         return
