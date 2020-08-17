@@ -27,10 +27,10 @@ def info(desc):
                 else:
                     user_ids = [u.id for u in Users.query.filter_by(leader_dmp_user_id=current_user_id).all()]
                     user_ids.append(current_user_id)
-                    current_app.logger.info(user_ids)
+                    # current_app.logger.info(user_ids)
                     data = [d.__json__() for d in
                             Database.query.filter(Database.dmp_user_id.in_(user_ids) | Database.ispublic == True).all()]
-                current_app.logger.info(data)
+                # current_app.logger.info(data)
             return resp_hanlder(result=data)
         except Exception as err:
             return resp_hanlder(code=999, err=err)
@@ -46,17 +46,15 @@ def dbdel(desc):
             if del_database_id:
                 del_database = Database.get(del_database_id)
                 if del_database:
-                    is_user = Users.get(Database.get(del_database_id).dmp_user_id).id == current_user_id
-                    is_user_leader = Users.get(
-                        Database.get(del_database_id).dmp_user_id).leader_dmp_user_id == current_user_id
+                    is_user = Database.get(del_database_id).dmp_user_id == current_user_id
+                    is_user_leader = Users.get(Database.get(del_database_id).dmp_user_id).leader_dmp_user_id == current_user_id
                     is_admin = Users.get(current_user_id).dmp_group_id == 1
                     if is_user or is_user_leader or is_admin:
-                        # current_app.logger.info(DataTable.query.filter_by(dmp_database_id=current_user_id).count())
-                        if DataTable.query.filter_by(dmp_database_id=del_database_id).count() == 0:
+                        try:
                             del_database.delete()
                             current_app.logger.info("del db complete!")
                             return resp_hanlder(result="OK")
-                        else:
+                        except Exception as err:
                             return resp_hanlder(code=502)
                     else:
                         return resp_hanlder(code=301)
@@ -65,7 +63,7 @@ def dbdel(desc):
             else:
                 return resp_hanlder(code=101)
         except Exception as err:
-            return resp_hanlder(err=err)
+            return resp_hanlder(code=999,err=err,msg=str(err))
 
 
 @database.route("/connect/", methods=["POST"], defaults={"desc": {"interface_name": "测试数据库连接","is_permission": False,"permission_belong": None}})
@@ -81,14 +79,16 @@ def connect(desc):
         db_name = db_info.get("db_name")
         if int(db_type) == 1:
             try:
-                from pyhive import hive
-                conn = hive.Connection(host=db_host, port=db_port, username=db_user, password=db_password,
-                                       database=db_name)
-                current_app.logger.info(conn.__dict__)
-                conn.close()
+                # from pyhive import hive
+                # conn = hive.Connection(host=db_host, port=db_port, username=db_user, password=db_password,
+                #                        database=db_name)
+                # current_app.logger.info(conn.client)
+                from dmp.utils.engine import HiveEngone
+                hive_conn = HiveEngone(host=db_host, port=db_port, user=db_user, passwd=db_password, db=db_name)
+                hive_conn.close_conn()
                 res = {"connect": "ok!"}
             except Exception as err:
-                return resp_hanlder(code=303, err=err)
+                return resp_hanlder(code=303, msg=str(err))
         elif int(db_type) == 2:
             try:
                 import pymysql
@@ -99,7 +99,7 @@ def connect(desc):
                 conn.close()
                 res = {"connect": "ok!"}
             except Exception as err:
-                return resp_hanlder(code=303, err=err)
+                return resp_hanlder(code=303, msg=str(err))
         elif int(db_type) == 3:
             try:
                 from pymongo import MongoClient
@@ -109,7 +109,7 @@ def connect(desc):
                 res = {"connect": "ok!"}
 
             except Exception as err:
-                return resp_hanlder(code=303, err=err)
+                return resp_hanlder(code=303, msg=str(err))
         return resp_hanlder(result=res)
 
 
@@ -118,7 +118,7 @@ def table_list(desc):
     if request.method == "GET":
         db_id = request.json.get("dmp_database_id")
         conn = auto_connect(db_id=db_id)
-        res = conn.tables_list()
+        res = conn.tables_list
         current_app.logger.info(res)
         return resp_hanlder(result=res)
 

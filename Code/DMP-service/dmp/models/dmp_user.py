@@ -18,9 +18,9 @@ class Users(db.Model, DMPModel):
     """用户表"""
     __tablename__ = 'dmp_user'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='用户ID')
-    dmp_username = db.Column(db.String(32), unique=True, nullable=False, comment='用户名')
+    dmp_username = db.Column(db.String(64), unique=True, nullable=False, comment='用户名')
     real_name = db.Column(db.String(32), nullable=False, comment='真实姓名')
-    email = db.Column(db.String(32), unique=True, nullable=False, comment='用户邮箱')
+    email = db.Column(db.String(64), unique=True, nullable=False, comment='用户邮箱')
     passwd = db.Column(db.String(512), nullable=False, comment='用户密码，加密储存')
     confirmed = db.Column(db.Boolean, default=False, comment='用户激活状态')
     icon = db.Column(db.String(128), default=None, comment='用户头像')
@@ -50,9 +50,9 @@ class Users(db.Model, DMPModel):
             'confirmed': self.confirmed,
             'icon': self.icon,
             'dmp_user_info': self.dmp_user_info,
-            'last_login': self.last_login,
-            'created_on': self.created_on,
-            'changed_on': self.changed_on,
+            'last_login': self.last_login.strftime("%Y-%m-%d %H:%M:%S"),
+            'created_on': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
+            'changed_on': self.changed_on.strftime("%Y-%m-%d %H:%M:%S"),
             'dmp_group_id': self.dmp_group_id,
             'leader_dmp_user_id': self.leader_dmp_user_id,
         }

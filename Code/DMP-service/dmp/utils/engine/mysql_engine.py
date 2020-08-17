@@ -19,6 +19,7 @@ class MysqlEngine():
         except Exception as e:
             current_app.logger.error(e)
 
+    @property
     def tables_list(self):
         cursor = self.conn.cursor()
         sql = """
@@ -39,7 +40,7 @@ class MysqlEngine():
         cursor.execute(sql.format(table_name=table_name))
         _d = cursor.fetchall()
         columns_type_list = [
-            {"dmp_data_table_column_name": column, "dmp_data_table_column_type": dtype} for column, dtype in _d]
+            {"dmp_data_table_column_name": str(column), "dmp_data_table_column_type": dtype} for column, dtype in _d]
         return columns_type_list
 
     def count(self, table_name):

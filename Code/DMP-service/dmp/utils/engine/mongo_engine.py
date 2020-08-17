@@ -17,6 +17,7 @@ class MongodbEngine():
         except Exception as e:
             current_app.logger.error("Connect Failed,Error Message:%s" % str(e))
 
+    @property
     def tables_list(self):
         res = self.database.collection_names()
         # data
@@ -25,7 +26,7 @@ class MongodbEngine():
     def columns(self, collection):
         collection_ = self.database[collection]
         column_list = [
-            {"dmp_data_table_column_name": k, "dmp_data_table_column_type": "Array" if type(v) == list else "string"}
+            {"dmp_data_table_column_name": str(k), "dmp_data_table_column_type": "Array" if type(v) == list else "string"}
             for k, v in
             collection_.find().limit(1)[0].items() if
             k != "_id"]

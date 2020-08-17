@@ -21,14 +21,15 @@ class Config:
         r"^/user/login/",
         r"^/static/.*",
         r"^/user/register/$",
+        r"^/user/icon/$",
         r"^/user/activate/.*",
         r"^/user/changepwd/",
         r"^/user/forgetpwd/",
-        r"^/verifier/email/",
-        r"^/verifier/username/",
+        r"^/verifier/.*",
         r"^/file/upload/",
         r"^/file/success/",
-        r"^/index/*"
+        r"^/database/connect/",
+        r"^/index/.*"
     ]
     # 免认证
     NO_PERMISSION_LIST = [
@@ -87,9 +88,10 @@ class TestingConfig(Config):
     CELERY_RESULT_BACKEND = "redis://192.168.3.87:6379/1"
     CELERY_BROKER_URL = "amqp://dmp:dmp123.@192.168.3.87:5672/dmpvhost"
     # db
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:shtd123.@192.168.3.87:3306/dmpdb?charset=utf8mb4"
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:shtd123.@192.168.3.87:3306/dmp_db?charset=utf8mb4"
     # UPLOADED
     UPLOADED_PATH = os.environ.get("DMP_UPLOAD_PATH") or "/home/dmp/dmp_upload"
+    # UPLOADED_PATH = os.path.join(base_dir, "static/upload")
     DOWNLOAD_PATH = os.environ.get("DMP_DOWNLOAD_PATH") or "/home/dmp/dmp_download"
 
     # DataX
@@ -120,5 +122,5 @@ config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
-    'default': DevelopmentConfig,
+    'default': TestingConfig,
 }

@@ -18,6 +18,7 @@ class HiveEngone():
         except Exception as e:
             current_app.logger.error("Connect Failed! Error Message：%s" % str(e))
 
+    @property
     def tables_list(self):
         cursor = self.conn.cursor()
         sql = """
@@ -35,7 +36,7 @@ class HiveEngone():
         """
         cursor.execute(sql.format(table_name=table_name))
         _d = cursor.fetchall()
-        columns_type_list = [{"dmp_data_table_column_name": column, "dmp_data_table_column_type": type} for
+        columns_type_list = [{"dmp_data_table_column_name": str(column), "dmp_data_table_column_type": type} for
                              column, type, comment in _d]
         return columns_type_list
 

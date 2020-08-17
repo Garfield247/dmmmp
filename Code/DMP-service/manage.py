@@ -3,7 +3,8 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 import os
-
+import json
+import datetime
 from flask_script import Manager, Server
 from flask_migrate import MigrateCommand
 
@@ -23,7 +24,7 @@ manager.add_command('db', MigrateCommand)
 # 添加服务配置
 
 
-manager.add_command('runserver', Server(host='0.0.0.0', port=7789))
+manager.add_command('runserver', Server(host='0.0.0.0', port=7789,use_debugger=True))
 
 
 # 路由列表命令
@@ -94,9 +95,51 @@ def test_datax():
     # Users.create_test_user()
 
 @manager.command
-def test_hive():
-    from dmp.test.hive_count_test import hct
-    hct()
+def sqla():
+    from dmp.models import Forms,FormUpload,FormMigrate,FormDownload,FormAddDataTable
+    from dmp.extensions import db
+    # print(dir(DataTable))
+    ta = json.load(open("/Users/catman/Desktop/dmp_from_add_data_table.json", "r"))
+    tm = json.load(open("/Users/catman/Desktop/dmp_from_migrate.json", "r"))
+    tu = json.load(open("/Users/catman/Desktop/dmp_from_upload.json", "r"))
+    td = json.load(open("/Users/catman/Desktop/dmp_from_download.json", "r"))
+    for a in tu.get("RECORDS"):
+        new_form_info = FormUpload(
+
+
+            filetype=a.get("filetype"),
+            filepath=a.get("filepath"),
+            column_line=a.get("column_line"),
+            column=a.get("column"),
+            method=a.get("method"),
+            destination_dmp_database_id=a.get("destination_dmp_database_id"),
+            destination_db_table_name=a.get("destination_db_table_name"),
+            dmp_case_id=a.get("dmp_case_id"),
+            dmp_data_table_name=a.get("dmp_data_table_name"),
+
+        )
+        new_form_info.save()
+        new_form = Forms(
+            form_info_id=new_form_info.fid,
+            submit_dmp_user_id=a.get("submit_dmp_user_id"),
+            submit_on = datetime.datetime.strptime(a.get("submit_on"), "%d/%m/%Y %H:%M:%S") if a.get("submit_on") else None,
+            description = a.get("description"),
+            approve_dmp_user_id = a.get("approve_dmp_user_id",1) if a.get("approve_dmp_user_id",1).strip() else None,
+            approve_on = datetime.datetime.strptime(a.get("approve_on"), "%d/%m/%Y %H:%M:%S") if a.get(
+                "approve_on") else None,
+            approve_result = a.get("approve_result"),
+            answer = a.get("answer"),
+            created_on = datetime.datetime.strptime(a.get("created_on"), "%d/%m/%Y %H:%M:%S") if a.get(
+                "created_on") else None,
+            changed_on = datetime.datetime.strptime(a.get("changed_on"), "%d/%m/%Y %H:%M:%S") if a.get(
+                "changed_on") else None,
+            form_type = a.get("form_type"),
+            # finish = a.get("finish"),
+            # result = a.get("result"),
+        )
+        new_form.save()
+
+
 
 @manager.option("-id",dest="pid")
 def test_per(pid):

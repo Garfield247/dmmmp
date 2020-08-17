@@ -15,11 +15,12 @@ class RET():
         # 权限类错误
         201: "Invalid_Token",
         301: "Permission_Denied",
+        302: "No right to delete this data sheet",
         # 对象类错误
         404: "Item_Does_Not_Exist",
         # 数据库类错误
         501: "Connection_Failed",
-        502: "Database_In_Use",
+        502: "The database already has data association and cannot be deleted",
         # 其他错误
         999: "Other_Error",
 
@@ -38,6 +39,9 @@ class RET():
         1013: "Username can be used, you can use it.",  # 用户名可以使用，你可以使用
         1014: "The mailbox has been activated. Please do not reactivate it.",  # 邮箱已激活，请勿重新激活
         1015: "User profile modified successfully.",
+        1016: "Groupname has been used, please change the username.",
+        1017: "Groupname can be used, you can use it.",
+
         2001: "Please provide a login token.",  # 请提供登录的token
         2002: "Token error, user activate failed.",  # token错误，用户激活失败
         3001: "Display all user information.",  # 展示所有的用户信息
@@ -46,6 +50,7 @@ class RET():
         3004: "The default user information has been changed.",  # 默认的用户信息已被修改
         3005: "User information modification failed.",  # 用户信息修改失败
         3006: "The currently selected user information has changed.",  # 当前选择的用户信息已被修改
+
         4001: "User profile icon uploaded successfully.",  # 用户头像上传成功
         4002: "The super administrator is not directly affiliated with anyone.",  # 超级管理员不直属于任何人
         4003: "The super administrator cannot freeze, please select another action.",  # 超级管理员不能被冻结，请选择其他操作
@@ -54,6 +59,7 @@ class RET():
         4005: "The super administrator could not delete.",  # 超级管理员无法删除
         4006: "User deletion successful.",  # 用户删除成功
         4007: "Root deletion successful.",  # 管理员删除成功
+
         5001: "Gets user group information and its corresponding permission information.",  # 获取用户组信息及对应的权限信息
         5002: "The user group information to be edited.",  # 获取需要被修改的用户组信息
         5003: "The maximum capacity of the administrator user group cannot be modified.",  # 管理员用户组最大容量不能被修改
@@ -62,6 +68,7 @@ class RET():
         5005: "User group and corresponding permissions were added successfully.",  # 用户组及对应的权限添加成功
         5006: "User group name is unique, please select again.",  # 用户组名称不可重复，请重新选择
         5007: "Group deletion successful.",  # 用户组删除成功
+
         6001: "Returned all the permissions list."  # 返回所有的权限列表信息
 
     }
@@ -70,18 +77,18 @@ class RET():
 def resp_hanlder(**option):
     msg = option.get("msg")
     result = option.get("result")
-    err = option.get("err")
+    err = option.get("err",None)
     code = 999 if err and not option.get("code") else option.get("code", 0)
     if msg:
         response_body = {
             "status": code,
-            "msg": msg,
-            "results": result if not err else {"error_msg": str(err)}
+            "msg": str(err) if err else msg,
+            "results": result
         }
     else:
         response_body = {
             "status": code,
-            "msg": RET.alert_code.get(code),
-            "results": result if not err else {"error_msg": str(err)}
+            "msg": str(err) if err else  RET.alert_code.get(code),
+            "results": result
         }
     return jsonify(response_body)
