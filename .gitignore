@@ -119,3 +119,4 @@ migrations/
 
 *.db
 *.sqlite
+tags

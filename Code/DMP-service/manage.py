@@ -24,7 +24,7 @@ manager.add_command('db', MigrateCommand)
 # 添加服务配置
 
 
-manager.add_command('runserver', Server(host='0.0.0.0', port=7789,use_debugger=True))
+manager.add_command('runserver', Server(host='0.0.0.0', port=7789, use_debugger=True))
 
 
 # 路由列表命令

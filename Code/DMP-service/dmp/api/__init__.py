@@ -16,6 +16,8 @@ from .user import user
 from .usergroup import usergroup
 from .verifier import verifier
 from .index import index
+from .bi import bi
+from .dataservice import ds
 
 # 蓝本配置
 DEFAULT_BLUEPRINT = (
@@ -31,6 +33,8 @@ DEFAULT_BLUEPRINT = (
     (usergroup, '/usergroup'),
     (verifier, '/verifier'),
     (index, "/index")
+    (bi, '/bi')
+    (ds, '/ds'
 )
 
 
