@@ -577,6 +577,9 @@ def udel(desc):
         except Exception as err:
             return resp_hanlder(code=999, msg=str(err))
 
+@user.route("/secretkey",methods=["GET"])
+def get_secret_key():
+    ...
 
 @user.before_request
 def before_request():

@@ -109,3 +109,20 @@ def groupname(desc):
         if group_obj:
             return resp_hanlder(code=1016, msg=RET.alert_code[1016], result={"exist": True})
         return resp_hanlder(code=1017, msg=RET.alert_code[1017], result={"exist": False})
+
+
+@verifier.route("/archive_name/",methods=["GET"])
+def exist_archive_by_name():
+    ...
+
+@ verifier.route("/dashboard_name",methods=["GET"])
+def exist_dashboard_by_name():
+    ...
+
+@verifier.route("/dataservice_name",methods=["GET"])
+def exist_dataservice_by_name():
+    ...
+
+@verifier.route("/dataservice_api",methods=["GET"])
+def exist_dataservice_by_api():
+    ...
