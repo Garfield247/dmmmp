@@ -78,6 +78,14 @@ class DMPModel(object):
     def __len__(self):
         return 1
 
+    @classmethod
+    def exist_item_by_id(cls,item_id):
+        if hasattr(cls,"id"):
+            item = cls.query.get(item_id)
+            if item:
+                return True
+        return False
+
 
 class JSONEncoder(_json.JSONEncoder):
     def default(self, o):
