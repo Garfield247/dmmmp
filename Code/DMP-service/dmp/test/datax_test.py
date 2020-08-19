@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Date    : 2020/5/25
-# @Author  : SHTD 
+# @Author  : SHTD
 
 import os
 from hdfs import Client

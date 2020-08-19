@@ -291,11 +291,11 @@ DMP( *Data Management Platform*)数据管理平台
 
 #### 返回值固有字段
 
-| 参数名  | 类型           | 参数说明                       |
-| ------- | -------------- | ------------------------------ |
-| status  | Int            | 标志结果集中所含设备或视频数量 |
-| msg     | string         | 状态码信息                     |
-| results | Dict/ArrayList | 返回值                         |
+| 参数名  | 类型           | 参数说明   |
+| ------- | -------------- | ---------- |
+| status  | Int            | 状态码     |
+| msg     | string         | 状态码信息 |
+| results | Dict/ArrayList | 返回值     |
 
 ### 注册
 
