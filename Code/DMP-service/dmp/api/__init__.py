@@ -21,20 +21,20 @@ from .dataservice import ds
 
 # 蓝本配置
 DEFAULT_BLUEPRINT = (
-    (main, '/'),
-    (case, '/case'),
-    (database, '/database'),
-    (dbtable, '/dbtable'),
-    (file, '/file'),
-    (form, '/form'),
-    (permission, '/permission'),
-    (rights, '/rights'),
-    (user, '/user'),
-    (usergroup, '/usergroup'),
-    (verifier, '/verifier'),
-    (index, "/index")
-    (bi, '/bi')
-    (ds, '/ds'
+    (main, "/"),
+    (case, "/case"),
+    (database, "/database"),
+    (dbtable, "/dbtable"),
+    (file, "/file"),
+    (form, "/form"),
+    (permission, "/permission"),
+    (rights, "/rights"),
+    (user, "/user"),
+    (usergroup, "/usergroup"),
+    (verifier, "/verifier"),
+    (index, "/index"),
+    (bi, "/bi"),
+    (ds, "/ds"),
 )
 
 

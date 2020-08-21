@@ -3,6 +3,7 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 
+
 from datetime import datetime, date
 
 from sqlalchemy import inspect
@@ -79,12 +80,42 @@ class DMPModel(object):
         return 1
 
     @classmethod
-    def exist_item_by_id(cls,item_id):
-        if hasattr(cls,"id"):
+    def exist_item_by_id(cls, item_id):
+        if hasattr(cls, "id"):
             item = cls.query.get(item_id)
             if item:
                 return True
         return False
+
+    @property
+    def changed_dmp_user_name(self):
+        from .dmp_user import Users
+        if hasattr(self, "changed_dmp_user_id"):
+            if Users.exist_item_by_id(self.changed_dmp_user_id):
+                user_name = Users.get(self.changed_dmp_user_id).user_name
+                return user_name
+        return "-"
+
+    @property
+    def created_dmp_user_name(self):
+        from .dmp_user import Users
+        if hasattr(self, "created_dmp_user_id"):
+            if Users.exist_item_by_id(self.created_dmp_user_id):
+                user_name = Users.get(self.created_dmp_user_id).user_name
+                return user_name
+        return "-"
+
+    @property
+    def _json_tmp(self):
+        _d = {}
+        if hasattr(self, "created_dmp_user_id"):
+            _d["created_dmp_user_name"] = self.created_dmp_user_name,
+        if hasattr(self, "changed_dmp_user_name"):
+            _d["changed_dmp_user_name"] = self.changed_dmp_user_name,
+
+        info_d = self.info_form.__json__()
+        _d.update(info_d)
+        return _d
 
 
 class JSONEncoder(_json.JSONEncoder):
@@ -94,6 +125,7 @@ class JSONEncoder(_json.JSONEncoder):
         return _json.JSONEncoder.default(self, o)
 
 
+from .dmp_user import Users
 from .dmp_case import Case
 from .dmp_data_table import DataTable
 from .dmp_data_table_column import DataTableColumn
@@ -107,4 +139,3 @@ from .dmp_form import Forms
 from .dmp_permission import Permissions
 from .dmp_group import Groups
 from .dmp_rights import Rights
-from .dmp_user import Users

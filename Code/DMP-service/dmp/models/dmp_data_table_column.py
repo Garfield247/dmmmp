@@ -12,7 +12,8 @@ class DataTableColumn(db.Model, DMPModel):
     """数据列信息表"""
     __tablename__ = 'dmp_data_table_column'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    dmp_data_table_column_name = db.Column(db.String(32), nullable=False, comment='列名')
+    dmp_data_table_column_name = db.Column(
+        db.String(32), nullable=False, comment='列名')
     dmp_data_table_column_type = db.Column(db.String(32), comment='数据类型')
     groupby = db.Column(db.Boolean, default=False, comment='可以进行分组')
     wherein = db.Column(db.Boolean, default=False, comment='可以区间筛选')
@@ -20,12 +21,8 @@ class DataTableColumn(db.Model, DMPModel):
     description = db.Column(db.Text, comment='字段说明')
     dmp_data_table_id = db.Column(db.Integer, nullable=False, comment='数据ID')
 
-
     def delete(self):
         from dmp.models import DataTableColumnRange
         data_table_columns_range = DataTableColumnRange.query.filter_by(
-            dmp_data_table_column_id=self.id).all()
-        for dtc in data_table_columns_range:
-            # current_app.logger.info(dtc.__json__())
-            dtc.delete()
+            dmp_data_table_column_id=self.id).delete()
         db.session.delete(self)
