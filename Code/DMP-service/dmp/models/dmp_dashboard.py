@@ -24,8 +24,8 @@ class Dashboard(db.Model, DMPModel):
     changed_dmp_user_id = db.Column(db.Integer, comment='修改人')
     created_on = db.Column(
         db.DateTime, default=datetime.datetime.now, comment='创建时间')
-    hanged_on = db.Column(db.DateTime, default=datetime.datetime.now,
-                          onupdate=datetime.datetime.now, comment='最后修改时间')
+    changed_on = db.Column(db.DateTime, default=datetime.datetime.now,
+                           onupdate=datetime.datetime.now, comment='最后修改时间')
 
     @classmethod
     def exsit_dashboard_by_name(cls, dashboard_name):
@@ -40,22 +40,6 @@ class Dashboard(db.Model, DMPModel):
             Chart.dmp_dashboard_id == self.id).delete()
         db.session.delete(self)
         db.session.commit()
-
-    @property
-    def changed_dmp_user_name(self):
-        from .dmp_user import Users
-        if Users.exist_item_by_id(self.changed_dmp_user_id):
-            user_name = Users.get(self.changed_dmp_user_id).user_name
-            return user_name
-        return "-"
-
-    @property
-    def created_dmp_user_name(self):
-        from .dmp_user import Users
-        if Users.exist_item_by_id(self.created_dmp_user_id):
-            user_name = Users.get(self.created_dmp_user_id).user_name
-            return user_name
-        return "-"
 
     @property
     def upper_dmp_dashboard_archive_name(self):

@@ -93,7 +93,7 @@ class DMPModel(object):
         from .dmp_user import Users
         if hasattr(self, "changed_dmp_user_id"):
             if Users.exist_item_by_id(self.changed_dmp_user_id):
-                user_name = Users.get(self.changed_dmp_user_id).user_name
+                user_name = Users.get(self.changed_dmp_user_id).dmp_username
                 return user_name
         return "-"
 
@@ -102,7 +102,7 @@ class DMPModel(object):
         from .dmp_user import Users
         if hasattr(self, "created_dmp_user_id"):
             if Users.exist_item_by_id(self.created_dmp_user_id):
-                user_name = Users.get(self.created_dmp_user_id).user_name
+                user_name = Users.get(self.created_dmp_user_id).dmp_username
                 return user_name
         return "-"
 
@@ -111,11 +111,9 @@ class DMPModel(object):
         _d = {}
         if hasattr(self, "created_dmp_user_id"):
             _d["created_dmp_user_name"] = self.created_dmp_user_name,
-        if hasattr(self, "changed_dmp_user_name"):
+        if hasattr(self, "changed_dmp_user_id"):
             _d["changed_dmp_user_name"] = self.changed_dmp_user_name,
 
-        info_d = self.info_form.__json__()
-        _d.update(info_d)
         return _d
 
 
