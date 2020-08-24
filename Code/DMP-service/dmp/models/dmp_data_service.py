@@ -3,6 +3,7 @@
 # @Date    : 2020/8/19
 # @Author  : SHTD
 
+import datetime
 from dmp.extensions import db
 from dmp.models import DMPModel
 
@@ -41,7 +42,7 @@ class DataService(db.Model, DMPModel):
 
     @classmethod
     def exsit_data_service_by_apipath(cls, apipath):
-        item = cls.query.filter_by(cls.api_path=apipath).first()
+        item = cls.query.filter_by(api_path=apipath).first()
         if item:
             return True
         return False

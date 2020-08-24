@@ -10,29 +10,29 @@ ds = Blueprint("ds", __name__)
 
 @ds.route("/dataservices", methods=["GET"])
 def get_data_services():
-    ...
+    pass
 
 
-@ds.route("/dataservices/<id:int>", methods=["GET"])
+@ds.route("/dataservices/<int:id>", methods=["GET"])
 def get_data_service_by_id():
-    ...
+    pass
 
 
 @ds.route("/dataservices", methods=["POST"])
 def add_data_services():
-    ...
+    pass
 
 
-@ds.route("/dataservices/<id:int>", methods=["PUT"])
+@ds.route("/dataservices/<int:id>", methods=["PUT"])
 def update_data_service_by_id():
-    ...
+    pass
 
 
-@ds.route("/dataservices/<id:int>", methods=["DELETE"])
+@ds.route("/dataservices/<int:id>", methods=["DELETE"])
 def delete_data_service_by_id():
-    ...
+    pass
 
 
-@ds.route("/api/<api:path>", methods=["GET", "POST"])
+@ds.route("/api/<path:api>", methods=["GET", "POST"])
 def get_data_by_data_service():
-    ...
+    pass

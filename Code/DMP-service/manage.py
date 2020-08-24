@@ -14,7 +14,7 @@ from dmp.extensions import db
 # 创建命令起动控制对象
 
 # 获取配置
-config_name = os.environ.get('DMP_CONFIG') or 'testing'
+config_name = os.environ.get('DMP_CONFIG') or 'default'
 
 # 创建实例
 app = create_app(config_name)
@@ -24,7 +24,8 @@ manager.add_command('db', MigrateCommand)
 # 添加服务配置
 
 
-manager.add_command('runserver', Server(host='0.0.0.0', port=7789, use_debugger=True))
+manager.add_command('runserver', Server(
+    host='0.0.0.0', port=7789, use_debugger=True))
 
 
 # 路由列表命令
@@ -88,18 +89,20 @@ def sys_init():
 
 @manager.command
 def test_datax():
-    from dmp.test.datax_test import test_csv2mysql,test_csv2hive,test_hive2csv
+    from dmp.test.datax_test import test_csv2mysql, test_csv2hive, test_hive2csv
     test_hive2csv()
 
     # from dmp.models import Users
     # Users.create_test_user()
 
+
 @manager.command
 def sqla():
-    from dmp.models import Forms,FormUpload,FormMigrate,FormDownload,FormAddDataTable
+    from dmp.models import Forms, FormUpload, FormMigrate, FormDownload, FormAddDataTable
     from dmp.extensions import db
     # print(dir(DataTable))
-    ta = json.load(open("/Users/catman/Desktop/dmp_from_add_data_table.json", "r"))
+    ta = json.load(
+        open("/Users/catman/Desktop/dmp_from_add_data_table.json", "r"))
     tm = json.load(open("/Users/catman/Desktop/dmp_from_migrate.json", "r"))
     tu = json.load(open("/Users/catman/Desktop/dmp_from_upload.json", "r"))
     td = json.load(open("/Users/catman/Desktop/dmp_from_download.json", "r"))
@@ -122,38 +125,38 @@ def sqla():
         new_form = Forms(
             form_info_id=new_form_info.fid,
             submit_dmp_user_id=a.get("submit_dmp_user_id"),
-            submit_on = datetime.datetime.strptime(a.get("submit_on"), "%d/%m/%Y %H:%M:%S") if a.get("submit_on") else None,
-            description = a.get("description"),
-            approve_dmp_user_id = a.get("approve_dmp_user_id",1) if a.get("approve_dmp_user_id",1).strip() else None,
-            approve_on = datetime.datetime.strptime(a.get("approve_on"), "%d/%m/%Y %H:%M:%S") if a.get(
+            submit_on=datetime.datetime.strptime(
+                a.get("submit_on"), "%d/%m/%Y %H:%M:%S") if a.get("submit_on") else None,
+            description=a.get("description"),
+            approve_dmp_user_id=a.get("approve_dmp_user_id", 1) if a.get(
+                "approve_dmp_user_id", 1).strip() else None,
+            approve_on=datetime.datetime.strptime(a.get("approve_on"), "%d/%m/%Y %H:%M:%S") if a.get(
                 "approve_on") else None,
-            approve_result = a.get("approve_result"),
-            answer = a.get("answer"),
-            created_on = datetime.datetime.strptime(a.get("created_on"), "%d/%m/%Y %H:%M:%S") if a.get(
+            approve_result=a.get("approve_result"),
+            answer=a.get("answer"),
+            created_on=datetime.datetime.strptime(a.get("created_on"), "%d/%m/%Y %H:%M:%S") if a.get(
                 "created_on") else None,
-            changed_on = datetime.datetime.strptime(a.get("changed_on"), "%d/%m/%Y %H:%M:%S") if a.get(
+            changed_on=datetime.datetime.strptime(a.get("changed_on"), "%d/%m/%Y %H:%M:%S") if a.get(
                 "changed_on") else None,
-            form_type = a.get("form_type"),
+            form_type=a.get("form_type"),
             # finish = a.get("finish"),
             # result = a.get("result"),
         )
         new_form.save()
 
 
-
-@manager.option("-id",dest="pid")
+@manager.option("-id", dest="pid")
 def test_per(pid):
     from dmp.api.form import form_permission
     res = form_permission(pid)
     print(res)
 
 
-
 @manager.option('-n', '-dmp_username', dest='dmp_username')
 @manager.option('-r', '-real_name', dest='real_name')
 @manager.option('-p', '-passwd', dest='passwd')
 @manager.option('-e', '-email', dest='email')
-def createsuperuser(dmp_username, real_name, passwd, email):
+def csu(dmp_username, real_name, passwd, email):
     """创建管理员用户"""
     from dmp.models import Users, Groups
     from dmp.utils.ep_data import EnvelopedData
@@ -162,10 +165,11 @@ def createsuperuser(dmp_username, real_name, passwd, email):
 
     db_user_count = Users.query.count()
     if db_user_count == 0:
-        user = Users(dmp_username=dmp_username, real_name=real_name, password=passwd, email=email)
+        user = Users(dmp_username=dmp_username,
+                     real_name=real_name, password=passwd, email=email)
         rootgroup = Groups.query.filter(Groups.id == 1).first()
         user.dmp_group_id = 1
-        user.leader_dmp_user_id = None
+        # user.leader_dmp_user_id = None
         user.confirmed = True
         db.session.add(user)
         db.session.commit()

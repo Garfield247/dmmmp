@@ -30,7 +30,7 @@ def register(desc):
     '''
     说明:用户注册及超级管理员单一添加用户接口
     参数:dmp_username,real_name,password,email;说明:客户端请求参数信息,数据类型:JSON
-    返回值:成功与失败返回对应的状态码及提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
+    返回值:成功与失败返回对应的状态码及提示信息,数据类型:JSON,数据格式:{'msg':'pass','results':null,'status':xxx}
     '''
     try:
         user_obj = Users.query.filter_by(id=1).first()
@@ -50,7 +50,8 @@ def register(desc):
                      email=email, leader_dmp_user_id=1)
         res_token = PuttingData.get_obj_data(Users, auth_token)
         if auth_token != None and isinstance(res_token, dict):
-            res = PuttingData.root_add_user(data, res_token, user, dmp_username, real_name)
+            res = PuttingData.root_add_user(
+                data, res_token, user, dmp_username, real_name)
             # 返回字典-管理员单一添加成功
             if isinstance(res, dict):
                 return resp_hanlder(code=0, msg=res)
@@ -77,7 +78,7 @@ def activate(desc):
     '''
     说明:用户邮箱激活接口
     参数:Authorization,说明:邮件生成的客户端标识,通过json传入,数据类型:JSON
-    返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
+    返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'pass','results':null,'status':xxx}
     '''
     try:
         # 激活邮箱--注册时激活、token失效或者忘记导致未激活
@@ -101,7 +102,7 @@ def login(desc):
     '''
     说明:用户登陆接口
     参数:Authorization,dmp_username,email,password,说明:用户可选择用户名或邮箱登录,数据类型:JSON
-    返回值:成功返回状态码、对应提示信息和客户端标识token,数据类型:JSON,数据格式:{'msg':'...','results':'xxx.sss.ccc','status':1003}
+    返回值:成功返回状态码、对应提示信息和客户端标识token,数据类型:JSON,数据格式:{'msg':'pass','results':'xxx.sss.ccc','status':1003}
     '''
     if request.method == 'POST':
         try:
@@ -109,7 +110,8 @@ def login(desc):
             email = data.get('email')
             dmp_username = data.get('dmp_username')
             if dmp_username and not email:
-                user = Users.query.filter(Users.dmp_username == dmp_username).first()
+                user = Users.query.filter(
+                    Users.dmp_username == dmp_username).first()
                 r = LoginVerify.login_username_verify_init(user)
                 if r == True:
                     auth_token = user.encode_auth_token()
@@ -142,7 +144,7 @@ def forgetpwd(desc):
     '''
      说明:用户找回密码接口
      参数:email,说明:用户忘记密码的邮箱，数据类型:JSON
-     返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
+     返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'pass','results':null,'status':xxx}
      '''
     if request.method == 'POST':
         try:
@@ -160,7 +162,7 @@ def changepwd(desc):
     '''
      说明:用户重设密码接口
      参数:Authorization,newpassword,说明:重置密码生成的标识token及新密码,都通过json传入，数据类型:JSON
-     返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
+     返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'pass','results':null,'status':xxx}
      '''
     if request.method == 'PUT':
         try:
@@ -181,7 +183,7 @@ def ulist(desc):
     '''
      说明:获取用户列表接口,管理员显示所有用户,教师显示直属管理者是自己的用户
      参数:Authorization,说明:用户登录标识token，数据类型:String
-     返回值:成功返回状态码、对应提示信息及用户列表,数据类型:JSON,数据格式:{'msg':'...','results':[{'x':'x'},..'],'status':xxx}
+     返回值:成功返回状态码、对应提示信息及用户列表,数据类型:JSON,数据格式:{'msg':'pass','results':[{'x':'x'},..'],'status':xxx}
      '''
     if request.method == 'GET':
         # 获取用户列表
@@ -190,24 +192,28 @@ def ulist(desc):
             res = PuttingData.get_obj_data(Users, auth_token)
             # 超级管理员显示所有的用户
             if res.get('id') == 1:
-                all_user_obj_list = Users.query.filter(Users.is_deleted == 0).all()
-                new_user_obj_dict_list = EnvelopedData.ulist(all_user_obj_list, res=None)
+                all_user_obj_list = Users.query.filter(
+                    Users.is_deleted == 0).all()
+                new_user_obj_dict_list = EnvelopedData.ulist(
+                    all_user_obj_list, res=None)
                 return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
             # 普通管理员只显示管理员级别以下的所有用户(teacher/student或者一些属于新添加用户组的用户等)，
             # 即只拥有用户管理或用户组管理(理论上，实际不可能单独拥有用户组管理权限)之一的权限
             if res.get('dmp_group_id') == 1 and res.get('id') != 1:
                 # 新添加用户组的所有用户对象
                 add_user_obj = Users.query.filter(
-                                    Users.dmp_group_id != 1,
-                                    Users.dmp_group_id != 2,
-                                    Users.dmp_group_id != 3).all()
-                user_dict = EnvelopedData.build_data_structures_ulist(add_user_obj)
+                    Users.dmp_group_id != 1,
+                    Users.dmp_group_id != 2,
+                    Users.dmp_group_id != 3).all()
+                user_dict = EnvelopedData.build_data_structures_ulist(
+                    add_user_obj)
                 show_user_list = []
                 for k, v in user_dict.items():
                     is_show = EnvelopedData.estimate_classify(v)
                     # 新添加的用户组 没有同时 拥有用户管理和用户组管理权限，则普通管理员显示
                     if is_show != 1:
-                        add_show_user_obj = Users.query.filter(Users.id == k, Users.is_deleted == 0).first()
+                        add_show_user_obj = Users.query.filter(
+                            Users.id == k, Users.is_deleted == 0).first()
                         if add_show_user_obj == None:
                             continue
                         if add_show_user_obj:
@@ -220,7 +226,8 @@ def ulist(desc):
                     or_((Users.dmp_group_id == 2), (Users.dmp_group_id == 3))).all()
                 # 将默认初始化的可以展示的用户和新添加判断后可以展示的用户 相加
                 all_user_obj_list = all_user_obj_list + show_user_list
-                new_user_obj_dict_list = EnvelopedData.ulist(all_user_obj_list, res=None)
+                new_user_obj_dict_list = EnvelopedData.ulist(
+                    all_user_obj_list, res=None)
 
                 return resp_hanlder(code=3001, msg=RET.alert_code[3001], result=new_user_obj_dict_list)
             # 教师登录，只显示直属管理者是自己的学生,且排除逻辑删除的学生
@@ -228,17 +235,19 @@ def ulist(desc):
             if res.get('dmp_group_id') == 2:
                 # 新添加用户组的所有用户对象
                 add_user_obj = Users.query.filter(
-                                    Users.dmp_group_id != 1,
-                                    Users.dmp_group_id != 2,
-                                    Users.dmp_group_id != 3).all()
-                user_dict = EnvelopedData.build_data_structures_ulist(add_user_obj)
+                    Users.dmp_group_id != 1,
+                    Users.dmp_group_id != 2,
+                    Users.dmp_group_id != 3).all()
+                user_dict = EnvelopedData.build_data_structures_ulist(
+                    add_user_obj)
                 show_child_user_list = []
                 for k, v in user_dict.items():
                     is_show = EnvelopedData.estimate_classify(v)
                     # 新添加的用户组 同时没有 拥有用户管理和用户组管理权限，则教师显示
                     # 相当于is_show==3,先判断是属于学生用户组类别
                     if is_show != 1 and is_show != 2 and is_show != 4:
-                        add_show_user_obj = Users.query.filter(Users.id == k, Users.is_deleted == 0).first()
+                        add_show_user_obj = Users.query.filter(
+                            Users.id == k, Users.is_deleted == 0).first()
                         if add_show_user_obj == None:
                             continue
                         if add_show_user_obj.leader_dmp_user_id == res.get('id'):
@@ -253,7 +262,8 @@ def ulist(desc):
                     Users.leader_dmp_user_id == res['id'],
                     Users.is_deleted == 0).all()
                 all_students_list = all_students_list + show_child_user_list
-                new_stu_obj_dict_list = EnvelopedData.ulist(all_students_list, res)
+                new_stu_obj_dict_list = EnvelopedData.ulist(
+                    all_students_list, res)
                 # 教师类用户组登录时，如果超级管理员将当前登录用户的直属领导划分为自己，则展示页不展示自己
                 for user_obj in new_stu_obj_dict_list:
                     if user_obj.get('dmp_username') == res.get('dmp_username'):
@@ -279,7 +289,8 @@ def ulist(desc):
                         Users.is_deleted == 0,
                         Users.dmp_group_id != 1,
                         Users.dmp_group_id != res.get('dmp_group_id')).all()
-                    new_user_obj_dict_list = EnvelopedData.ulist(all_user_obj_list, res=None)
+                    new_user_obj_dict_list = EnvelopedData.ulist(
+                        all_user_obj_list, res=None)
                     g = EnvelopedData.glist(new_user_obj_dict_list)
                     # 进行新添用户组的is_show判断
                     for u in g:
@@ -298,7 +309,8 @@ def ulist(desc):
                         Users.dmp_group_id != 1,
                         Users.dmp_group_id != 2,
                         Users.dmp_group_id != res.get('dmp_group_id')).all()
-                    new_user_obj_dict_list = EnvelopedData.ulist(all_user_list, res)
+                    new_user_obj_dict_list = EnvelopedData.ulist(
+                        all_user_list, res)
                     g = EnvelopedData.glist(new_user_obj_dict_list)
                     for u in g:
                         u_p = u.get('u_group_permission')
@@ -329,7 +341,7 @@ def info(desc):
     '''
      说明:获取用户资料接口
      参数:Authorization,dmp_user_id,说明:没有dmp_user_id默认返回当前用户信息,有dmp_user_id返回指定id的用户信息，数据类型:JSON
-     返回值:成功返回状态码、对应提示信息及用户资料信息,数据类型:JSON,数据格式:{'msg':'...','results':{'x':'x'},'status':xxx}
+     返回值:成功返回状态码、对应提示信息及用户资料信息,数据类型:JSON,数据格式:{'msg':'pass','results':{'x':'x'},'status':xxx}
      '''
     if request.method == 'GET':
         # 默认返回当前用户信息，若传dmp_user_id参数，则返回指定id的用户信息
@@ -342,7 +354,8 @@ def info(desc):
             if data == None:
                 # 当前用户
                 current_obj = Users.query.filter(Users.id == res['id']).first()
-                dmp_group_name = Groups.query.filter(Groups.id == res['dmp_group_id']).first().dmp_group_name
+                dmp_group_name = Groups.query.filter(
+                    Groups.id == res['dmp_group_id']).first().dmp_group_name
                 # 当前用户所对应的用户组
                 u_group = current_obj.groups
                 ret = EnvelopedData.info_s2_data(u_group, res, dmp_group_name)
@@ -353,44 +366,51 @@ def info(desc):
                     or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
                 # 判断属于新添加用户组的用户，如果他们的用户组的is_show=1或者is_show=2，则append进入
                 add_user_list = Users.query.filter(
-                                   Users.is_deleted == 0,
-                                   Users.dmp_group_id != 1,
-                                   Users.dmp_group_id != 2,
-                                   Users.dmp_group_id != 3).all()
-                user_dict = EnvelopedData.build_data_structures_ulist(add_user_list)
+                    Users.is_deleted == 0,
+                    Users.dmp_group_id != 1,
+                    Users.dmp_group_id != 2,
+                    Users.dmp_group_id != 3).all()
+                user_dict = EnvelopedData.build_data_structures_ulist(
+                    add_user_list)
                 show_class_root_teacher_list = []
                 for k, v in user_dict.items():
                     is_show = EnvelopedData.estimate_classify(v)
                     if is_show == 1 or is_show == 2:
-                        add_show_user_obj = Users.query.filter(Users.id == k).first()
+                        add_show_user_obj = Users.query.filter(
+                            Users.id == k).first()
                         show_class_root_teacher_list.append(add_show_user_obj)
                 user_obj_list = user_obj_list + show_class_root_teacher_list
                 new_res = EnvelopedData.info_s1_data(user_obj_list, ret)
                 return resp_hanlder(code=3002, msg=RET.alert_code[3002], result=new_res)
 
             dmp_user_id = data.get('dmp_user_id')
-            get_user_info_obj = Users.query.filter(Users.id == dmp_user_id).first()
+            get_user_info_obj = Users.query.filter(
+                Users.id == dmp_user_id).first()
             get_user_info_dict = get_user_info_obj.user_to_dict()
             u_group = get_user_info_obj.groups
-            dmp_group_name = Groups.query.filter(Groups.id == get_user_info_dict['dmp_group_id']).first().dmp_group_name
-            ret = EnvelopedData.info_s2_data(u_group, get_user_info_dict, dmp_group_name)
+            dmp_group_name = Groups.query.filter(
+                Groups.id == get_user_info_dict['dmp_group_id']).first().dmp_group_name
+            ret = EnvelopedData.info_s2_data(
+                u_group, get_user_info_dict, dmp_group_name)
 
             # 展示所有管理员及教师
             user_obj_list = Users.query.filter(
-                            Users.is_deleted == 0,
-                            or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
+                Users.is_deleted == 0,
+                or_((Users.dmp_group_id == 1), (Users.dmp_group_id == 2))).all()
             # 判断属于新添加用户组的用户，如果他们的用户组的is_show=1或者is_show=2，则append进入
             add_user_list = Users.query.filter(
                 Users.is_deleted == 0,
                 Users.dmp_group_id != 1,
                 Users.dmp_group_id != 2,
                 Users.dmp_group_id != 3).all()
-            user_dict = EnvelopedData.build_data_structures_ulist(add_user_list)
+            user_dict = EnvelopedData.build_data_structures_ulist(
+                add_user_list)
             show_class_root_teacher_list = []
             for k, v in user_dict.items():
                 is_show = EnvelopedData.estimate_classify(v)
                 if is_show == 1 or is_show == 2:
-                    add_show_user_obj = Users.query.filter(Users.id == k).first()
+                    add_show_user_obj = Users.query.filter(
+                        Users.id == k).first()
                     show_class_root_teacher_list.append(add_show_user_obj)
             user_obj_list = user_obj_list + show_class_root_teacher_list
             new_ret = EnvelopedData.info_s1_data(user_obj_list, ret)
@@ -405,7 +425,7 @@ def icon(desc):
     '''
      说明:修改用户头像接口
      参数:Authorization,说明:修改指定用户的头像信息，数据类型:JSON
-     返回值:成功返回状态码、对应提示信息及头像地址,数据类型:JSON,数据格式:{'msg':'...','results':'http://...','status':xxx}
+     返回值:成功返回状态码、对应提示信息及头像地址,数据类型:JSON,数据格式:{'msg':'pass','results':'http://pass','status':xxx}
      '''
     if request.method == 'POST':
         try:
@@ -444,7 +464,7 @@ def changeprofile(desc):
      参数:Authorization,dmp_user_id,password,email,confirmed,dmp_group_id,leader_dmp_user_id,
           说明:指定用户标识token,没有dmp_user_id默认修改当前用户信息,有dmp_user_id修改指定id的用户信息，email为用户邮箱,
           confirmed为用户状态是否激活,dmp_group_id为用户所属组,leader_dmp_user_id为用户所属直属领导者,数据类型:JSON
-     返回值:成功返回状态码、对应提示信息及修改后的用户资料信息,数据类型:JSON,数据格式:{'msg':'...','results':{'x':'x'},'status':xxx}
+     返回值:成功返回状态码、对应提示信息及修改后的用户资料信息,数据类型:JSON,数据格式:{'msg':'pass','results':{'x':'x'},'status':xxx}
      '''
     if request.method == 'PUT':
         # + try
@@ -482,7 +502,8 @@ def changeprofile(desc):
                         return resp_hanlder(code=1015, msg=RET.alert_code[1015])
                     # 获取当前登录用户信息(同时修改4个参数信息-新邮箱需要重新发送邮箱校验)，并进行修改--root、teacher、student都可
                     else:
-                        ret = EnvelopedData.edit_private_info(current_obj, email, passwd, dmp_username, real_name)
+                        ret = EnvelopedData.edit_private_info(
+                            current_obj, email, passwd, dmp_username, real_name)
                         if isinstance(ret, str):
                             return resp_hanlder(code=0, msg=ret)
                         else:
@@ -490,19 +511,24 @@ def changeprofile(desc):
                 EnvelopedData.changeprofile(current_obj, email, passwd, dmp_group_id,
                                             confirmed, leader_dmp_user_id, dmp_username, real_name)
                 # 构建返回数据:包括用户对应的用户组及用户组权限
-                select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
+                select_group_obj = Groups.query.filter(
+                    Groups.id == dmp_group_id).first()
                 ret_obj = Users.query.filter(Users.id == res['id']).first()
                 ret_obj_dict = ret_obj.user_to_dict()
-                ret_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, ret_obj_dict)
+                ret_obj_dict = EnvelopedData.p_changeprofile(
+                    select_group_obj, ret_obj_dict)
                 return resp_hanlder(code=3004, msg=RET.alert_code[3004], result=ret_obj_dict)
 
-            choose_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
+            choose_user_obj = Users.query.filter(
+                Users.id == dmp_user_id).first()
             choose_user_obj_dict = choose_user_obj.user_to_dict()
             # ori_dmp_group_id = choose_user_obj_dict.get('dmp_group_id')
             EnvelopedData.changeprofile(choose_user_obj, email, passwd, dmp_group_id,
                                         confirmed, leader_dmp_user_id, dmp_username, real_name)
-            select_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
-            choose_user_obj_dict = EnvelopedData.p_changeprofile(select_group_obj, choose_user_obj_dict)
+            select_group_obj = Groups.query.filter(
+                Groups.id == dmp_group_id).first()
+            choose_user_obj_dict = EnvelopedData.p_changeprofile(
+                select_group_obj, choose_user_obj_dict)
             return resp_hanlder(code=3006, msg=RET.alert_code[3006], result=choose_user_obj_dict)
 
         except Exception as err:
@@ -515,7 +541,7 @@ def frozen_user(desc):
     '''
      说明:冻结用户接口
      参数:Authorization,dmp_user_id,说明:指定用户标识token,没有dmp_user_id默认指定冻结自己,有dmp_user_id冻结指定id的用户,将confirmed改为false,数据类型:JSON
-     返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
+     返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'pass','results':null,'status':xxx}
      '''
     if request.method == 'POST':
         data = request.json
@@ -524,10 +550,12 @@ def frozen_user(desc):
         try:
             # 没有dmp_user_id，默认冻结自己
             if data == None:
-                frozen_user_obj = Users.query.filter(Users.id == res['id']).first()
+                frozen_user_obj = Users.query.filter(
+                    Users.id == res['id']).first()
             else:
                 dmp_user_id = data.get('dmp_user_id')
-                frozen_user_obj = Users.query.filter(Users.id == dmp_user_id).first()
+                frozen_user_obj = Users.query.filter(
+                    Users.id == dmp_user_id).first()
             # 超级管理员不可以冻结
             if frozen_user_obj.id == 1:
                 return resp_hanlder(code=4003, msg=RET.alert_code[4003])
@@ -543,7 +571,7 @@ def udel(desc):
     '''
     说明:删除用户接口
     参数:Authorization,dmp_user_id,说明:指定用户标识token,超级管理员无法删除,根据dmp_user_id删除指定的用户信息,数据类型:JSON
-    返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':xxx}
+    返回值:成功返回状态码及对应提示信息,数据类型:JSON,数据格式:{'msg':'pass','results':null,'status':xxx}
     '''
     if request.method == 'DELETE':
         try:
@@ -563,11 +591,14 @@ def udel(desc):
             else:
                 # 逻辑删除，并改变用户名(加了时间戳)
                 del_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                del_time = del_time.split(' ')[0] + "-" + del_time.split(' ')[1]
+                del_time = del_time.split(
+                    ' ')[0] + "-" + del_time.split(' ')[1]
                 if '[' and ']' not in del_user_obj.dmp_username:
                     del_user_obj.is_deleted = True
-                    del_user_obj.dmp_username = del_user_obj.dmp_username + '[DELETED ON:' + del_time + ']'
-                    del_user_obj.email = del_user_obj.email + '[DELETED ON:' + del_time + ']'
+                    del_user_obj.dmp_username = del_user_obj.dmp_username + \
+                        '[DELETED ON:' + del_time + ']'
+                    del_user_obj.email = del_user_obj.email + \
+                        '[DELETED ON:' + del_time + ']'
                     db.session.commit()
                 else:
                     dn = del_user_obj.dmp_username.split('[')[0]
@@ -577,15 +608,17 @@ def udel(desc):
         except Exception as err:
             return resp_hanlder(code=999, msg=str(err))
 
-@user.route("/secretkey",methods=["GET"])
+
+@user.route("/secretkey", methods=["GET"])
 def get_secret_key():
-    ...
+    pass
+
 
 @user.before_request
 def before_request():
     '''
     说明:钩子函数-权限校验以及token传入是否正确及有效性校验
     参数:无
-    返回值:有权限访问url通过,没权限访问返回提示信息,数据类型:JSON,数据格式:{'msg':'...','results':null,'status':301}
+    返回值:有权限访问url通过,没权限访问返回提示信息,数据类型:JSON,数据格式:{'msg':'pass','results':null,'status':301}
     '''
     rbac_middleware()

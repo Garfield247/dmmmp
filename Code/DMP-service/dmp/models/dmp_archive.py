@@ -3,6 +3,7 @@
 # @Date    : 2020/8/19
 # @Author  : SHTD
 
+import datetime
 from dmp.extensions import db
 from dmp.models import DMPModel
 
@@ -32,8 +33,9 @@ class DashboardArchive(db.Model, DMPModel):
         return False
 
     def delete(self):
-        form .dmp_dashboard import Dashboard
-        db.session.query(Dashboard).filter(Dashboard.upper_dmp_dashboard_archive_id=self.id).delete()
+        from .dmp_dashboard import Dashboard
+        db.session.query(Dashboard).filter(
+            Dashboard.upper_dmp_dashboard_archive_id == self.id).delete()
         db.session.delete(self)
         db.session.commit()
 

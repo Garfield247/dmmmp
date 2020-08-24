@@ -13,7 +13,7 @@ class DataServiceParameter(db.Model, DMPModel):
     """数据服务表"""
     __tablename__ = 'dmp_data_service_parameter'
     id = db.Column(db.Integer, primary_key=True,
-                   autoincrement=True, comment='看板ID')
+                   autoincrement=True, comment='参数ID')
     dmp_data_service_id = db.Column(
         db.Integer, nullable=False, comment='数据服务ID')
     parameter_name = db.Column(
