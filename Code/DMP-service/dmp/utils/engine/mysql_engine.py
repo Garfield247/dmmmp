@@ -3,6 +3,7 @@
 # @Date    : 2020/5/11
 # @Author  : SHTD
 
+import re
 import pymysql
 from flask import current_app
 
@@ -14,7 +15,8 @@ class MysqlEngine():
         try:
             print(host)
             # current_app.logger.info(host, port, user, passwd, db)
-            self.conn = pymysql.Connect(host=host, port=port, user=user, passwd=passwd, db=db)
+            self.conn = pymysql.Connect(
+                host=host, port=port, user=user, passwd=passwd, db=db)
             current_app.logger.info(self.conn.server_version)
         except Exception as e:
             current_app.logger.error(e)
@@ -55,6 +57,15 @@ class MysqlEngine():
     def execsql(self, sql):
         cursor = self.conn.cursor()
         cursor.execute(sql)
+
+    def exec_query_sql(self, sql):
+        if bool(re.match(r"^select ", sql, re.I)):
+            cursor = self.conn.cursor()
+            cursor.execute(sql)
+            res = cursor.fetchall()
+            return True, res
+        else:
+            return False, None
 
     def retrieve(self, table_name, limit=100):
         cursor = self.conn.cursor()

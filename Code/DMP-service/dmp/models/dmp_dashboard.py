@@ -52,3 +52,12 @@ class Dashboard(db.Model, DMPModel):
                 return archive_name
 
         return "-"
+
+    @property
+    def _json_tmp(self):
+        _d = {
+            "created_dmp_user_name": self.created_dmp_user_name,
+            "changed_dmp_user_name": self.changed_dmp_user_name,
+            "upper_dmp_dashboard_archive_name": upper_dmp_dashboard_archive_name,
+        }
+        return _d
