@@ -7,43 +7,52 @@ from flask import Blueprint
 
 bi = Blueprint("bi", __name__)
 
-@bi.route("/dashboards",methods=["GET"])
+
+@bi.route("/dashboards", methods=["GET"])
 def get_dashboards_and_archives():
-    ...
+    pass
 
-@bi.route("/dashboards",methods=["POST"])
+
+@bi.route("/dashboards", methods=["POST"])
 def add_dashboard():
-    ...
+    pass
 
-@bi.route("/dashboards/<id:int>",methods=["GET"])
+
+@bi.route("/dashboards/<int:id>", methods=["GET"])
 def get_dashboard_by_id():
-    ...
+    pass
 
-@bi.route("/dashboards/<id:int>",methods=["PUT"])
+
+@bi.route("/dashboards/<int:id>", methods=["PUT"])
 def update_dashboard_by_id():
-    ...
+    pass
 
-@bi.route("/dashboards/<id:int>",methods=["DELETE"])
+
+@bi.route("/dashboards/<int:id>", methods=["DELETE"])
 def delete_dashboard_by_id():
-    ...
+    pass
 
-@bi.route("/archives",methods=["POST"])
+
+@bi.route("/archives", methods=["POST"])
 def add_archive():
-    ...
+    pass
 
-@bi.route("/archives/<id:int>",methods=["PUT"])
+
+@bi.route("/archives/<int:id>", methods=["PUT"])
 def update_archive_by_id():
-    ...
+    pass
 
-@bi.route("/archives/<id:int>",methods=["DELETE"])
+
+@bi.route("/archives/<int:id>", methods=["DELETE"])
 def delete_archive_by_id():
-    ...
+    pass
 
 
-@bi.route("/charts",methods=["POST"])
+@bi.route("/charts", methods=["POST"])
 def add_chart():
-    ...
+    pass
 
-@bi.route("/charts/<id:int>",methods=["PUT"])
+
+@bi.route("/charts/<int:id>", methods=["PUT"])
 def update_charts_by_id():
-    ...
+    pass

@@ -12,14 +12,15 @@ from dmp.utils.engine import auto_connect
 dbtable = Blueprint("dbtable", __name__)
 
 
-@dbtable.route("/info/", methods=["GET"], defaults={"desc": {"interface_name": "获取数据表信息","is_permission": True,"permission_belong": 0}})
+@dbtable.route("/info/", methods=["GET"], defaults={"desc": {"interface_name": "获取数据表信息", "is_permission": True, "permission_belong": 0}})
 def info(desc):
     if request.method == "GET":
         try:
             dmp_data_table_id = request.json.get("dmp_data_table_id")
             dmp_case_id = request.json.get("dmp_case_id")
             if dmp_case_id and not dmp_data_table_id:
-                dbtables = [dtb.__json__() for dtb in DataTable.query.filter_by(dmp_case_id=dmp_case_id).all()]
+                dbtables = [dtb.__json__() for dtb in DataTable.query.filter_by(
+                    dmp_case_id=dmp_case_id).all()]
                 # current_app.logger.info(dbtables)
                 return resp_hanlder(result=dbtables)
             elif dmp_data_table_id and not dmp_case_id:
@@ -30,7 +31,7 @@ def info(desc):
             return resp_hanlder(err=err)
 
 
-@dbtable.route("/all/", methods=["GET"], defaults={"desc": {"interface_name": "获取所有数据表信息","is_permission": True,"permission_belong": 0}})
+@dbtable.route("/all/", methods=["GET"], defaults={"desc": {"interface_name": "获取所有数据表信息", "is_permission": True, "permission_belong": 0}})
 def all(desc):
     if request.method == "GET":
         try:
@@ -60,7 +61,7 @@ def post(dmp_data_table_name,
     return new_db_table.__json__()
 
 
-@dbtable.route("/put/", methods=["PUT"], defaults={"desc": {"interface_name": "修改数据表信息","is_permission": True,"permission_belong": 1}})
+@dbtable.route("/put/", methods=["PUT"], defaults={"desc": {"interface_name": "修改数据表信息", "is_permission": True, "permission_belong": 1}})
 def put(desc):
     if request.method == "PUT":
         auth_token = request.headers.get('Authorization')
@@ -74,7 +75,8 @@ def put(desc):
             if current_user_id == 1 or current_user_id == dmp_user_id or Users.get(
                     dmp_user_id).leader_dmp_user_id == current_user_id:
                 if "dmp_data_table_name" in dbt_info.keys():
-                    dbt.dmp_data_table_name = dbt_info.get("dmp_data_table_name")
+                    dbt.dmp_data_table_name = dbt_info.get(
+                        "dmp_data_table_name")
                 if "description" in dbt_info.keys():
                     dbt.description = dbt_info.get("description")
                 dbt.put()
@@ -85,7 +87,7 @@ def put(desc):
             return resp_hanlder(code=404)
 
 
-@dbtable.route("/column/", methods=["GET"], defaults={"desc": {"interface_name": "获取数据表的列信息","is_permission": True,"permission_belong": 0}})
+@dbtable.route("/column/", methods=["GET"], defaults={"desc": {"interface_name": "获取数据表的列信息", "is_permission": True, "permission_belong": 0}})
 def column(desc):
     if request.method == "GET":
         try:
@@ -102,13 +104,15 @@ def column(desc):
             db_username = database_info.db_username
             db_passwd = database_info.db_passwd
 
-            colums4sdb = DataTableColumn.query.filter_by(dmp_data_table_id=dmp_data_table_id)
+            colums4sdb = DataTableColumn.query.filter_by(
+                dmp_data_table_id=dmp_data_table_id)
             column4sdb_array = []
             current_app.logger.info(colums4sdb.count())
             if colums4sdb.count() > 0:
                 column4sdb_array = [col.__json__() for col in colums4sdb.all()]
             columns4db = []
-            columns4db = auto_connect(data_table_info.dmp_database_id).columns(db_table_name)
+            columns4db = auto_connect(
+                db_id=data_table_info.dmp_database_id).columns(db_table_name)
             # if db_type == 1:
             #     # hive
             #     pass
@@ -138,7 +142,7 @@ def column(desc):
             return resp_hanlder(code=999, err=err)
 
 
-@dbtable.route("/columnsetting/", methods=["POST"], defaults={"desc": {"interface_name": "数据表的数据列设置","is_permission": True,"permission_belong": 0}})
+@dbtable.route("/columnsetting/", methods=["POST"], defaults={"desc": {"interface_name": "数据表的数据列设置", "is_permission": True, "permission_belong": 0}})
 def columnsetting(desc):
     if request.method == "POST":
         columns_info = request.json
@@ -178,7 +182,7 @@ def columnsetting(desc):
         return resp_hanlder(result="OK!")
 
 
-@dbtable.route("/retrieve/", methods=["GET"], defaults={"desc": {"interface_name": "数据查询","is_permission": True,"permission_belong": 0}})
+@dbtable.route("/retrieve/", methods=["GET"], defaults={"desc": {"interface_name": "数据查询", "is_permission": True, "permission_belong": 0}})
 def retrieve(desc):
     if request.method == "GET":
         retrieve_info = request.json
@@ -192,7 +196,7 @@ def retrieve(desc):
         return resp_hanlder(result=data)
 
 
-@dbtable.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除数据表","is_permission": True,"permission_belong": 1}})
+@dbtable.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除数据表", "is_permission": True, "permission_belong": 1}})
 def dbtdel(desc):
     if request.method == "DELETE":
         try:
@@ -202,7 +206,8 @@ def dbtdel(desc):
             if del_data_table_id:
                 del_data_table = DataTable.get(del_data_table_id)
                 if del_data_table:
-                    is_user = Users.get(DataTable.get(del_data_table_id).dmp_user_id).id == current_user_id
+                    is_user = Users.get(DataTable.get(
+                        del_data_table_id).dmp_user_id).id == current_user_id
                     is_user_leader = Users.get(
                         DataTable.get(del_data_table_id).dmp_user_id).leader_dmp_user_id == current_user_id
                     is_admin = Users.get(current_user_id).dmp_group_id == 1

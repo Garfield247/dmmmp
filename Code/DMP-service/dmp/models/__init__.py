@@ -3,6 +3,8 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 
+
+
 from datetime import datetime, date
 
 from sqlalchemy import inspect
@@ -78,6 +80,42 @@ class DMPModel(object):
     def __len__(self):
         return 1
 
+    @classmethod
+    def exist_item_by_id(cls, item_id):
+        if hasattr(cls, "id"):
+            item = cls.query.get(item_id)
+            if item:
+                return True
+        return False
+
+    @property
+    def changed_dmp_user_name(self):
+        from .dmp_user import Users
+        if hasattr(self, "changed_dmp_user_id"):
+            if Users.exist_item_by_id(self.changed_dmp_user_id):
+                user_name = Users.get(self.changed_dmp_user_id).dmp_username
+                return user_name
+        return "-"
+
+    @property
+    def created_dmp_user_name(self):
+        from .dmp_user import Users
+        if hasattr(self, "created_dmp_user_id"):
+            if Users.exist_item_by_id(self.created_dmp_user_id):
+                user_name = Users.get(self.created_dmp_user_id).dmp_username
+                return user_name
+        return "-"
+
+    @property
+    def _json_tmp(self):
+        _d = {}
+        if hasattr(self, "created_dmp_user_id"):
+            _d["created_dmp_user_name"] = self.created_dmp_user_name,
+        if hasattr(self, "changed_dmp_user_id"):
+            _d["changed_dmp_user_name"] = self.changed_dmp_user_name,
+
+        return _d
+
 
 class JSONEncoder(_json.JSONEncoder):
     def default(self, o):
@@ -86,17 +124,26 @@ class JSONEncoder(_json.JSONEncoder):
         return _json.JSONEncoder.default(self, o)
 
 
-from .dmp_case import Case
-from .dmp_data_table import DataTable
-from .dmp_data_table_column import DataTableColumn
-from .dmp_data_table_column_range import DataTableColumnRange
-from .dmp_database import Database
-from .dmp_form_add_data_table import FormAddDataTable
-from .dmp_form_download import FormDownload
-from .dmp_form_migrate import FormMigrate
-from .dmp_form_upload import FormUpload
-from .dmp_form import Forms
-from .dmp_permission import Permissions
-from .dmp_group import Groups
+from .dmp_user_dashboard import UserDashboard
+from .dmp_data_service_parameter import DataServiceParameter
+from .dmp_chart import Chart
+from .dmp_user_data_service import UserDataService
+from .dmp_data_service import DataService
+from .dmp_archive_star import ArchiveStar
+from .dmp_dashboard import Dashboard
+from .dmp_archive import DashboardArchive
 from .dmp_rights import Rights
+from .dmp_group import Groups
+from .dmp_permission import Permissions
+from .dmp_form import Forms
+from .dmp_form_upload import FormUpload
+from .dmp_form_migrate import FormMigrate
+from .dmp_form_download import FormDownload
+from .dmp_form_add_data_table import FormAddDataTable
+from .dmp_database import Database
+from .dmp_data_table_column_range import DataTableColumnRange
+from .dmp_data_table_column import DataTableColumn
+from .dmp_data_table import DataTable
+from .dmp_case import Case
 from .dmp_user import Users
+from .dmp_saved_query import SavedQuery

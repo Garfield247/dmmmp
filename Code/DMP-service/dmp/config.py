@@ -56,8 +56,10 @@ class DevelopmentConfig(Config):
     CELERY_BROKER_URL = "redis://localhost:6379/2"
     # DB
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir, 'dmp-dev.sqlite')
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
+    # os.path.join(base_dir, 'dmp-dev.sqlite')
 
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:shtd123.@192.168.3.87:3306/dmpdb?charset=utf8"
     # UPLOADED
     UPLOADED_PATH = os.path.join(base_dir, "static/upload")
 
@@ -82,7 +84,8 @@ class TestingConfig(Config):
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.shtdtech.com'
     EMAIL_PORT = 25
     EMAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'dmp.service@shtdtech.com'
+    MAIL_USERNAME = os.environ.get(
+        'MAIL_USERNAME') or 'dmp.service@shtdtech.com'
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'shtd.123'
     # Celery
     CELERY_RESULT_BACKEND = "redis://192.168.3.87:6379/1"
@@ -92,12 +95,14 @@ class TestingConfig(Config):
     # UPLOADED
     UPLOADED_PATH = os.environ.get("DMP_UPLOAD_PATH") or "/home/dmp/dmp_upload"
     # UPLOADED_PATH = os.path.join(base_dir, "static/upload")
-    DOWNLOAD_PATH = os.environ.get("DMP_DOWNLOAD_PATH") or "/home/dmp/dmp_download"
+    DOWNLOAD_PATH = os.environ.get(
+        "DMP_DOWNLOAD_PATH") or "/home/dmp/dmp_download"
 
     # DataX
     DATAX_HOME = os.environ.get("DATAX_HOME") or "/home/dmp/datax"
     DATAX_JOB_PATH = os.environ.get("DATAX_JOB_PATH") or "/home/dmp/dmp_job"
-    DATAX_LOG_PATH = os.environ.get("DATAX_LOG_PATH") or "/home/dmp/dmp_log/datax"
+    DATAX_LOG_PATH = os.environ.get(
+        "DATAX_LOG_PATH") or "/home/dmp/dmp_log/datax"
 
     # ICON_URL
     SAVE_URL = os.path.join(base_dir, "static/icon")
@@ -114,7 +119,8 @@ class ProductionConfig(Config):
     CELERY_RESULT_BACKEND = "redis://localhost:6379/1/"
     CELERY_BROKER_URL = "redis://localhost:6379/2"
     # DB
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir, 'dmp.sqlite')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
+        os.path.join(base_dir, 'dmp.sqlite')
 
 
 # 配置字典
@@ -122,5 +128,5 @@ config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
-    'default': TestingConfig,
+    'default': DevelopmentConfig,
 }

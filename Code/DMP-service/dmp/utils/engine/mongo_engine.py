@@ -11,11 +11,13 @@ class MongodbEngine():
 
     def __init__(self, host, port, user, passwd, db):
         try:
-            self.connect = pymongo.MongoClient(host=host, port=port, username=user, password=passwd)
+            self.connect = pymongo.MongoClient(
+                host=host, port=port, username=user, password=passwd)
             current_app.logger.info(self.connect.server_info())
             self.database = self.connect[db]
         except Exception as e:
-            current_app.logger.error("Connect Failed,Error Message:%s" % str(e))
+            current_app.logger.error(
+                "Connect Failed,Error Message:%s" % str(e))
 
     @property
     def tables_list(self):
@@ -26,7 +28,8 @@ class MongodbEngine():
     def columns(self, collection):
         collection_ = self.database[collection]
         column_list = [
-            {"dmp_data_table_column_name": str(k), "dmp_data_table_column_type": "Array" if type(v) == list else "string"}
+            {"dmp_data_table_column_name": str(
+                k), "dmp_data_table_column_type": "Array" if type(v) == list else "string"}
             for k, v in
             collection_.find().limit(1)[0].items() if
             k != "_id"]
@@ -34,6 +37,13 @@ class MongodbEngine():
 
     def count(self, collection):
         return int(self.database[collection].count())
+
+    def exec_query_by_param(self, collection, filters={}, projection={"_id": 0}, sort=[("_id", 1)], skip=0, limit=100):
+
+        res = self.database[collection].find(filters, projection).sort(
+            sort).skip(skip).limit(limit)
+        data = [r for r in res]
+        return data
 
     def retrieve(self, table_name, limit=100):
         collection_ = self.database[table_name]

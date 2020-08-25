@@ -14,7 +14,6 @@ from dmp.utils.rbac import rbac_middleware
 # 封装一个方法，专门用于创建Flask实例
 
 
-
 def create_app(config_name):
     # 创建应用实例
     app = Flask(__name__)
@@ -34,8 +33,9 @@ def create_app(config_name):
 
     # 返回应用实例
     return app
+
+
 # 获取配置
-config_name = os.environ.get('DMP_CONFIG') or 'testing'
+config_name = os.environ.get('DMP_CONFIG') or 'default'
 # 创建实例
 app = create_app(config_name)
-
