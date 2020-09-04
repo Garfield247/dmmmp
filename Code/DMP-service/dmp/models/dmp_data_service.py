@@ -20,7 +20,7 @@ class DataService(db.Model, DMPModel):
     api_path = db.Column(db.String(256), unique=True,
                          nullable=False, comment='API地址')
     source_dmp_data_table_id = db.Column(
-        db.Integer, nullable=False, comment='数据表ID')
+        db.Integer, comment='数据表ID')
     query_sql = db.Column(db.Text, comment='查询语句，MySQL必须项')
     query_params = db.Column(db.Text, comment='查询参数，MongoDB必须项')
     state = db.Column(db.Integer, default=0, comment='是否启用')
@@ -32,6 +32,17 @@ class DataService(db.Model, DMPModel):
         db.DateTime, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now, comment='最后修改时间')
+
+    def delete(self):
+        from dmp.models import DataServiceParameter
+        count = DataServiceParameter.query.filter_by(dmp_data_service_id=self.id).count()
+        if count > 0:
+            parameters = DataServiceParameter.query.filter_by(dmp_data_service_id=self.id)
+            parameters.delete()
+            db.session.delete(self)
+        else:
+            db.session.delete(self)
+
 
     @classmethod
     def exsit_data_service_by_name(cls, ds_name):
@@ -52,7 +63,7 @@ class DataService(db.Model, DMPModel):
         from .dmp_data_table import DataTable
         if DataTable.exist_item_by_id(self.source_dmp_data_table_id):
             data_table_name = DataTable.get(
-                self.source_dmp_data_table_id).data_table_name
+                self.source_dmp_data_table_id).db_table_name
             return data_table_name
         return "-"
 
@@ -61,6 +72,6 @@ class DataService(db.Model, DMPModel):
         _d = {
             "created_dmp_user_name": self.created_dmp_user_name,
             "changed_dmp_user_name": self.changed_dmp_user_name,
-            "source_dmp_data_table_name": source_dmp_data_table_name,
+            "source_dmp_data_table_name": self.source_dmp_data_table_name,
         }
         return _d
