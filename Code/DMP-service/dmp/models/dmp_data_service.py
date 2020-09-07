@@ -47,7 +47,26 @@ class DataService(db.Model, DMPModel):
             return True
         return False
 
+    def delete(self):
+        try:
+            from .dmp_data_service_parameter import DataServiceParameter
+            DataServiceParameter.query.filter_by(
+                dmp_data_service_id=self.id).delete()
+            db.session.delete(self)
+        except Exception as err:
+            raise err
+
     @property
+    def params(self):
+
+        from .dmp_data_service_parameter import DataServiceParameter
+        _params = DataServiceParameter.query.filter_by(
+            dmp_data_service_id=self.id).all()
+        res = [{"parameter_name": p.parameter_name, "required": bool(
+            p.required_parameter)} for p in _params]
+        return res
+
+    @ property
     def source_dmp_data_table_name(self):
         from .dmp_data_table import DataTable
         if DataTable.exist_item_by_id(self.source_dmp_data_table_id):
@@ -56,7 +75,7 @@ class DataService(db.Model, DMPModel):
             return data_table_name
         return "-"
 
-    @property
+    @ property
     def _json_tmp(self):
         _d = {
             "created_dmp_user_name": self.created_dmp_user_name,

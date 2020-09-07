@@ -25,6 +25,18 @@ class DashboardArchive(db.Model, DMPModel):
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now, comment='最后修改时间')
 
+    def save(self):
+        try:
+            self.put()
+            self.commit()
+            if self.upper_dmp_dashboard_archive_id:
+                if DashboardArchive.exist_item_by_id(self.upper_dmp_dashboard_archive_id):
+                    upper = DashboardArchive.get(self.upper_dmp_dashboard_archive_id)
+                    upper.changed_on = self.changed_on
+                    upper.save()
+        except Exception:
+            self.rollback()
+
     @classmethod
     def exsit_archive_by_name(cls, archive_name):
         item = cls.query.filter_by(dashboard_archive_name=archive_name).first()

@@ -27,6 +27,21 @@ class Dashboard(db.Model, DMPModel):
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now, comment='最后修改时间')
 
+
+    def save(self):
+        try:
+            self.put()
+            self.commit()
+            from .dmp_archive import DashboardArchive
+            if self.upper_dmp_dashboard_archive_id:
+                if DashboardArchive.exist_item_by_id(self.upper_dmp_dashboard_archive_id):
+                    upper = DashboardArchive.get(self.upper_dmp_dashboard_archive_id)
+                    upper.changed_on = self.changed_on
+                    upper.save()
+        except Exception:
+            self.rollback()
+
+
     @classmethod
     def exsit_dashboard_by_name(cls, dashboard_name):
         item = cls.query.filter_by(dmp_dashboard_name=dashboard_name).first()

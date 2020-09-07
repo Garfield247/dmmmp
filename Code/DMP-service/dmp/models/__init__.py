@@ -147,3 +147,5 @@ from .dmp_data_table import DataTable
 from .dmp_case import Case
 from .dmp_user import Users
 from .dmp_saved_query import SavedQuery
+from .dmp_dashboard_star import DashboardStar
+

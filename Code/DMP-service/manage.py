@@ -98,12 +98,18 @@ def test_datax():
 
 @manager.command
 def tests():
-    from dmp.utils.engine import auto_connect
-    t_id = 92
-    conn = auto_connect(table_id=t_id)
-    data = conn.exec_query_by_param(collection="0701_test")
-    app.logger.info(data)
+    from dmp.models import Dashboard, DashboardArchive, Chart, DataService
+    import random
+    a = DashboardArchive(
+                dashboard_archive_name = "archive%f"%random.random(),
+                created_dmp_user_id =1,
+                changed_dmp_user_id = 2,
+            )
+    a.save()
 
+    app.logger.info(a._json_tmp)
+
+    ...
 
 @manager.option("-id", dest="pid")
 def test_per(pid):
