@@ -14,8 +14,8 @@ from dmp.utils.validators.bi import Get_dashboards_and_archives_validator
 bi = Blueprint("bi", __name__)
 
 
-@bi.route("/dashboards", methods=["GET"])
-def get_dashboards_and_archives():
+@bi.route("/dashboards", methods=["GET"],defaults={"desc": {"interface_name": "查询多个文件夹和看板服务", "is_permission": True, "permission_belong": 0}})
+def get_dashboards_and_archives(desc):
     current_user_id = 1
     request_json = request.json
     valid = Get_dashboards_and_archives_validator(request_json)
