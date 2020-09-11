@@ -9,7 +9,7 @@ from flask_script import Manager, Server
 from flask_migrate import MigrateCommand
 
 from dmp import create_app
-from dmp.extensions import db
+from dmp.extensions import db,apscheduler
 
 # 创建命令起动控制对象
 
@@ -95,21 +95,13 @@ def test_datax():
     # from dmp.models import Users
     # Users.create_test_user()
 
+def func1(a,b):
+    return a+b
+
 
 @manager.command
 def tests():
-    from dmp.models import Dashboard, DashboardArchive, Chart, DataService
-    import random
-    a = DashboardArchive(
-                dashboard_archive_name = "archive%f"%random.random(),
-                created_dmp_user_id =1,
-                changed_dmp_user_id = 2,
-            )
-    a.save()
-
-    app.logger.info(a._json_tmp)
-
-    ...
+    apscheduler.add_job(id="sasss",func=func1,kwargs={"a":1,"b":2})
 
 @manager.option("-id", dest="pid")
 def test_per(pid):

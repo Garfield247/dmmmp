@@ -9,6 +9,7 @@ from flask import current_app
 
 class MongodbEngine():
 
+    type = 3
     def __init__(self, host, port, user, passwd, db):
         try:
             self.connect = pymongo.MongoClient(

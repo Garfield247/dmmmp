@@ -9,6 +9,7 @@ from pyhive import hive
 
 class HiveEngone():
 
+    type=1
     def __init__(self, host, port, user, passwd, db):
         self.db = db
         try:

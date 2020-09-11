@@ -3,13 +3,14 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 
+from datetime import datetime
 from flask import (Blueprint,
                    jsonify,
                    current_app
                    )
 from dmp.utils.job_task import add
 from dmp.models import *
-from dmp.extensions import db
+from dmp.extensions import db,apscheduler
 
 main = Blueprint("mian", __name__)
 
@@ -31,18 +32,19 @@ def test(desc):
 #     return str(current_app.url_map)
 #
 #
-# @main.route('/testAdd', methods=["GET"], defaults={"desc": {"interface_name": "celery测试路由","is_permission": True,"permission_belong": 1}})
-# def test_add(desc):
-#     """
-#     测试相加
-#     :return:
-#     """
-#     result = add.delay(1, 2)
-#     res = result.get(timeout=1)
-#     data = {
-#         "status": 0,
-#         "msg": "success",
-#         "results": {
-#             "res": res,
-#         }}
-#     return jsonify(data)
+def say(word):
+    print(word,datetime.now())
+
+@main.route('/testAdd', methods=["GET"], defaults={"desc": {"interface_name": "celery测试路由","is_permission": True,"permission_belong": 1}})
+def test_add(desc):
+    """
+    测试相加
+    :return:
+    """
+    apscheduler.add_job(id="test02",func=say,kwargs={"word":"hello"},trigger="interval",seconds=5)
+    return "OK! "
+
+@main.route("/tasks",methods=["GET"])
+def tasks():
+    res = [str(job) for job in apscheduler.get_jobs()]
+    return {"res":res}

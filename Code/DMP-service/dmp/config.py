@@ -5,7 +5,7 @@
 
 # 通用配置
 import os
-
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 base_dir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -74,7 +74,17 @@ class DevelopmentConfig(Config):
     SAVE_URL = 'dmp/static/icon/'
     ICON_URL = 'http://192.168.3.87:7789/static/icon/'
 
-
+    JOBS = []
+    SCHEDULER_API_ENABLED = True
+    SCHEDULER_JOBSTORES = {"default": SQLAlchemyJobStore(url=SQLALCHEMY_DATABASE_URI)}
+    SCHEDULER_TIMEZONE = "UTC"
+    # SCHEDULER_EXECUTORS = {
+	# 'default': {'type': 'threadpool', 'max_workers': 20}
+    # }
+    SCHEDULER_JOB_DEFAULTS = {
+        'coalesce': False,
+        'max_instances': 5
+    }
 # 测试环境
 class TestingConfig(Config):
     # Mail

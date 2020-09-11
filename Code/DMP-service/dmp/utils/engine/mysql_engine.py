@@ -10,6 +10,7 @@ from flask import current_app
 
 class MysqlEngine():
 
+    type=2
     def __init__(self, host, port, user, passwd, db):
 
         try:
