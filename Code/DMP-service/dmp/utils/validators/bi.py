@@ -1,3 +1,14 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim:fenc=utf-8
+#
+# Copyright © 2020 CatMan <garfield_lv@163.com>
+#
+# Distributed under terms of the MIT license.
+
+"""
+
+"""
 from validator import Validator, StringField, IntegerField, EnumField
 
 

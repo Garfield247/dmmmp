@@ -11,6 +11,7 @@ from flask import (Blueprint,
 from dmp.utils.job_task import add
 from dmp.models import *
 from dmp.extensions import db,apscheduler
+from dmp.utils.aps_task import task2json
 
 main = Blueprint("mian", __name__)
 
@@ -41,10 +42,16 @@ def test_add(desc):
     测试相加
     :return:
     """
-    apscheduler.add_job(id="test02",func=say,kwargs={"word":"hello"},trigger="interval",seconds=5)
+    apscheduler.add_job(id="csawad",func=say,kwargs={"word":"hello"},trigger="interval",weeks=60)
     return "OK! "
 
 @main.route("/tasks",methods=["GET"])
 def tasks():
-    res = [str(job) for job in apscheduler.get_jobs()]
+    jobs = apscheduler.get_jobs()
+    res = [task2json(job) for job in apscheduler.get_jobs()]
     return {"res":res}
+
+@main.route("/stopall",methods=["GET"])
+def stops():
+    apscheduler.delete_all_jobs()
+    return {"res":"ok"}

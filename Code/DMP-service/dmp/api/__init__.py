@@ -18,6 +18,7 @@ from .verifier import verifier
 from .index import index
 from .bi import bi
 from .dataservice import ds
+from .task import task
 
 # 蓝本配置
 DEFAULT_BLUEPRINT = (
@@ -35,6 +36,7 @@ DEFAULT_BLUEPRINT = (
     (index, "/index"),
     (bi, "/bi"),
     (ds, "/ds"),
+    (task, "/task"),
 )
 
 
