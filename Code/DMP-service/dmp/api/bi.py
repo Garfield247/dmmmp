@@ -7,7 +7,7 @@ from flask import Blueprint,request
 from sqlalchemy import literal,union,desc,exists,and_,or_
 from validator import create_validator
 from dmp.extensions import db
-from dmp.models import Dashboard, DashboardArchive,Users,DashboardStar,ArchiveStar
+from dmp.models import Users, Dashboard, DashboardArchive, Users, DashboardStar, ArchiveStar
 from dmp.utils import resp_hanlder
 from dmp.utils.validators.bi import Get_dashboards_and_archives_validator
 
@@ -16,7 +16,9 @@ bi = Blueprint("bi", __name__)
 
 @bi.route("/dashboards", methods=["GET"],defaults={"desc": {"interface_name": "查询多个文件夹和看板服务", "is_permission": True, "permission_belong": 0}})
 def get_dashboards_and_archives(desc):
-    current_user_id = 1
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+    # current_user_id = 1
     request_json = request.json
     valid = Get_dashboards_and_archives_validator(request_json)
     if not valid.is_valid():

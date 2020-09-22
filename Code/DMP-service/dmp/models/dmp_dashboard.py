@@ -51,8 +51,9 @@ class Dashboard(db.Model, DMPModel):
 
     def delete(self):
         from .dmp_chart import Chart
-        db.session.query(Chart).filter(
-            Chart.dmp_dashboard_id == self.id).delete()
+        charts = db.session.query(Chart).filter(Chart.dmp_dashboard_id == self.id).all()
+        for chart in charts:
+            chart.delete()
         db.session.delete(self)
         db.session.commit()
 

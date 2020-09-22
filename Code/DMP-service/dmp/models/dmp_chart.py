@@ -14,25 +14,33 @@ class Chart(db.Model, DMPModel):
     id = db.Column(db.Integer, primary_key=True,
                    autoincrement=True, comment='看板ID')
     chart_name = db.Column(db.String(64), nullable=False, comment='图标名称')
-    dmp_data_table_id = db.Column(db.Integer, nullable=False, comment='数据表ID')
-    query_string = db.Column(db.Text, nullable=False, comment='查询语句')
-    chart_data = db.Column(db.Text, nullable=False, comment='数据')
+    dmp_data_table_id = db.Column(db.Integer,  comment='数据表ID')
+    query_string = db.Column(db.Text,  comment='查询语句')
+    chart_data = db.Column(db.Text,  comment='数据')
     chart_type = db.Column(db.Integer, nullable=False,
                            comment='图表类型，柱状图1，折线图2，饼图3，地图4，雷达图5')
-    params = db.Column(db.Text, nullable=False, comment='图表参数')
+    params = db.Column(db.Text,  comment='图表参数')
     update_interval = db.Column(
-        db.Integer, default=0, nullable=False, comment='时间间隔时间')
+        db.Integer, default=0,  comment='时间间隔时间')
     update_unit = db.Column(db.Integer, default=0,
-                            nullable=False, comment='时间间隔单位，0小时，1日，3周')
+                             comment='时间间隔单位，0小时，1日，3周')
+
     description = db.Column(db.String(512), comment='简介')
     dmp_dashboard_id = db.Column(db.Integer, nullable=False, comment='数据看板ID')
-
+    update_task_id = db.Column(db.String(64), comment='更新任务ID')
     created_dmp_user_id = db.Column(db.Integer, nullable=False, comment='创建人')
     changed_dmp_user_id = db.Column(db.Integer, comment='修改人')
     created_on = db.Column(
         db.DateTime, default=datetime.datetime.now, comment='创建时间')
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now, comment='最后修改时间')
+
+    def delete(self):
+        from dmp.extensions import apscheduler
+        apscheduler.delete_job(id=self.update_task_id)
+        db.session.delete(self)
+        db.session.commit()
+
 
     @property
     def dmp_data_table_name(self):
