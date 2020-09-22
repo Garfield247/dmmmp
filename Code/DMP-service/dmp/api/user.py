@@ -609,9 +609,46 @@ def udel(desc):
             return resp_hanlder(code=999, msg=str(err))
 
 
-@user.route("/secretkey", methods=["GET"])
+@user.route("/secretkey/", methods=["GET"])
 def get_secret_key():
-    pass
+    '''发放有效的 JWT-token'''
+    import datetime
+    import jwt
+    try:
+        auth_token = request.headers.get('Authorization')
+        res = PuttingData.get_obj_data(Users, auth_token)
+        if not isinstance(res, dict):
+            return resp_hanlder(code=999)
+        data = request.json
+        if data == None:
+            payload = {
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=60*60*24),
+                'iat': datetime.datetime.utcnow(),
+                'user_id': res.get('id')
+            }
+            jwt_token_bytes = jwt.encode(
+                payload,
+                current_app.config.get('SECRET_KEY'),
+                algorithm='HS256'
+            )
+            return resp_hanlder(code=0, msg='Personal key obtained successfully.',
+                               result={'self_token': jwt_token_bytes.decode('utf-8')})
+        else:
+            expires = data.get('expires')
+            payload = {
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=expires),
+                'iat': datetime.datetime.utcnow(),
+                'user_id': res.get('id')
+            }
+            jwt_token_bytes = jwt.encode(
+                                            payload,
+                                            current_app.config.get('SECRET_KEY'),
+                                            algorithm='HS256'
+                                        )
+            return resp_hanlder(code=0, msg='Personal key obtained successfully.',
+                                result={'self_token': jwt_token_bytes.decode('utf-8')})
+    except Exception as err:
+        return resp_hanlder(code=999, err=str(err))
 
 
 @user.before_request
