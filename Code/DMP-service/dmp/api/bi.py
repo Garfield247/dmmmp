@@ -9,6 +9,7 @@ from dmp.extensions import db
 from dmp.models import Dashboard, DashboardArchive, Users, DashboardStar, ArchiveStar,Chart
 from dmp.utils import resp_hanlder
 from dmp.utils.put_data import PuttingData
+from dmp.utils.validators.bi import Get_dashboards_and_archives_validator
 
 bi = Blueprint("bi", __name__)
 
@@ -119,9 +120,15 @@ def add_dashboard(desc):
         db.session.rollback()
         return resp_hanlder(code=999, err=str(err))
 
-@bi.route("/dashboards/<int:id>",methods=["GET"])
+@bi.route("/dashboards/<int:id>",methods=["GET"], defaults={"desc": {"interface_name": "获取单一看板信息", "is_permission": True, "permission_belong": 0}})
 def get_dashboard_by_id(id):
-    pass
+    current_dashboard = Dashboard.get(id)
+    if current_dashboard:
+        current_dashboard_info = current_dashboard.__json__()
+        return resp_hanlder(code=0, result={"data":current_dashboard_info})
+    else:
+        return resp_hanlder(code=999,msg="看板不存在或已被删除")
+
 
 @bi.route("/dashboards/<int:id>",methods=["PUT"], defaults={"desc": {"interface_name": "修改看板", "is_permission": True, "permission_belong": 0}})
 def update_dashboard_by_id(id, desc):
