@@ -77,7 +77,7 @@ def get_dashboards_and_archives(desc):
             DashboardArchive.changed_on.label("changed_on")
             ).filter(*archives_filters)
 
-    dashboards_and_archives = dashboards.union_all(archives)
+    dashboards_and_archives = dashboards.union(archives)
     count = dashboards_and_archives.count()
     data = [d._asdict() for d in dashboards_and_archives.order_by(desc_("is_star"),desc_("changed_on")).offset((pagenum-1)*pagesize).limit(pagesize)]
     res = {
