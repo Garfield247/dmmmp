@@ -21,7 +21,7 @@ def get_dashboards_and_archives(desc):
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
     # current_user_id = 1
-    request_json = request.json
+    request_json = request.json if request.json else {}
     valid = Get_dashboards_and_archives_validator(request_json)
     if not valid.is_valid():
         return resp_hanlder(code=201, msg=valid.str_errors)
@@ -78,7 +78,6 @@ def get_dashboards_and_archives(desc):
             ).filter(*archives_filters)
 
     dashboards_and_archives = dashboards.union_all(archives)
-    print( type(dashboards_and_archives) )
     count = dashboards_and_archives.count()
     data = [d._asdict() for d in dashboards_and_archives.order_by(desc_("is_star"),desc_("changed_on")).offset((pagenum-1)*pagesize).limit(pagesize)]
     res = {
