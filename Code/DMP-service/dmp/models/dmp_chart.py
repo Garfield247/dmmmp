@@ -35,6 +35,26 @@ class Chart(db.Model, DMPModel):
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now, comment='最后修改时间')
 
+    def chart_to_dict(self):
+        chart_dict = {
+            'id': self.id,
+            'chart_name': self.chart_name,
+            'dmp_data_table_id': self.dmp_data_table_id,
+            'query_string': self.query_string,
+            'chart_data': self.chart_data,
+            'chart_type': self.chart_type,
+            'params': self.params,
+            'update_interval': self.update_interval,
+            'update_unit': self.update_unit,
+            'description': self.description,
+            'dmp_dashboard_id': self.dmp_dashboard_id,
+            'created_dmp_user_id': self.created_dmp_user_id,
+            'changed_dmp_user_id': self.changed_dmp_user_id,
+            'created_on': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
+            'changed_on': self.changed_on.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        return chart_dict
+        
     def delete(self):
         from dmp.extensions import apscheduler
         apscheduler.delete_job(id=self.update_task_id)

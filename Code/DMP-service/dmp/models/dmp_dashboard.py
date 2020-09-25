@@ -27,6 +27,20 @@ class Dashboard(db.Model, DMPModel):
     changed_on = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now, comment='最后修改时间')
 
+    def dashboard_to_dict(self):
+        dashboard_dict = {
+            'id': self.id,
+            'dmp_dashboard_name': self.dmp_dashboard_name,
+            'description': self.description,
+            'release': self.release,
+            'charts_position': self.charts_position,
+            'upper_dmp_dashboard_archive_id': self.upper_dmp_dashboard_archive_id,
+            'created_dmp_user_id': self.created_dmp_user_id,
+            'changed_dmp_user_id': self.changed_dmp_user_id,
+            'created_on': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
+            'changed_on': self.changed_on.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        return dashboard_dict
 
     def save(self):
         try:
