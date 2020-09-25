@@ -5,7 +5,8 @@
 
 from flask import Blueprint, request
 
-from sqlparse import literal,and_,or_
+from sqlalchemy import literal,and_,or_,exists,union,desc,union_all
+from sqlalchemy import desc as desc_
 from dmp.extensions import db
 from dmp.models import Dashboard, DashboardArchive, Users, DashboardStar, ArchiveStar,Chart
 from dmp.utils import resp_hanlder
@@ -76,9 +77,10 @@ def get_dashboards_and_archives(desc):
             DashboardArchive.changed_on.label("changed_on")
             ).filter(*archives_filters)
 
-    dashboards_and_archives = dashboards.union(archives)
+    dashboards_and_archives = dashboards.union_all(archives)
+    print( type(dashboards_and_archives) )
     count = dashboards_and_archives.count()
-    data = [d._asdict() for d in dashboards_and_archives.order_by(desc("is_star"),desc("changed_on")).offset((pagenum-1)*pagesize).limit(pagesize)]
+    data = [d._asdict() for d in dashboards_and_archives.order_by(desc_("is_star"),desc_("changed_on")).offset((pagenum-1)*pagesize).limit(pagesize)]
     res = {
         "data_count":count,
         "pagenum":pagenum,
