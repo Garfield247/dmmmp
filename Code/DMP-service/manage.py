@@ -7,7 +7,7 @@ import json
 import datetime
 from flask_script import Manager, Server
 from flask_migrate import MigrateCommand
-
+from flasgger import Swagger
 from dmp import create_app
 from dmp.extensions import db,apscheduler
 
@@ -18,6 +18,7 @@ config_name = os.environ.get('DMP_CONFIG') or 'testing'
 
 # 创建实例
 app = create_app(config_name)
+swagger = Swagger(app)
 manager = Manager(app)
 # 添加数据库迁移命令
 manager.add_command('db', MigrateCommand)

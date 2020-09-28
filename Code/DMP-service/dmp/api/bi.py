@@ -8,7 +8,7 @@ from flask import Blueprint, request
 from sqlalchemy import literal,and_,or_,exists,union,desc,union_all
 from sqlalchemy import desc as desc_
 from dmp.extensions import db
-from dmp.models import Dashboard, DashboardArchive, Users, DashboardStar, ArchiveStar,Chart
+from dmp.models import Dashboard, DashboardArchive, Users, DashboardStar, ArchiveStar,Chart,UserDashboard
 from dmp.utils import resp_hanlder
 from dmp.utils.put_data import PuttingData
 from dmp.utils.validators.bi import Get_dashboards_and_archives_validator
@@ -403,3 +403,103 @@ def delete_charts_by_id(id, desc):
     except Exception as err:
         db.session.rollback()
         return resp_hanlder(code=999, err=str(err))
+
+
+@bi.route("/index/<int:dashboard_id>", methods=["POST"],defaults={"desc": {"interface_name": "设置首页", "is_permission": True, "permission_belong": 0}})
+def set_index(desc,dashboard_id):
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+
+    if Dashboard.exist_item_by_id(dashboard_id):
+
+        UserDashboard.query.filter_by(dmp_user_id = current_user_id).delete()
+
+        index_page = UserDashboard(
+            dmp_user_id = current_user_id,
+            dmp_dashboard_id = dashboard_id
+                )
+        index_page.save()
+        return resp_hanlder(code=0,result="OK")
+
+
+@bi.route("/index/", methods=["DELETE"],defaults={"desc": {"interface_name": "取消设置首页", "is_permission": True, "permission_belong": 0}})
+def del_index(desc):
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+    if current_user_id:
+        UserDashboard.query.filter_by(dmp_user_id = current_user_id).delete()
+        return resp_hanlder(code=0,result="OK")
+
+
+@bi.route("/dashboards_star/<int:dashboard_id>", methods=["POST"],defaults={"desc": {"interface_name": "看板置顶", "is_permission": True, "permission_belong": 0}})
+def add_dashboard_star(desc,dashboard_id):
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+
+    if Dashboard.exist_item_by_id(dashboard_id):
+        is_exists = db.session.query(exists().where(and_(DashboardStar.dmp_user_id==current_user_id,DashboardStar.dmp_dashboard_id==dashboard_id))).scalar()
+        if not is_exists:
+            star = DashboardStar(
+                dmp_user_id = current_user_id,
+                dmp_dashboard_id = dashboard_id
+                    )
+            star.save()
+            return resp_hanlder(code=0,msg="OK")
+        else:
+            return resp_hanlder(code=999,msg="看板已置顶")
+    else:
+        return resp_hanlder(code=999,msg="看板不存在或已被删除")
+
+
+@bi.route("/dashboards_star/<int:dashboard_id>", methods=["DELETE"],defaults={"desc": {"interface_name": "看板取消置顶", "is_permission": True, "permission_belong": 0}})
+def del_dashboard_star(desc,dashboard_id):
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+    if Dashboard.exist_item_by_id(dashboard_id):
+        is_exists = db.session.query(exists().where(and_(DashboardStar.dmp_user_id==current_user_id,DashboardStar.dmp_dashboard_id==dashboard_id))).scalar()
+        if is_exists:
+            DashboardStar.query.filter_by(dmp_user_id=current_user_id,dmp_dashboard_id=dashboard_id).delete()
+            return resp_hanlder(code=0,msg="OK")
+        else:
+            return resp_hanlder(code=999,msg="看板已删除置顶")
+    else:
+        return resp_hanlder(code=999,msg="看板不存在或已被删除")
+
+
+
+@bi.route("/archive_star/<int:archive_id>", methods=["POST"],defaults={"desc": {"interface_name": "文件夹置顶", "is_permission": True, "permission_belong": 0}})
+def add_archive_star(desc):
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+    if DashboardArchive.exist_item_by_id(archive_id):
+        is_exists = db.session.query(exists().where(and_(ArchiveStar.dmp_user_id==current_user_id,ArchiveStar.dmp_dashboard_id==dashboard_id))).scalar()
+        if not is_exists:
+            star = ArchiveStar(
+                dmp_user_id = current_user_id,
+                dmp_archive_id = archive_id
+                    )
+            star.save()
+            return resp_hanlder(code=0,msg="OK")
+        else:
+            return resp_hanlder(code=999,msg="文件夹已置顶")
+    else:
+        return resp_hanlder(code=999,msg="文件夹不存在或已被删除")
+
+
+
+@bi.route("/archive_star/<int:archive_id>", methods=["DELETE"],defaults={"desc": {"interface_name": "文件夹取消置顶", "is_permission": True, "permission_belong": 0}})
+def del_archive_star(desc):
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+    if DashboardArchive.exist_item_by_id(archive_id):
+        is_exists = db.session.query(exists().where(and_(ArchiveStar.dmp_user_id==current_user_id,ArchiveStar.dmp_dashboard_id==dashboard_id))).scalar()
+        if is_exists:
+            ArchiveStar.query.filter_by(dmp_user_id=current_user_id,dmp_archive_id=archive_id).delete()
+            return resp_hanlder(code=0,msg="OK")
+        else:
+            return resp_hanlder(code=999,msg="文件夹已置顶")
+    else:
+        return resp_hanlder(code=999,msg="看板不存在或已被删除")
+
+
+

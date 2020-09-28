@@ -18,7 +18,41 @@ main = Blueprint("mian", __name__)
 
 @main.route("/", defaults={"desc": {"interface_name": "服务跟路由","is_permission": False,"permission_belong": None}})
 def test(desc):
-    db.create_all()
+    """
+    This is the language awesomeness API
+    Call this api passing a language name and get back its features
+    ---
+    tags:
+      - Awesomeness Language API
+    parameters:
+      - name: language
+        in: path
+        type: string
+        required: true
+        description: The language name
+      - name: size
+        in: query
+        type: integer
+        description: size of awesomeness
+    responses:
+      500:
+        description: Error The language is not awesome!
+      200:
+        description: A language with its awesomeness
+        schema:
+          id: awesome
+          properties:
+            language:
+              type: string
+              description: The language name
+              default: Lua
+            features:
+              type: array
+              description: The awesomeness list
+              items:
+                type: string
+              default: ["perfect", "simple", "lovely"]
+	"""
     result = {
         "status": 0,
         "msg": "success",
@@ -55,3 +89,10 @@ def tasks():
 def stops():
     apscheduler.delete_all_jobs()
     return {"res":"ok"}
+
+# @main.route("/spec")
+# def spec():
+    # # from flask_swagger import swagger
+    # from flasgger import Swagger
+    # swagger = Swagger(current_app)
+    # return jsonify(swagger(current_app))

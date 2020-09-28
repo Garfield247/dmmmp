@@ -16,6 +16,41 @@ task = Blueprint("task",__name__)
 
 @task.route("/chart_data/<task_id>",methods=["GET"],defaults={"desc": {"interface_name": "查询单一任务信息", "is_permission": False, "permission_belong": None}})
 def get_query_data_task(desc,task_id):
+    """
+    获取单一查询任务信息
+    ---
+    tags:
+      - Task
+    parameters:
+      - name: task_id
+        in: path
+        type: string
+        required: true
+        description: 任务ID
+      - name: task_id
+        in: path
+        type: string
+        required: true
+        description: 任务ID
+    responses:
+      500:
+        description: Error The language is not awesome!
+      0:
+        description: 查询任务信息
+        schema:
+          id: awesome
+          properties:
+            language:
+              type: string
+              description: The language name
+              default: Lua
+            features:
+              type: array
+              description: The awesomeness list
+              items:
+                type: string
+              default: ["perfect", "simple", "lovely"]
+	"""
     _task = apscheduler.get_job(id=task_id)
     return task2json(_task)
 
