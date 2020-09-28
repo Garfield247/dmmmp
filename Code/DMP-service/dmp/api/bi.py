@@ -12,6 +12,7 @@ from dmp.models import Dashboard, DashboardArchive, Users, DashboardStar, Archiv
 from dmp.utils import resp_hanlder
 from dmp.utils.put_data import PuttingData
 from dmp.utils.validators.bi import Get_dashboards_and_archives_validator
+from dmp.utils.form_verify import DashboardForm, ArchiveForm, ChartForm
 
 bi = Blueprint("bi", __name__)
 
@@ -134,6 +135,10 @@ def add_dashboard(desc):
         dmp_dashboard_name = data.get('dmp_dashboard_name')
         charts_position = data.get('charts_position')
         upper_dmp_dashboard_archive_id = data.get('upper_dmp_dashboard_archive_id')
+        # 字段表单验证
+        form = DashboardForm(meta={"csrf": False})
+        if not form.validate_on_submit():
+            return resp_hanlder(code=999, err=str(form.errors))
         if dmp_dashboard_name:
             dashboard_obj = Dashboard(
                 dmp_dashboard_name=dmp_dashboard_name,
@@ -225,8 +230,11 @@ def update_dashboard_by_id(id, desc):
         charts_position = data.get('charts_position')
         release = data.get('release')
         upper_dmp_dashboard_archive_id = data.get('upper_dmp_dashboard_archive_id')
+        # 字段表单验证
+        form = DashboardForm(meta={"csrf": False})
+        if not form.validate_on_submit():
+            return resp_hanlder(code=999, err=str(form.errors))
         dashboard_obj = Dashboard.query.filter(Dashboard.id == id).first()
-
         if dashboard_obj.created_dmp_user_id == res.get('id'):
             if dmp_dashboard_name and id:
                 dashboard_obj.dmp_dashboard_name = dmp_dashboard_name
@@ -330,6 +338,10 @@ def add_archive(desc):
                 return resp_hanlder(code=999)
             dashboard_archive_name = data.get('dashboard_archive_name')
             upper_dmp_dashboard_archive_id = data.get('upper_dmp_dashboard_archive_id')
+            # 字段表单验证
+            form = ArchiveForm(meta={"csrf": False})
+            if not form.validate_on_submit():
+                return resp_hanlder(code=999, err=str(form.errors))
             if upper_dmp_dashboard_archive_id:
                 upper_archive_obj = DashboardArchive.query.filter(
                                         DashboardArchive.id == upper_dmp_dashboard_archive_id).first()
@@ -407,8 +419,11 @@ def update_archive_by_id(id, desc):
             if data == None:
                 return resp_hanlder(code=999)
             dashboard_archive_name = data.get('dashboard_archive_name')
+            # 字段表单验证
+            form = ArchiveForm(meta={"csrf": False})
+            if not form.validate_on_submit():
+                return resp_hanlder(code=999, err=str(form.errors))
             update_dashboard_archive_obj = DashboardArchive.query.filter(DashboardArchive.id == id).first()
-
             if DashboardArchive.created_dmp_user_id == res.get('id'):
                 if dashboard_archive_name and update_dashboard_archive_obj:
                     update_dashboard_archive_obj.dashboard_archive_name = dashboard_archive_name
@@ -542,7 +557,10 @@ def add_chart(desc):
         chart_params = data.get('chart_params')
         description = data.get('description')
         dmp_dashboard_id = data.get('dmp_dashboard_id')
-
+        # 字段表单验证
+        form = ChartForm(meta={"csrf": False})
+        if not form.validate_on_submit():
+            return resp_hanlder(code=999, err=str(form.errors))
         if chart_name and chart_type and dmp_dashboard_id and dmp_data_table_id:
             chart_obj = Chart(
                 chart_name=chart_name,
@@ -641,8 +659,11 @@ def update_charts_by_id(id, desc):
             chart_params = data.get('chart_params')
             description = data.get('description')
             dmp_dashboard_id = data.get('dmp_dashboard_id')
+            # 字段表单验证
+            form = ChartForm(meta={"csrf": False})
+            if not form.validate_on_submit():
+                return resp_hanlder(code=999, err=str(form.errors))
             chart_obj = Chart.query.filter(Chart.id == id).first()
-
             if Chart.created_dmp_user_id == res.get('id'):
                 if chart_name and chart_type and dmp_dashboard_id and chart_obj:
                     chart_obj.chart_name = chart_name
