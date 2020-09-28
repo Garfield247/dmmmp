@@ -3,6 +3,9 @@ from wtforms import StringField, IntegerField
 from wtforms.validators import DataRequired, Length
 
 class DashboardForm(FlaskForm):
+    """
+    看板表单验证
+    """
     dmp_dashboard_name = StringField("dmp_dashboard_name",
                                      validators=[DataRequired(message="看板名称不能为空"),
                                                  Length(max=50, message="看板名称最大长度不超过50")]
@@ -16,6 +19,9 @@ class DashboardForm(FlaskForm):
 
 
 class ArchiveForm(FlaskForm):
+    """
+    文件夹表单验证
+    """
     dashboard_archive_name = StringField("dashboard_archive_name",
                                          validators=[DataRequired(message="文件夹名称不能为空"),
                                                      Length(max=50, message="文件夹名称最大长度不超过50")]
@@ -23,6 +29,9 @@ class ArchiveForm(FlaskForm):
 
 
 class ChartForm(FlaskForm):
+    """
+    图表表单验证
+    """
     chart_name = StringField("chart_name",
                              validators=[DataRequired(message="图表名称不能为空"),
                                          Length(max=50, message="图表名称最大长度不超过50")]
