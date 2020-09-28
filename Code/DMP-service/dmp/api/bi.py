@@ -92,6 +92,7 @@ def get_dashboards_and_archives(desc):
             Dashboard.description.label("description"),
             Dashboard.release.label("release"),
             db.session.query(DashboardStar.id).filter(and_(DashboardStar.dmp_dashboard_id==Dashboard.id,DashboardStar.dmp_user_id==current_user_id)).exists().label("is_star"),
+            exists().where(and_(UserDashboard.dmp_dashboard_id ==Dashboard.id,UserDashboard.dmp_user_id==current_user_id)).label("is_index"),
             Dashboard.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
             db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             Dashboard.created_dmp_user_id.label("created_dmp_user_id"),
@@ -105,6 +106,7 @@ def get_dashboards_and_archives(desc):
             literal("-").label("description"),
             literal("-").label("release"),
             exists().where(and_(ArchiveStar.dmp_archive_id ==DashboardArchive.id,ArchiveStar.dmp_user_id==current_user_id)).label("is_star"),
+            literal("-").label("is_index"),
             DashboardArchive.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
             db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             DashboardArchive.created_dmp_user_id.label("created_dmp_user_id"),
@@ -114,7 +116,7 @@ def get_dashboards_and_archives(desc):
 
     dashboards_and_archives = dashboards.union(archives)
     count = dashboards_and_archives.count()
-    data = [d._asdict() for d in dashboards_and_archives.order_by(desc_("is_star"),desc_("changed_on")).offset((pagenum-1)*pagesize).limit(pagesize)]
+    data = [d._asdict() for d in dashboards_and_archives.order_by(desc_("is_index"),desc_("is_star"),desc_("changed_on")).offset((pagenum-1)*pagesize).limit(pagesize)]
     res = {
         "data_count":count,
         "pagenum":pagenum,
