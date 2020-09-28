@@ -286,6 +286,33 @@ def format_sql(query_sql_tmp, query_params):
 @ds.route("/api/<path:api>", methods=["GET"])
 @limiter.limit("1/second")
 def get_data_by_data_service():
+    """
+    数据服务调用
+
+    ---
+    tags:
+      - DataService
+    parameters:
+      - name: api
+        type: string
+        required: true
+        description: 数据接口路径
+      - name: secret_key
+        type: string
+        required: true
+        description: 密钥
+      - name: page_num
+        type: int
+        required: true
+        description: 数据页码
+      - name: 其他参数
+        type: string
+        required: false
+        description: 数据服务的筛选参数
+    responses:
+      0:
+        description: 正常响应
+	"""
     request_params = request.json
     code = 100
     msg = None

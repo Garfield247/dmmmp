@@ -1,0 +1,30 @@
+
+    """
+    <++>
+    <++>
+    ---
+    tags:
+      - <++>
+    parameters:
+      - name: <++>
+        in: <++>
+        type: <++>
+        required: <++>
+        description: <++>
+    responses:
+      <++>:
+        description: <++>
+        schema:
+          id: result
+          properties:
+            <++>:
+              type: <++>
+              description: <++>
+              default: <++>
+            <++>:
+              type: <++>
+              description: <++>
+              items:
+                type: <++>
+              default: ["<++>", "<++>", "<++>"]
+	"""

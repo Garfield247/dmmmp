@@ -18,6 +18,41 @@ bi = Blueprint("bi", __name__)
 
 @bi.route("/dashboards", methods=["GET"],defaults={"desc": {"interface_name": "查询多个文件夹和看板服务", "is_permission": True, "permission_belong": 0}})
 def get_dashboards_and_archives(desc):
+    """
+    查询多个文件夹和看板服务
+
+    ---
+    tags:
+      - BI
+    parameters:
+      - name: upper_dmp_dashboard_archive_id
+        type: int
+        required: false
+        description: 父文件夹
+      - name: is_owner
+        type: bool
+        required: true
+        description: 是否是我的
+      - name: state
+        type: int
+        required: false
+        description: 发布状态
+      - name: name
+        type: string
+        required: false
+        description: 要检索的看板名或用户名
+      - name: pagenum
+        type: int
+        required: true
+        description: 页码
+      - name: pagesize
+        type: int
+        required: true
+        description: 每页内容数量
+    responses:
+      0:
+        description: OK!
+	"""
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
     # current_user_id = 1
@@ -122,9 +157,24 @@ def add_dashboard(desc):
         db.session.rollback()
         return resp_hanlder(code=999, err=str(err))
 
-@bi.route("/dashboards/<int:id>",methods=["GET"], defaults={"desc": {"interface_name": "获取单一看板信息", "is_permission": True, "permission_belong": 0}})
-def get_dashboard_by_id(id):
-    current_dashboard = Dashboard.get(id)
+@bi.route("/dashboards/<int:dashboard_id>",methods=["GET"], defaults={"desc": {"interface_name": "获取单一看板信息", "is_permission": True, "permission_belong": 0}})
+def get_dashboard_by_id(dashboard_id):
+    """
+    获取但一看板信息
+
+    ---
+    tags:
+      - BI
+    parameters:
+      - name: dashboard_id
+        type: int
+        required: true
+        description: 要获取的看板ID
+    responses:
+      0:
+        description: OK
+	"""
+    current_dashboard = Dashboard.get(dashboard_id)
     if current_dashboard:
         current_dashboard_info = current_dashboard.__json__()
         return resp_hanlder(code=0, result={"data":current_dashboard_info})
@@ -407,6 +457,21 @@ def delete_charts_by_id(id, desc):
 
 @bi.route("/index/<int:dashboard_id>", methods=["POST"],defaults={"desc": {"interface_name": "设置首页", "is_permission": True, "permission_belong": 0}})
 def set_index(desc,dashboard_id):
+    """
+    设置首页
+
+    ---
+    tags:
+      - BI
+    parameters:
+      - name: dashboard_id
+        type: int
+        required: true
+        description: 要设置为首页的看板ID
+    responses:
+      0:
+        description: ok
+    """
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
 
@@ -424,6 +489,22 @@ def set_index(desc,dashboard_id):
 
 @bi.route("/index/", methods=["DELETE"],defaults={"desc": {"interface_name": "取消设置首页", "is_permission": True, "permission_belong": 0}})
 def del_index(desc):
+    """
+    取消设置首页
+
+    ---
+    tags:
+      - BI
+    parameters:
+      - name: 无
+        in: <++>
+        type: string
+        required: false
+        description: 不需要参数
+    responses:
+      0:
+        description: ok
+    """
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
     if current_user_id:
@@ -433,6 +514,21 @@ def del_index(desc):
 
 @bi.route("/dashboards_star/<int:dashboard_id>", methods=["POST"],defaults={"desc": {"interface_name": "看板置顶", "is_permission": True, "permission_belong": 0}})
 def add_dashboard_star(desc,dashboard_id):
+    """
+    看板置顶
+
+    ---
+    tags:
+      - BI
+    parameters:
+      - name: dashboard_id
+        type: int
+        required: true
+        description: 要置顶的看板的ID
+    responses:
+      0:
+        description: ok
+	"""
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
 
@@ -453,6 +549,21 @@ def add_dashboard_star(desc,dashboard_id):
 
 @bi.route("/dashboards_star/<int:dashboard_id>", methods=["DELETE"],defaults={"desc": {"interface_name": "看板取消置顶", "is_permission": True, "permission_belong": 0}})
 def del_dashboard_star(desc,dashboard_id):
+    """
+    看板取消置顶
+
+    ---
+    tags:
+      - BI
+    parameters:
+      - name: dashboard_id
+        type: int
+        required: true
+        description: 要取消置顶的看板ID
+    responses:
+      0:
+        description: ok
+	"""
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
     if Dashboard.exist_item_by_id(dashboard_id):
@@ -469,6 +580,21 @@ def del_dashboard_star(desc,dashboard_id):
 
 @bi.route("/archive_star/<int:archive_id>", methods=["POST"],defaults={"desc": {"interface_name": "文件夹置顶", "is_permission": True, "permission_belong": 0}})
 def add_archive_star(desc):
+    """
+    文件夹置顶
+
+    ---
+    tags:
+      - BI
+    parameters:
+      - name: archive_id
+        type: int
+        required: true
+        description: 要置顶的文件夹ID
+    responses:
+      0:
+        description: ok
+    """
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
     if DashboardArchive.exist_item_by_id(archive_id):
@@ -489,6 +615,21 @@ def add_archive_star(desc):
 
 @bi.route("/archive_star/<int:archive_id>", methods=["DELETE"],defaults={"desc": {"interface_name": "文件夹取消置顶", "is_permission": True, "permission_belong": 0}})
 def del_archive_star(desc):
+    """
+    文件夹取消置顶
+
+    ---
+    tags:
+      - BI
+    parameters:
+      - name: archive_id
+        type: int
+        required: true
+        description: 要取消置顶的文件夹ID
+    responses:
+      0:
+        description: ok
+	"""
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
     if DashboardArchive.exist_item_by_id(archive_id):

@@ -17,45 +17,49 @@ task = Blueprint("task",__name__)
 @task.route("/chart_data/<task_id>",methods=["GET"],defaults={"desc": {"interface_name": "查询单一任务信息", "is_permission": False, "permission_belong": None}})
 def get_query_data_task(desc,task_id):
     """
-    获取单一查询任务信息
+    查询单一任务信息
+
     ---
     tags:
       - Task
     parameters:
       - name: task_id
-        in: path
-        type: string
-        required: true
-        description: 任务ID
-      - name: task_id
-        in: path
         type: string
         required: true
         description: 任务ID
     responses:
-      500:
-        description: Error The language is not awesome!
-      0:
-        description: 查询任务信息
-        schema:
-          id: awesome
-          properties:
-            language:
-              type: string
-              description: The language name
-              default: Lua
-            features:
-              type: array
-              description: The awesomeness list
-              items:
-                type: string
-              default: ["perfect", "simple", "lovely"]
+      10:
+        description: ok
 	"""
     _task = apscheduler.get_job(id=task_id)
     return task2json(_task)
 
 @task.route("/chart_data",methods=["POST"],defaults={"desc": {"interface_name": "添加图表更新任务", "is_permission": False, "permission_belong": None}})
 def add_query_data_task(desc):
+    """
+    添加图表更新任务
+
+    ---
+    tags:
+      - Task
+    parameters:
+      - name: chart_id
+        type: int
+        required: true
+        description: 要添加定时更新任务的图表ID
+      - name: time_unit
+        type: string
+        enum: ['weeks','days','hours','mins','seconds']
+        required: true
+        description: 时间单位
+      - name: time_value
+        type: int
+        required: true
+        description: 时间数值
+    responses:
+      0:
+        description: 添加定时任务成功并返回任务ID
+    """
     _task_param = request.json
     valid = Add_query_data_task_validator(_task_param)
     if not valid.is_valid():
@@ -82,6 +86,26 @@ def add_query_data_task(desc):
 
 @task.route("/chart_data/<task_id>",methods=["PUT"],defaults={"desc": {"interface_name": "修改图表更新任务", "is_permission": False, "permission_belong": None}})
 def update_query_data_task(desc,task_id):
+    """
+    修改图表更新任务
+
+    ---
+    tags:
+      - Task
+    parameters:
+      - name: time_unit
+        type: string
+        enum: ['weeks','days','hours','mins','seconds']
+        required: true
+        description: 时间单位
+      - name: time_value
+        type: int
+        required: true
+        description: 时间数值
+    responses:
+      0:
+        description: 修改成功
+	"""
     current_task = apscheduler.get_job(task_id)
     if current_task:
         _task_param = request.json
@@ -105,6 +129,21 @@ def update_query_data_task(desc,task_id):
 
 @task.route("/chart_data/<task_id>",methods=["DELETE"],defaults={"desc": {"interface_name": "删除图表更新任务", "is_permission": False, "permission_belong": None}})
 def delete_query_data_task(desc,task_id):
+    """
+    删除图表更新任务
+
+    ---
+    tags:
+      - Task
+    parameters:
+      - name: task_id
+        type: string
+        required: true
+        description: 要删除的定时更新任务的ID
+    responses:
+      0:
+        description: 删除成功
+	"""
     current_task = apscheduler.get_job(task_id)
     current_task = Chart.query.filter_by(update_task_id=task_id).first()
     if current_task:
