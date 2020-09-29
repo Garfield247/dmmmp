@@ -4,6 +4,7 @@
 # @Author  : SHTD
 
 from flask import Blueprint, request
+from dmp.extensions import limiter
 from dmp.models import DataService, Users, DataServiceParameter, DataTable
 from dmp.models import UserDataService
 from dmp.utils import resp_hanlder
@@ -612,6 +613,7 @@ def update_ds_parameters(id, desc):
 
 
 @ds.route("/api/<path:api>", methods=["GET", "POST"])
+@limiter.limit("1/second")
 def get_data_by_data_service():
     """
     数据服务调用
