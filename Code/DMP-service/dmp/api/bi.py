@@ -115,14 +115,7 @@ def add_dashboard(desc):
         description: 图表布局信息
     responses:
       0:
-        description: 创建看板接口返回信息
-        schema:
-          id: result
-          properties:
-            result:
-              type: json
-              description: 数据看板创建成功返回的json数据
-              default: {"status": 0, "msg": "数据看板创建成功", "result": {"data": "json"}}
+        description: ok
     """
     try:
         auth_token = request.headers.get('Authorization')
@@ -208,14 +201,7 @@ def update_dashboard_by_id(id, desc):
         description: 发布状态
     responses:
       0:
-        description: 修改看板接口返回信息
-        schema:
-          id: result
-          properties:
-            result:
-              type: json
-              description: 数据看板修改成功返回的json数据
-              default: {"status": 0, "msg": "数据看板修改成功", "result": {"data": "json"}}
+        description: ok
     """
     try:
         auth_token = request.headers.get('Authorization')
@@ -269,14 +255,7 @@ def delete_dashboard_by_id(id, desc):
         description: url参数id
     responses:
       0:
-        description: 删除看板接口返回信息
-        schema:
-          id: result
-          properties:
-            result:
-              type: string
-              description: 数据看板删除成功
-              default: {"status": 0, "msg": "数据看板删除成功", "result": "string"}
+        description: ok
     """
     try:
         auth_token = request.headers.get('Authorization')
@@ -318,14 +297,7 @@ def add_archive(desc):
         description: 父文件夹名称
     responses:
       0:
-        description: 创建文件夹接口返回信息
-        schema:
-          id: result
-          properties:
-            result:
-              type: json
-              description: 创建看板文件夹(子文件夹)成功返回的json数据
-              default: {"status": 0, "msg": "看板文件夹(子文件夹)创建成功", "result": {"data": "json"}}
+        description: ok
     """
     if request.method == 'POST':
         try:
@@ -400,14 +372,7 @@ def update_archive_by_id(id, desc):
         description: 修改之后的文件夹名称
     responses:
       0:
-        description: 修改文件夹接口返回信息
-        schema:
-          id: result
-          properties:
-            result:
-              type: json
-              description: 看板文件夹信息修改成功返回的json数据
-              default: {"status": 0, "msg": "看板文件夹信息修改成功", "result": {"data": "json"}}
+        description: ok
     """
     if request.method == 'PUT':
         try:
@@ -454,14 +419,7 @@ def delete_archive_by_id(id, desc):
         description: url参数id
     responses:
       0:
-        description: 删除文件夹接口返回信息
-        schema:
-          id: result
-          properties:
-            result:
-              type: string
-              description: 看板文件夹删除成功
-              default: {"status": 0, "msg": "看板文件夹删除成功", "result": "string"}
+        description: ok
     """
     try:
         auth_token = request.headers.get('Authorization')
@@ -532,14 +490,7 @@ def add_chart(desc):
         description: 数据看板ID
     responses:
       0:
-        description: 添加图表接口返回信息
-        schema:
-          id: result
-          properties:
-            result:
-              type: string
-              description: 图表添加成功返回的json数据
-              default: {"status": 0, "msg": "图表添加成功", "result": {"data": "json"}}
+        description: ok
     """
     try:
         auth_token = request.headers.get('Authorization')
@@ -633,14 +584,7 @@ def update_charts_by_id(id, desc):
         description: 数据看板ID
     responses:
       0:
-        description: 修改图表接口返回信息
-        schema:
-          id: result
-          properties:
-            result:
-              type: string
-              description: 修改图表成功返回的json数据
-              default: {"status": 0, "msg": "修改图表信息成功", "result": {"data": "json"}}
+        description: ok
     """
     if request.method == 'PUT':
         try:
@@ -701,14 +645,7 @@ def delete_charts_by_id(id, desc):
         description: url参数id
     responses:
       0:
-        description: 删除图表接口返回信息
-        schema:
-          id: result
-          properties:
-            result:
-              type: string
-              description: 图表删除成功
-              default: {"status": 0, "msg": "图表删除成功", "result": "string"}
+        description: ok
     """
     try:
         auth_token = request.headers.get('Authorization')

@@ -624,14 +624,7 @@ def get_secret_key():
         description: 到期时间
     responses:
       0:
-        description: 获取个人密钥接口返回信息
-        schema:
-          id: result
-          properties:
-            result:
-              type: json
-              description: 获取个人密钥成功返回的json数据
-              default: {"status": 0, "msg": "获取个人密钥成功", "result": {"data": "json"}}
+        description: ok
     """
     import datetime
     import jwt
