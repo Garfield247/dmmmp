@@ -4,6 +4,7 @@
 # @Author  : SHTD
 
 from flask import Blueprint, request
+
 from dmp.extensions import limiter
 from dmp.models import DataService, Users, DataServiceParameter, DataTable
 from dmp.models import UserDataService
@@ -612,7 +613,37 @@ def update_ds_parameters(id, desc):
             return resp_hanlder(code=999, err=err)
 
 
-@ds.route("/api/<path:api>", methods=["GET", "POST"])
+def parse_query_params(request_params, dataservice):
+    legal = True
+    query_params = {}
+    missing = []
+    dsparams = crrent_data_sevice.params
+    for dsp in dsparams:
+        p_name = dsp.get("parameter_name")
+        p_required = dsp.get("required")
+        value = request_params.get(p_name, None)
+        if p_required == True and value != None:
+            query_params[p_name] = value
+        elif p_required == False and value != None:
+            query_params[p_name] = value
+        elif p_required == True and value == None:
+            missing.append(p_name)
+            legal = False
+    if legal:
+        return None, query_params
+    else:
+        return missing, None
+
+
+def format_sql(query_sql_tmp, query_params):
+    for param_name, value in query_params.items():
+        query_sql_tmp = query_sql_tmp.replace(
+            "{%s}" % str(param_name), str(value))
+
+    return query_sql_tmp
+
+
+@ds.route("/api/<path:api>", methods=["GET"])
 @limiter.limit("1/second")
 def get_data_by_data_service():
     """
