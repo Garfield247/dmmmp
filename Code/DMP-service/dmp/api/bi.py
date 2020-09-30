@@ -96,6 +96,8 @@ def get_dashboards_and_archives(desc):
             Dashboard.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
             db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             Dashboard.created_dmp_user_id.label("created_dmp_user_id"),
+            db.session.query(Users.dmp_username).filter(Users.id == Dashboard.changed_dmp_user_id).subquery().c.dmp_username.label("changed_dmp_user_name"),
+            Dashboard.changed_dmp_user_id.label("changed_dmp_user_id"),
             Dashboard.created_on.label("created_on"),
            Dashboard.changed_on.label("changed_on")
            ).filter(*dashboards_filters)
@@ -110,6 +112,8 @@ def get_dashboards_and_archives(desc):
             DashboardArchive.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
             db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             DashboardArchive.created_dmp_user_id.label("created_dmp_user_id"),
+            db.session.query(Users.dmp_username).filter(Users.id == Dashboard.changed_dmp_user_id).subquery().c.dmp_username.label("changed_dmp_user_name"),
+            DashboardArchive.changed_dmp_user_id.label("changed_dmp_user_id"),
             DashboardArchive.created_on.label("created_on"),
             DashboardArchive.changed_on.label("changed_on")
             ).filter(*archives_filters)
@@ -125,6 +129,45 @@ def get_dashboards_and_archives(desc):
         }
     return resp_hanlder(result=res)
 
+@bi.route("/index", methods=["GET"],defaults={"desc": {"interface_name": "获取首页看板", "is_permission": True, "permission_belong": 0}})
+def get_index_dashboards(desc):
+    """
+    获取首页看板
+
+    ---
+    tags:
+      - BI
+    parameters:
+      - name: 无
+        type: int
+        required: false
+        description: 无需参数
+    responses:
+      0:
+        description: OK!
+    """
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+    index_dashboards = None
+    ud = UserDashboard.query.filter_by(dmp_user_id==current_user_id).first()
+    index_dashboards_id = ud.dmp_dashboard_id if ud else None
+    if index_dashboards_id:
+        index_dashboards_obj = db.session.query(Dashboard.id.label("id"),
+            literal("dashboard").label("type"),
+            Dashboard.dmp_dashboard_name.label("name"),
+            Dashboard.charts_position.label("charts_position"),
+            Dashboard.description.label("description"),
+            Dashboard.release.label("release"),
+            db.session.query(DashboardStar.id).filter(and_(DashboardStar.dmp_dashboard_id==Dashboard.id,DashboardStar.dmp_user_id==current_user_id)).exists().label("is_star"),
+            exists().where(and_(UserDashboard.dmp_dashboard_id ==Dashboard.id,UserDashboard.dmp_user_id==current_user_id)).label("is_index"),
+            Dashboard.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
+            db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
+            Dashboard.created_dmp_user_id.label("created_dmp_user_id"),
+            Dashboard.created_on.label("created_on"),
+           Dashboard.changed_on.label("changed_on")
+           ).filter(Dashboard.id==index_dashboards_id).first()
+        index_dashboards = index_dashboards_obj._asdict() if index_dashboards_obj else None
+    return resp_hanlder(code=0,result={"index":index_dashboards})
 
 @bi.route("/dashboards/",methods=["POST"], defaults={"desc": {"interface_name": "创建看板", "is_permission": True, "permission_belong": 0}})
 def add_dashboard(desc):
@@ -176,10 +219,23 @@ def get_dashboard_by_id(dashboard_id):
       0:
         description: OK
 	"""
-    current_dashboard = Dashboard.get(dashboard_id)
-    if current_dashboard:
-        current_dashboard_info = current_dashboard.__json__()
-        return resp_hanlder(code=0, result={"data":current_dashboard_info})
+    if Dashboard.exist_item_by_id(dashboard_id):
+        dashboards_obj = db.session.query(Dashboard.id.label("id"),
+            literal("dashboard").label("type"),
+            Dashboard.dmp_dashboard_name.label("name"),
+            Dashboard.description.label("description"),
+            Dashboard.charts_position.label("charts_position"),
+            Dashboard.release.label("release"),
+            db.session.query(DashboardStar.id).filter(and_(DashboardStar.dmp_dashboard_id==Dashboard.id,DashboardStar.dmp_user_id==current_user_id)).exists().label("is_star"),
+            exists().where(and_(UserDashboard.dmp_dashboard_id ==Dashboard.id,UserDashboard.dmp_user_id==current_user_id)).label("is_index"),
+            Dashboard.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
+            db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
+            Dashboard.created_dmp_user_id.label("created_dmp_user_id"),
+            Dashboard.created_on.label("created_on"),
+           Dashboard.changed_on.label("changed_on")
+           ).filter(Dashboard.id==index_dashboards_id).first()
+        dashboards = dashboards_obj._asdict() if dashboards_obj else None
+        return resp_hanlder(code=0, result={"data":dashboards})
     else:
         return resp_hanlder(code=999,msg="看板不存在或已被删除")
 
