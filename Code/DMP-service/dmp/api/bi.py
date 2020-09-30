@@ -12,6 +12,7 @@ from dmp.models import Dashboard, DashboardArchive, Users, DashboardStar, Archiv
 from dmp.utils import resp_hanlder
 from dmp.utils.put_data import PuttingData
 from dmp.utils.validators.bi import Get_dashboards_and_archives_validator
+from dmp.utils.form_verify import DashboardForm, ArchiveForm, ChartForm
 
 bi = Blueprint("bi", __name__)
 
@@ -171,7 +172,31 @@ def get_index_dashboards(desc):
 
 @bi.route("/dashboards/",methods=["POST"], defaults={"desc": {"interface_name": "创建看板", "is_permission": True, "permission_belong": 0}})
 def add_dashboard(desc):
-    '''创建看板'''
+    """
+    创建看板
+    ---
+    tags:
+      - Bi
+    parameters:
+      - name: dmp_dashboard_name
+        in: path
+        type: string
+        required: true
+        description: 看板名称
+      - name: upper_dmp_dashboard_archive_id
+        in: path
+        type: int
+        required: false
+        description: 父文件夹ID
+      - name: charts_position
+        in: path
+        type: string
+        required: false
+        description: 图表布局信息
+    responses:
+      0:
+        description: ok
+    """
     try:
         auth_token = request.headers.get('Authorization')
         res = PuttingData.get_obj_data(Users, auth_token)
@@ -183,6 +208,10 @@ def add_dashboard(desc):
         dmp_dashboard_name = data.get('dmp_dashboard_name')
         charts_position = data.get('charts_position')
         upper_dmp_dashboard_archive_id = data.get('upper_dmp_dashboard_archive_id')
+        # 字段表单验证
+        form = DashboardForm(meta={"csrf": False})
+        if not form.validate_on_submit():
+            return resp_hanlder(code=999, err=str(form.errors))
         if dmp_dashboard_name:
             dashboard_obj = Dashboard(
                 dmp_dashboard_name=dmp_dashboard_name,
@@ -242,7 +271,46 @@ def get_dashboard_by_id(dashboard_id):
 
 @bi.route("/dashboards/<int:id>",methods=["PUT"], defaults={"desc": {"interface_name": "修改看板", "is_permission": True, "permission_belong": 0}})
 def update_dashboard_by_id(id, desc):
-    '''修改看板'''
+    """
+    修改看板
+    ---
+    tags:
+      - Bi
+    parameters:
+      - name: id
+        in: path
+        type: int
+        required: true
+        description: url参数id
+      - name: dmp_dashboard_name
+        in: path
+        type: string
+        required: false
+        description: 看板名称
+      - name: description
+        in: path
+        type: string
+        required: false
+        description: 简介
+      - name: upper_dmp_dashboard_archive_id
+        in: path
+        type: int
+        required: false
+        description: 父文件夹ID
+      - name: charts_position
+        in: path
+        type: string
+        required: false
+        description: 图表布局信息
+      - name: release
+        in: path
+        type: int
+        required: false
+        description: 发布状态
+    responses:
+      0:
+        description: ok
+    """
     try:
         auth_token = request.headers.get('Authorization')
         res = PuttingData.get_obj_data(Users, auth_token)
@@ -256,8 +324,11 @@ def update_dashboard_by_id(id, desc):
         charts_position = data.get('charts_position')
         release = data.get('release')
         upper_dmp_dashboard_archive_id = data.get('upper_dmp_dashboard_archive_id')
+        # 字段表单验证
+        form = DashboardForm(meta={"csrf": False})
+        if not form.validate_on_submit():
+            return resp_hanlder(code=999, err=str(form.errors))
         dashboard_obj = Dashboard.query.filter(Dashboard.id == id).first()
-
         if dashboard_obj.created_dmp_user_id == res.get('id'):
             if dmp_dashboard_name and id:
                 dashboard_obj.dmp_dashboard_name = dmp_dashboard_name
@@ -279,7 +350,21 @@ def update_dashboard_by_id(id, desc):
 
 @bi.route("/dashboards/<int:id>",methods=["DELETE"], defaults={"desc": {"interface_name": "删除看板", "is_permission": True, "permission_belong": 0}})
 def delete_dashboard_by_id(id, desc):
-    '''删除看板'''
+    """
+    删除看板
+    ---
+    tags:
+      - Bi
+    parameters:
+      - name: id
+        in: path
+        type: int
+        required: true
+        description: url参数id
+    responses:
+      0:
+        description: ok
+    """
     try:
         auth_token = request.headers.get('Authorization')
         res = PuttingData.get_obj_data(Users, auth_token)
@@ -291,7 +376,7 @@ def delete_dashboard_by_id(id, desc):
             if del_dashboard_obj and id:
                 # 封装的delete方法
                 del_dashboard_obj.delete()
-                return resp_hanlder(code=0, msg='看板删除成功.')
+                return resp_hanlder(code=0, msg='数据看板删除成功.')
             else:
                 return resp_hanlder(code=999, msg='看板ID错误或对象不存在,请重新确认.')
         else:
@@ -302,7 +387,26 @@ def delete_dashboard_by_id(id, desc):
 
 @bi.route("/archives/",methods=["POST"], defaults={"desc": {"interface_name": "创建文件夹", "is_permission": True, "permission_belong": 0}})
 def add_archive(desc):
-    '''创建文件夹'''
+    """
+    创建文件夹
+    ---
+    tags:
+      - Bi
+    parameters:
+      - name: dashboard_archive_name
+        in: path
+        type: string
+        required: true
+        description: 文件夹名称
+      - name: upper_dmp_dashboard_archive_id
+        in: path
+        type: int
+        required: false
+        description: 父文件夹名称
+    responses:
+      0:
+        description: ok
+    """
     if request.method == 'POST':
         try:
             auth_token = request.headers.get('Authorization')
@@ -313,8 +417,11 @@ def add_archive(desc):
             if data == None:
                 return resp_hanlder(code=999)
             dashboard_archive_name = data.get('dashboard_archive_name')
-
             upper_dmp_dashboard_archive_id = data.get('upper_dmp_dashboard_archive_id')
+            # 字段表单验证
+            form = ArchiveForm(meta={"csrf": False})
+            if not form.validate_on_submit():
+                return resp_hanlder(code=999, err=str(form.errors))
             if upper_dmp_dashboard_archive_id:
                 upper_archive_obj = DashboardArchive.query.filter(
                                         DashboardArchive.id == upper_dmp_dashboard_archive_id).first()
@@ -355,7 +462,26 @@ def add_archive(desc):
 
 @bi.route("/archives/<int:id>",methods=["PUT"], defaults={"desc": {"interface_name": "修改文件夹信息", "is_permission": True, "permission_belong": 0}})
 def update_archive_by_id(id, desc):
-    '''修改文件夹信息'''
+    """
+    修改文件夹信息
+    ---
+    tags:
+      - Bi
+    parameters:
+      - name: id
+        in: path
+        type: int
+        required: true
+        description: url参数id
+      - name: dashboard_archive_name
+        in: path
+        type: string
+        required: true
+        description: 修改之后的文件夹名称
+    responses:
+      0:
+        description: ok
+    """
     if request.method == 'PUT':
         try:
             auth_token = request.headers.get('Authorization')
@@ -366,8 +492,11 @@ def update_archive_by_id(id, desc):
             if data == None:
                 return resp_hanlder(code=999)
             dashboard_archive_name = data.get('dashboard_archive_name')
+            # 字段表单验证
+            form = ArchiveForm(meta={"csrf": False})
+            if not form.validate_on_submit():
+                return resp_hanlder(code=999, err=str(form.errors))
             update_dashboard_archive_obj = DashboardArchive.query.filter(DashboardArchive.id == id).first()
-
             if DashboardArchive.created_dmp_user_id == res.get('id'):
                 if dashboard_archive_name and update_dashboard_archive_obj:
                     update_dashboard_archive_obj.dashboard_archive_name = dashboard_archive_name
@@ -385,7 +514,21 @@ def update_archive_by_id(id, desc):
 
 @bi.route("/archives/<int:id>",methods=["DELETE"], defaults={"desc": {"interface_name": "删除文件夹", "is_permission": True, "permission_belong": 0}})
 def delete_archive_by_id(id, desc):
-    '''删除文件夹'''
+    """
+    删除文件夹
+    ---
+    tags:
+      - Bi
+    parameters:
+      - name: id
+        in: path
+        type: int
+        required: true
+        description: url参数id
+    responses:
+      0:
+        description: ok
+    """
     try:
         auth_token = request.headers.get('Authorization')
         res = PuttingData.get_obj_data(Users, auth_token)
@@ -407,7 +550,56 @@ def delete_archive_by_id(id, desc):
 
 @bi.route("/charts/",methods=["POST"], defaults={"desc": {"interface_name": "添加图表接口", "is_permission": True, "permission_belong": 0}})
 def add_chart(desc):
-    '''添加图表接口'''
+    """
+    添加图表接口
+    ---
+    tags:
+      - Bi
+    parameters:
+      - name: chart_name
+        in: path
+        type: string
+        required: true
+        description: 图表名称
+      - name: dmp_data_table_id
+        in: path
+        type: int
+        required: false
+        description: 数据源表ID
+      - name: query_string
+        in: path
+        type: string
+        required: false
+        description: 查询语句
+      - name: chart_data
+        in: path
+        type: string
+        required: false
+        description: 图表数据
+      - name: chart_type
+        in: path
+        type: int
+        required: true
+        description: 图表类型代码,柱状图1,折线图2,饼图3,地图4,雷达图5
+      - name: chart_params
+        in: path
+        type: string
+        required: false
+        description: 图表参数
+      - name: description
+        in: path
+        type: string
+        required: false
+        description: 图表简介
+      - name: dmp_dashboard_id
+        in: path
+        type: id
+        required: int
+        description: 数据看板ID
+    responses:
+      0:
+        description: ok
+    """
     try:
         auth_token = request.headers.get('Authorization')
         res = PuttingData.get_obj_data(Users, auth_token)
@@ -424,7 +616,10 @@ def add_chart(desc):
         chart_params = data.get('chart_params')
         description = data.get('description')
         dmp_dashboard_id = data.get('dmp_dashboard_id')
-
+        # 字段表单验证
+        form = ChartForm(meta={"csrf": False})
+        if not form.validate_on_submit():
+            return resp_hanlder(code=999, err=str(form.errors))
         if chart_name and chart_type and dmp_dashboard_id and dmp_data_table_id:
             chart_obj = Chart(
                 chart_name=chart_name,
@@ -449,7 +644,56 @@ def add_chart(desc):
 
 @bi.route("/charts/<int:id>",methods=["PUT"], defaults={"desc": {"interface_name": "修改图表", "is_permission": True, "permission_belong": 0}})
 def update_charts_by_id(id, desc):
-    '''修改图表'''
+    """
+    修改图表
+    ---
+    tags:
+      - Bi
+    parameters:
+      - name: chart_name
+        in: path
+        type: string
+        required: true
+        description: 图表名称
+      - name: dmp_data_table_id
+        in: path
+        type: int
+        required: false
+        description: 数据源表ID
+      - name: query_string
+        in: path
+        type: string
+        required: false
+        description: 查询语句
+      - name: chart_data
+        in: path
+        type: string
+        required: false
+        description: 图表数据
+      - name: chart_type
+        in: path
+        type: int
+        required: true
+        description: 图表类型代码,柱状图1,折线图2,饼图3,地图4,雷达图5
+      - name: chart_params
+        in: path
+        type: string
+        required: false
+        description: 图表参数
+      - name: description
+        in: path
+        type: string
+        required: false
+        description: 图表简介
+      - name: dmp_dashboard_id
+        in: path
+        type: id
+        required: int
+        description: 数据看板ID
+    responses:
+      0:
+        description: ok
+    """
     if request.method == 'PUT':
         try:
             auth_token = request.headers.get('Authorization')
@@ -467,8 +711,11 @@ def update_charts_by_id(id, desc):
             chart_params = data.get('chart_params')
             description = data.get('description')
             dmp_dashboard_id = data.get('dmp_dashboard_id')
+            # 字段表单验证
+            form = ChartForm(meta={"csrf": False})
+            if not form.validate_on_submit():
+                return resp_hanlder(code=999, err=str(form.errors))
             chart_obj = Chart.query.filter(Chart.id == id).first()
-
             if Chart.created_dmp_user_id == res.get('id'):
                 if chart_name and chart_type and dmp_dashboard_id and chart_obj:
                     chart_obj.chart_name = chart_name
@@ -481,6 +728,8 @@ def update_charts_by_id(id, desc):
                     chart_obj.dmp_dashboard_id = dmp_dashboard_id
                     chart_obj.changed_dmp_user_id = res.get('id')
                     db.session.commit()
+                    return resp_hanlder(code=0, msg='修改图表信息成功.',
+                                        result=chart_obj.chart_to_dict())
                 else:
                     return resp_hanlder(code=999, msg='请正确输入修改图表信息.')
             else:
@@ -491,7 +740,21 @@ def update_charts_by_id(id, desc):
 
 @bi.route("/charts/<int:id>",methods=["DELETE"], defaults={"desc": {"interface_name": "删除图表", "is_permission": True, "permission_belong": 0}})
 def delete_charts_by_id(id, desc):
-    '''删除图表'''
+    """
+    删除图表
+    ---
+    tags:
+      - Bi
+    parameters:
+      - name: id
+        in: path
+        type: int
+        required: true
+        description: url参数id
+    responses:
+      0:
+        description: ok
+    """
     try:
         auth_token = request.headers.get('Authorization')
         res = PuttingData.get_obj_data(Users, auth_token)

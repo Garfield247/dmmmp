@@ -609,9 +609,23 @@ def udel(desc):
             return resp_hanlder(code=999, msg=str(err))
 
 
-@user.route("/secretkey/", methods=["GET"])
+@user.route("/secretkey/", methods=["GET"], defaults={"desc": {"interface_name": "获取个人密钥", "is_permission": True, "permission_belong": 0}})
 def get_secret_key():
-    '''发放有效的 JWT-token'''
+    """
+    获取个人密钥
+    ---
+    tags:
+      - Bi
+    parameters:
+      - name: expires
+        in: path
+        type: int
+        required: true
+        description: 到期时间
+    responses:
+      0:
+        description: ok
+    """
     import datetime
     import jwt
     try:
@@ -631,10 +645,11 @@ def get_secret_key():
                 current_app.config.get('SECRET_KEY'),
                 algorithm='HS256'
             )
-            return resp_hanlder(code=0, msg='Personal key obtained successfully.',
+            return resp_hanlder(code=0, msg='个人密钥获取成功.',
                                result={'self_token': jwt_token_bytes.decode('utf-8')})
         else:
             expires = data.get('expires')
+            expires = int(expires)
             payload = {
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=expires),
                 'iat': datetime.datetime.utcnow(),
@@ -645,7 +660,7 @@ def get_secret_key():
                                             current_app.config.get('SECRET_KEY'),
                                             algorithm='HS256'
                                         )
-            return resp_hanlder(code=0, msg='Personal key obtained successfully.',
+            return resp_hanlder(code=0, msg='个人密钥获取成功.',
                                 result={'self_token': jwt_token_bytes.decode('utf-8')})
     except Exception as err:
         return resp_hanlder(code=999, err=str(err))
