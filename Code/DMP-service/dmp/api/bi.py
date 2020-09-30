@@ -221,7 +221,8 @@ def update_dashboard_by_id(id, desc):
         if not form.validate_on_submit():
             return resp_hanlder(code=999, err=str(form.errors))
         dashboard_obj = Dashboard.query.filter(Dashboard.id == id).first()
-        if dashboard_obj.created_dmp_user_id == res.get('id'):
+        # 自己和超级管理员都可以修改看板
+        if dashboard_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
             if dmp_dashboard_name and id:
                 dashboard_obj.dmp_dashboard_name = dmp_dashboard_name
                 dashboard_obj.description = description
@@ -656,8 +657,7 @@ def delete_charts_by_id(id, desc):
 
         if del_chart_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
             if del_chart_obj and id:
-                db.session.delete(del_chart_obj)
-                db.session.commit()
+                del_chart_obj.delete()
                 return resp_hanlder(code=0, msg='图表删除成功.')
             else:
                 return resp_hanlder(code=999, msg='图表ID错误或对象不存在,请重新确认.')
