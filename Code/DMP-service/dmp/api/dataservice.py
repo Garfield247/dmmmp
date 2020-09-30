@@ -11,8 +11,12 @@ from flask import Blueprint, request
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField
 from wtforms.validators import DataRequired, Length
+from dmp.extensions import limiter
 from dmp.models import DataService, Users, DataServiceParameter, DataTable
+from dmp.models import UserDataService
 from dmp.utils import resp_hanlder
+from dmp.utils.engine import auto_connect
+from dmp.utils.validators.dataservice import DataServiceForm, DataServiceParameterForm
 
 ds = Blueprint("ds", __name__)
 
@@ -20,6 +24,157 @@ ds = Blueprint("ds", __name__)
 @ds.route("/dataservices", methods=["GET"],
           defaults={"desc": {"interface_name": "查询多个数据服务", "is_permission": True, "permission_belong": 0}})
 def get_data_services(desc):
+    """
+    查询多个数据服务
+    ---
+    tags:
+      - DataService
+    parameters:
+      - name: data_service_name
+        in: json
+        type: string
+        required: false
+        description: 要进行检索的服务名
+      - name: page_num
+        in: json
+        type: string
+        required: false
+        description: 页码
+        default: '1'
+      - name: pagesize
+        in: json
+        type: string
+        required: false
+        description: 单页数量
+        default: '10'
+    definitions:
+      DataService:
+        type: object
+        properties:
+            id:
+              type: integer
+              description: 数据服务ID
+            data_service_name:
+              type: string
+              description: 数据服务名称
+            request_method:
+              type: integer
+              description: 请求方法1get2post
+            source_dmp_data_table_id:
+              type: integer
+              description: 源数据表ID
+            projection:
+              type: string
+              description: 预选字段
+            state:
+              type: integer
+              description: 是否启用
+            description:
+              type: string
+              description: 数据服务简介
+            created_on:
+              type: string
+              description: 创建时间
+            changed_on:
+              type: string
+              description: 最后修改时间
+            created_dmp_user_id:
+              type: integer
+              description: 创建人ID
+            changed_dmp_user_id:
+              type: integer
+              description: 最后修改人ID
+            created_dmp_user_name:
+              type: string
+              description: 创建人名称
+            changed_dmp_user_name:
+              type: string
+              description: 最后修改人名称
+      DataServiceParameter:
+        type: object
+        properties:
+            id:
+              type: integer
+              description: 数据服务参数ID
+            parameter_name:
+              type: string
+              description: 数据服务参数名称
+            type:
+              type: integer
+              description: 数据类型
+            source_dmp_data_table_id:
+              type: integer
+              description: 源数据表ID
+            required_parameter:
+              type: integer
+              description: 是否必填
+            description:
+              type: string
+              description: 数据服务简介
+      DataServiceItems:
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/definitions/DataService'
+      DataServiceParameterItem:
+          properties:
+            id:
+              type: integer
+              description: 数据服务ID
+            data_service_name:
+              type: string
+              description: 数据服务名称
+            request_method:
+              type: integer
+              description: 请求方法1get2post
+            source_dmp_data_table_id:
+              type: integer
+              description: 源数据表ID
+            projection:
+              type: string
+              description: 预选字段
+            state:
+              type: integer
+              description: 是否启用
+            description:
+              type: string
+              description: 数据服务简介
+            created_on:
+              type: string
+              description: 创建时间
+            changed_on:
+              type: string
+              description: 最后修改时间
+            created_dmp_user_id:
+              type: integer
+              description: 创建人ID
+            changed_dmp_user_id:
+              type: integer
+              description: 最后修改人ID
+            created_dmp_user_name:
+              type: string
+              description: 创建人名称
+            changed_dmp_user_name:
+              type: string
+              description: 最后修改人名称
+            parameters:
+              type: array
+              $ref: '#/definitions/DataServiceParameter'
+      DataServiceParameterItems:
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/definitions/DataServiceParameterItem'
+    responses:
+      500:
+        description: Error The language is not awesome!
+      0:
+        description: 查询数据服务信息
+        schema:
+          $ref: '#/definitions/DataServiceItems'
+    """
     if request.method == 'GET':
         try:
             auth_token = request.headers.get("Authorization")
@@ -39,7 +194,12 @@ def get_data_services(desc):
                 results = results.filter(DataService.data_service_name.like('%' + data_service_name + '%'))
             results = results.limit(pagesize).offset((int(page_num) - 1) * int(pagesize))
             data = [d.__json__() for d in results]
-            return resp_hanlder(result=data)
+            results = {
+                'data': data,
+                'page_num': page_num,
+                'pagesize': pagesize
+            }
+            return resp_hanlder(result=results)
         except Exception as err:
             return resp_hanlder(code=999, error=err)
 
@@ -47,6 +207,26 @@ def get_data_services(desc):
 @ds.route("/dataservices/<int:id>", methods=["GET"],
           defaults={"desc": {"interface_name": "获取单一数据服务", "is_permission": True, "permission_belong": 0}})
 def get_data_service_by_id(id, desc):
+    """
+    获取单一数据服务
+    ---
+    tags:
+      - DataService
+    parameters:
+      - name: id
+        in: path
+        type: int
+        required: true
+        description: URL参数要获取的数据服务内容的ID
+    responses:
+      500:
+        description: Error The language is not awesome!
+      0:
+        description: 查询单一数据服务信息
+        schema:
+           $ref: '#/definitions/DataServiceParameterItems'
+
+    """
     if request.method == 'GET':
         try:
             auth_token = request.headers.get("Authorization")
@@ -70,6 +250,38 @@ def get_data_service_by_id(id, desc):
 @ds.route("/dataservices", methods=["POST"],
           defaults={"desc": {"interface_name": "添加数据服务", "is_permission": True, "permission_belong": 0}})
 def add_data_services(desc):
+    """
+    添加数据服务
+    ---
+    tags:
+      - DataService
+    parameters:
+      - name: data_service_name
+        in: json
+        type: string
+        required: true
+        description: 数据服务名称
+      - name: api_path
+        in: json
+        type: string
+        required: true
+        description: 数据服务接口
+      - name: request_method
+        in: json
+        type: integer
+        required: true
+        description: 请求方法1get2post
+      - name: description
+        in: json
+        type: string
+        required: false
+        description: 简介
+    responses:
+      500:
+        description: Error The language is not awesome!
+      0:
+        msg: 'ok'
+    """
     if request.method == 'POST':
         try:
             form = DataServiceForm(csrf_enabled=False)
@@ -88,6 +300,7 @@ def add_data_services(desc):
                                        api_path=api_path,
                                        request_method=request_method,
                                        created_dmp_user_id=user_id,
+                                       changed_dmp_user_id=user_id,
                                        description=description)
             data_service.save()
             return resp_hanlder(result={"add_data_service": "complete!"})
@@ -98,6 +311,63 @@ def add_data_services(desc):
 @ds.route("/dataservices/<int:id>", methods=["PUT"],
           defaults={"desc": {"interface_name": "修改数据服务", "is_permission": True, "permission_belong": 0}})
 def update_data_service_by_id(id, desc):
+    """
+    修改数据服务
+    ---
+    tags:
+      - DataService
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: URL参数，要修改的数据服务的ID
+      - name: data_service_name
+        in: json
+        type: string
+        required: false
+        description: 数据服务名称
+      - name: api_path
+        in: json
+        type: string
+        required: false
+        description: 数据服务接口
+      - name: request_method
+        in: json
+        type: integer
+        required: false
+        description: 请求方法1get2post
+      - name: description
+        in: json
+        type: string
+        required: false
+        description: 简介
+      - name: source_dmp_data_table_id
+        in: json
+        type: integer
+        required: false
+        description: 源数据表ID
+      - name: query_sql
+        in: json
+        type: string
+        required: false
+        description: 查询语句（mysql）
+      - name: query_params
+        in: json
+        type: integer
+        required: false
+        description: 查询参数（mongodb）
+      - name: state
+        in: json
+        type: integer
+        required: false
+        description: 是否启用
+    responses:
+      500:
+        description: Error The language is not awesome!
+      0:
+        msg: 'ok'
+    """
     if request.method == 'PUT':
         try:
             auth_token = request.headers.get("Authorization")
@@ -151,6 +421,23 @@ def update_data_service_by_id(id, desc):
 @ds.route("/dataservices/<int:id>", methods=["DELETE"],
           defaults={"desc": {"interface_name": "删除数据服务", "is_permission": True, "permission_belong": 0}})
 def delete_data_service_by_id(id, desc):
+    """
+    删除数据服务
+    ---
+    tags:
+      - DataService
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: URL参数，要删除的数据服务的ID
+    responses:
+      500:
+        description: Error The language is not awesome!
+      0:
+        msg: 'ok'
+    """
     if request.method == 'DELETE':
         try:
             if id:
@@ -174,6 +461,43 @@ def delete_data_service_by_id(id, desc):
 @ds.route("/ds_parameters", methods=["POST"],
           defaults={"desc": {"interface_name": "添加数据服务参数", "is_permission": True, "permission_belong": 0}})
 def add_ds_parameters(desc):
+    """
+    添加数据服务参数
+    ---
+    tags:
+      - DataService
+    parameters:
+      - name: dmp_data_service_id
+        in: json
+        type: integer
+        required: true
+        description: 数据服务ID
+      - name: parameter_name
+        in: json
+        type: string
+        required: true
+        description: 参数名
+      - name: type
+        in: json
+        type: string
+        required: true
+        description: 字段类型
+      - name: required_parameter
+        in: json
+        type: integer
+        required: false
+        description: 是否是必填项
+      - name: description
+        in: json
+        type: string
+        required: false
+        description: 简介
+    responses:
+      500:
+        description: Error The language is not awesome!
+      0:
+        msg: 'ok'
+    """
     if request.method == 'POST':
         try:
             auth_token = request.headers.get("Authorization")
@@ -216,6 +540,48 @@ def add_ds_parameters(desc):
 @ds.route("/ds_parameters/<int:id>", methods=["PUT"],
           defaults={"desc": {"interface_name": "修改数据服务参数", "is_permission": True, "permission_belong": 0}})
 def update_ds_parameters(id, desc):
+    """
+    修改数据服务参数
+    ---
+    tags:
+      - DataService
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: 数据服务参数ID
+      - name: dmp_data_service_id
+        in: json
+        type: integer
+        required: true
+        description: 数据服务ID
+      - name: parameter_name
+        in: json
+        type: string
+        required: false
+        description: 参数名
+      - name: type
+        in: json
+        type: string
+        required: false
+        description: 字段类型
+      - name: required_parameter
+        in: json
+        type: integer
+        required: false
+        description: 是否是必填项
+      - name: description
+        in: json
+        type: string
+        required: false
+        description: 简介
+    responses:
+      500:
+        description: Error The language is not awesome!
+      0:
+        msg: 'ok'
+    """
     if request.method == 'PUT':
         try:
             auth_token = request.headers.get("Authorization")
@@ -355,22 +721,3 @@ def get_data_by_data_service():
     else:
         code = 8101
     return resp_hanlder(code=code, msg=msg, result=result)
-
-
-class DataServiceForm(FlaskForm):
-    data_service_name = StringField("data_service_name",
-                                    validators=[DataRequired(message="API名称不能为空"),
-                                                Length(max=50, message="API名称长度不能超过50!")])
-    api_path = StringField("api_path",
-                           validators=[DataRequired(message="API路径不能为空"), Length(max=255, message="API路径长度不能超过255!")])
-    request_method = SelectField("request_method", choices={1})
-    description = StringField("description", validators=[Length(max=400, message="API描述长度不能超过400")])
-
-
-class DataServiceParameterForm(FlaskForm):
-    parameter_name = StringField("parameter_name",
-                                 validators=[DataRequired(message="参数名不能为空"),
-                                             Length(max=100, message="参数名长度不能超过100!")])
-    type = StringField("type", validators=[DataRequired(), Length(max=50, message="字段类型长度不能超过50!")])
-    required_parameter = SelectField("required_parameter", choices={0, 1})
-    description = StringField("description", validators=[Length(max=400, message="简介长度不能超过400")])

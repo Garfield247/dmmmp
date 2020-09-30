@@ -176,7 +176,7 @@ def add_dashboard(desc):
     创建看板
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: dmp_dashboard_name
         in: path
@@ -275,7 +275,7 @@ def update_dashboard_by_id(id, desc):
     修改看板
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: id
         in: path
@@ -354,7 +354,7 @@ def delete_dashboard_by_id(id, desc):
     删除看板
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: id
         in: path
@@ -391,7 +391,7 @@ def add_archive(desc):
     创建文件夹
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: dashboard_archive_name
         in: path
@@ -466,7 +466,7 @@ def update_archive_by_id(id, desc):
     修改文件夹信息
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: id
         in: path
@@ -518,7 +518,7 @@ def delete_archive_by_id(id, desc):
     删除文件夹
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: id
         in: path
@@ -554,7 +554,7 @@ def add_chart(desc):
     添加图表接口
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: chart_name
         in: path
@@ -648,7 +648,7 @@ def update_charts_by_id(id, desc):
     修改图表
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: chart_name
         in: path
@@ -744,7 +744,7 @@ def delete_charts_by_id(id, desc):
     删除图表
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: id
         in: path
