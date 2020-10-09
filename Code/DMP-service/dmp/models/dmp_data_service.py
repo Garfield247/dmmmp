@@ -87,10 +87,20 @@ class DataService(db.Model, DMPModel):
         return "-"
 
     @ property
+    def database_type(self):
+        from .dmp_data_table import DataTable
+        if DataTable.exist_item_by_id(self.source_dmp_data_table_id):
+            dmp_database_type = DataTable.get(
+                self.source_dmp_data_table_id).dmp_database_type
+            return dmp_database_type
+        return "-"
+
+    @ property
     def _json_tmp(self):
         _d = {
             "created_dmp_user_name": self.created_dmp_user_name,
             "changed_dmp_user_name": self.changed_dmp_user_name,
             "source_dmp_data_table_name": self.source_dmp_data_table_name,
+            "database_type": self.database_type,
         }
         return _d

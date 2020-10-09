@@ -50,6 +50,13 @@ class DataTable(db.Model, DMPModel):
         d_name = d.dmp_database_name if d else "-"
         return d_name
 
+    @property
+    def dmp_database_type(self):
+        from dmp.models import Database
+        d = Database.get(self.dmp_database_id)
+        d_type = d.dmp_database_type if d else "-"
+        return d_type
+
     def data_count(self):
         from dmp.utils.engine import auto_connect
         conn = auto_connect(db_id=self.dmp_database_id)
@@ -75,6 +82,7 @@ class DataTable(db.Model, DMPModel):
             "dmp_user_name": self.dmp_user_name,
             "dmp_case_name": self.dmp_case_name,
             "dmp_database_name": self.dmp_database_name,
+            "database_type": self.database_type,
         }
         return _d
 
