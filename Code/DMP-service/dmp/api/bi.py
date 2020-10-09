@@ -95,7 +95,7 @@ def get_dashboards_and_archives(desc):
             db.session.query(DashboardStar.id).filter(and_(DashboardStar.dmp_dashboard_id==Dashboard.id,DashboardStar.dmp_user_id==current_user_id)).exists().label("is_star"),
             exists().where(and_(UserDashboard.dmp_dashboard_id ==Dashboard.id,UserDashboard.dmp_user_id==current_user_id)).label("is_index"),
             Dashboard.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
-            db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
+            # db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             Dashboard.created_dmp_user_id.label("created_dmp_user_id"),
             db.session.query(Users.dmp_username).filter(Users.id == Dashboard.changed_dmp_user_id).subquery().c.dmp_username.label("changed_dmp_user_name"),
             Dashboard.changed_dmp_user_id.label("changed_dmp_user_id"),
@@ -111,7 +111,7 @@ def get_dashboards_and_archives(desc):
             exists().where(and_(ArchiveStar.dmp_archive_id ==DashboardArchive.id,ArchiveStar.dmp_user_id==current_user_id)).label("is_star"),
             literal("-").label("is_index"),
             DashboardArchive.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
-            db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
+            # db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             DashboardArchive.created_dmp_user_id.label("created_dmp_user_id"),
             db.session.query(Users.dmp_username).filter(Users.id == Dashboard.changed_dmp_user_id).subquery().c.dmp_username.label("changed_dmp_user_name"),
             DashboardArchive.changed_dmp_user_id.label("changed_dmp_user_id"),
@@ -120,6 +120,7 @@ def get_dashboards_and_archives(desc):
             ).filter(*archives_filters)
 
     dashboards_and_archives = dashboards.union(archives)
+    print(dashboards_and_archives)
     count = dashboards_and_archives.count()
     data = [d._asdict() for d in dashboards_and_archives.order_by(desc_("is_index"),desc_("is_star"),desc_("changed_on")).offset((pagenum-1)*pagesize).limit(pagesize)]
     res = {
@@ -232,9 +233,9 @@ def add_dashboard(desc):
         return resp_hanlder(code=999, err=str(err))
 
 @bi.route("/dashboards/<int:dashboard_id>",methods=["GET"], defaults={"desc": {"interface_name": "获取单一看板信息", "is_permission": True, "permission_belong": 0}})
-def get_dashboard_by_id(dashboard_id):
+def get_dashboard_by_id(desc,dashboard_id):
     """
-    获取但一看板信息
+    获取单一看板信息
 
     ---
     tags:
@@ -248,6 +249,8 @@ def get_dashboard_by_id(dashboard_id):
       0:
         description: OK
 	"""
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
     if Dashboard.exist_item_by_id(dashboard_id):
         dashboards_obj = db.session.query(Dashboard.id.label("id"),
             literal("dashboard").label("type"),
@@ -262,7 +265,7 @@ def get_dashboard_by_id(dashboard_id):
             Dashboard.created_dmp_user_id.label("created_dmp_user_id"),
             Dashboard.created_on.label("created_on"),
            Dashboard.changed_on.label("changed_on")
-           ).filter(Dashboard.id==index_dashboards_id).first()
+           ).filter(Dashboard.id==dashboard_id).first()
         dashboards = dashboards_obj._asdict() if dashboards_obj else None
         return resp_hanlder(code=0, result={"data":dashboards})
     else:
