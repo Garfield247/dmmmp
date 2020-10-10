@@ -903,7 +903,7 @@ def del_dashboard_star(desc,dashboard_id):
 
 
 @bi.route("/archive_star/<int:archive_id>", methods=["POST"],defaults={"desc": {"interface_name": "文件夹置顶", "is_permission": True, "permission_belong": 0}})
-def add_archive_star(desc):
+def add_archive_star(desc,archive_id):
     """
     文件夹置顶
 
@@ -922,7 +922,7 @@ def add_archive_star(desc):
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
     if DashboardArchive.exist_item_by_id(archive_id):
-        is_exists = db.session.query(exists().where(and_(ArchiveStar.dmp_user_id==current_user_id,ArchiveStar.dmp_dashboard_id==dashboard_id))).scalar()
+        is_exists = db.session.query(exists().where(and_(ArchiveStar.dmp_user_id==current_user_id,ArchiveStar.dmp_archive_id==archive_id))).scalar()
         if not is_exists:
             star = ArchiveStar(
                 dmp_user_id = current_user_id,
@@ -938,7 +938,7 @@ def add_archive_star(desc):
 
 
 @bi.route("/archive_star/<int:archive_id>", methods=["DELETE"],defaults={"desc": {"interface_name": "文件夹取消置顶", "is_permission": True, "permission_belong": 0}})
-def del_archive_star(desc):
+def del_archive_star(desc, archive_id):
     """
     文件夹取消置顶
 
@@ -957,14 +957,14 @@ def del_archive_star(desc):
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
     if DashboardArchive.exist_item_by_id(archive_id):
-        is_exists = db.session.query(exists().where(and_(ArchiveStar.dmp_user_id==current_user_id,ArchiveStar.dmp_dashboard_id==dashboard_id))).scalar()
+        is_exists = db.session.query(exists().where(and_(ArchiveStar.dmp_user_id==current_user_id,ArchiveStar.dmp_archive_id==archive_id))).scalar()
         if is_exists:
             ArchiveStar.query.filter_by(dmp_user_id=current_user_id,dmp_archive_id=archive_id).delete()
             return resp_hanlder(code=0,msg="OK")
         else:
-            return resp_hanlder(code=999,msg="文件夹已置顶")
+            return resp_hanlder(code=999,msg="文件夹未置顶")
     else:
-        return resp_hanlder(code=999,msg="看板不存在或已被删除")
+        return resp_hanlder(code=999,msg="文件夹不存在或已被删除")
 
 
 
