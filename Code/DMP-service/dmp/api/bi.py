@@ -328,24 +328,27 @@ def update_dashboard_by_id(id, desc):
         charts_position = data.get('charts_position')
         release = data.get('release')
         upper_dmp_dashboard_archive_id = data.get('upper_dmp_dashboard_archive_id')
-        # 字段表单验证
         form = DashboardForm(meta={"csrf": False})
         if not form.validate_on_submit():
             return resp_hanlder(code=999, err=str(form.errors))
         dashboard_obj = Dashboard.query.filter(Dashboard.id == id).first()
-        if dashboard_obj.created_dmp_user_id == res.get('id'):
-            if dmp_dashboard_name and id:
+        # 看板只有自己和超级管理员能修改，别人无权利修改
+        if dashboard_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
+            # if dmp_dashboard_name and id:
+            if dmp_dashboard_name != None:
                 dashboard_obj.dmp_dashboard_name = dmp_dashboard_name
+            if description != None:
                 dashboard_obj.description = description
+            if charts_position != None:
                 dashboard_obj.charts_position = charts_position
+            if release != None:
                 dashboard_obj.release = release
+            if upper_dmp_dashboard_archive_id != None:
                 dashboard_obj.upper_dmp_dashboard_archive_id = upper_dmp_dashboard_archive_id
-                dashboard_obj.changed_dmp_user_id = res.get('id')
-                db.session.commit()
-                return resp_hanlder(code=0, msg='看板数据修改成功.',
-                                    result=dashboard_obj.dashboard_to_dict())
-            else:
-                return resp_hanlder(code=999, msg='请确认看板名称是否存在并确认其是否正确.')
+            dashboard_obj.changed_dmp_user_id = res.get('id')
+            db.session.commit()
+            return resp_hanlder(code=0, msg='看板数据修改成功.',
+                                result=dashboard_obj.dashboard_to_dict())
         else:
             return resp_hanlder(code=301, msg='没有权限修改其他看板信息.')
     except Exception as err:
@@ -715,27 +718,32 @@ def update_charts_by_id(id, desc):
             chart_params = data.get('chart_params')
             description = data.get('description')
             dmp_dashboard_id = data.get('dmp_dashboard_id')
-            # 字段表单验证
             form = ChartForm(meta={"csrf": False})
             if not form.validate_on_submit():
                 return resp_hanlder(code=999, err=str(form.errors))
             chart_obj = Chart.query.filter(Chart.id == id).first()
-            if Chart.created_dmp_user_id == res.get('id'):
+            # 图表信息只能自己修改，其他人无权修改
+            if chart_obj.created_dmp_user_id == res.get('id'):
                 if chart_name and chart_type and dmp_dashboard_id and chart_obj:
                     chart_obj.chart_name = chart_name
-                    chart_obj.dmp_data_table_id = dmp_data_table_id
-                    chart_obj.query_string = query_string
-                    chart_obj.chart_data = chart_data
                     chart_obj.chart_type = chart_type
-                    chart_obj.chart_params = chart_params
-                    chart_obj.description = description
                     chart_obj.dmp_dashboard_id = dmp_dashboard_id
+                    if dmp_data_table_id != None:
+                        chart_obj.dmp_data_table_id = dmp_data_table_id
+                    if query_string != None:
+                        chart_obj.query_string = query_string
+                    if chart_data != None:
+                        chart_obj.chart_data = chart_data
+                    if chart_params != None:
+                        chart_obj.chart_params = chart_params
+                    if description != None:
+                        chart_obj.description = description
                     chart_obj.changed_dmp_user_id = res.get('id')
                     db.session.commit()
-                    return resp_hanlder(code=0, msg='修改图表信息成功.',
+                    return resp_hanlder(code=0, msg='图表信息修改成功.',
                                         result=chart_obj.chart_to_dict())
                 else:
-                    return resp_hanlder(code=999, msg='请正确输入修改图表信息.')
+                    return resp_hanlder(code=999, msg='请正确输入修改图表所必要的参数信息.')
             else:
                 return resp_hanlder(code=301, msg='没有权限修改其他图表信息.')
         except Exception as err:
@@ -768,8 +776,7 @@ def delete_charts_by_id(id, desc):
 
         if del_chart_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
             if del_chart_obj and id:
-                db.session.delete(del_chart_obj)
-                db.session.commit()
+                del_chart_obj.delete()
                 return resp_hanlder(code=0, msg='图表删除成功.')
             else:
                 return resp_hanlder(code=999, msg='图表ID错误或对象不存在,请重新确认.')
