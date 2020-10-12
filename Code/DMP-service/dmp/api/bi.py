@@ -93,7 +93,8 @@ def get_dashboards_and_archives(desc):
             Dashboard.description.label("description"),
             Dashboard.release.label("release"),
             db.session.query(DashboardStar.id).filter(and_(DashboardStar.dmp_dashboard_id==Dashboard.id,DashboardStar.dmp_user_id==current_user_id)).exists().label("is_star"),
-            exists().where(and_(UserDashboard.dmp_dashboard_id ==Dashboard.id,UserDashboard.dmp_user_id==current_user_id)).label("is_index"),
+            db.session.query(DashboardStar.id).filter(and_(UserDashboard.dmp_dashboard_id==Dashboard.id,UserDashboard.dmp_user_id==current_user_id)).exists().label("is_index"),
+            # exists().where(and_(UserDashboard.dmp_dashboard_id ==Dashboard.id,UserDashboard.dmp_user_id==current_user_id)).label("is_index"),
             Dashboard.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
             # db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             Dashboard.created_dmp_user_id.label("created_dmp_user_id"),
@@ -151,7 +152,7 @@ def get_index_dashboards(desc):
     auth_token = request.headers.get('Authorization')
     current_user_id = Users.decode_auth_token(auth_token)
     index_dashboards = None
-    ud = UserDashboard.query.filter_by(dmp_user_id==current_user_id).first()
+    ud = UserDashboard.query.filter_by(dmp_user_id=current_user_id).first()
     index_dashboards_id = ud.dmp_dashboard_id if ud else None
     if index_dashboards_id:
         index_dashboards_obj = db.session.query(Dashboard.id.label("id"),
