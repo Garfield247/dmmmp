@@ -627,7 +627,7 @@ def add_chart(desc):
         form = ChartForm(meta={"csrf": False})
         if not form.validate_on_submit():
             return resp_hanlder(code=999, err=str(form.errors))
-        if chart_name and chart_type and dmp_dashboard_id and dmp_data_table_id:
+        if chart_name and chart_type and dmp_dashboard_id:
             chart_obj = Chart(
                 chart_name=chart_name,
                 dmp_data_table_id=dmp_data_table_id,
