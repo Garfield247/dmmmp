@@ -610,7 +610,7 @@ def udel(desc):
 
 
 @user.route("/secretkey/", methods=["GET"], defaults={"desc": {"interface_name": "获取个人密钥", "is_permission": True, "permission_belong": 0}})
-def get_secret_key():
+def get_secret_key(desc):
     """
     获取个人密钥
     ---

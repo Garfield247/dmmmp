@@ -240,7 +240,7 @@ class KylinTool():
         code,data = self._put("models",params=params)
         return code,data
 
-    def api_get_model_desc_data(self,modelName=None ,projectName=None ,limit=None ,offset=None)
+    def api_get_model_desc_data(self,modelName=None ,projectName=None ,limit=None ,offset=None):
         """
         获取模型描述数据
         modelName - 可选 string model名称。
@@ -326,7 +326,7 @@ class KylinTool():
             "cubeName":cubeName,
             "projectName":projectName
         }
-        code,data = self.get("cubes",params=params)
+        code,data = self._get("cubes",params=params)
         return code,data
 
     def api_get_cube(self,cubeName):
@@ -348,7 +348,7 @@ class KylinTool():
         return code,data
 
 
-    def api_build_cube(self,cubeName,startTime=None,endTime=None,buildType):
+    def api_build_cube(self,cubeName,buildType,startTime=None,endTime=None):
         """
         构建立方体
         参数：
@@ -428,10 +428,10 @@ class KylinTool():
         cubeName - 必需 string 多维数据集名称.
         segmentName - 必需 string 分片名称
         """
-        code,data = self._get("cubes/{cubeName}/segs/{segmentName}/sql".format(cubeName,segmentName=segmentName))
+        code,data = self._get("cubes/{cubeName}/segs/{segmentName}/sql".format(cubeName=cubeName,segmentName=segmentName))
         return code,data
 
-    def api_force_rebuild_lookup_table_snapshot(self,cubeName=cubeName):
+    def api_force_rebuild_lookup_table_snapshot(self,cubeName):
         """
         强制重建查找表快照
         参数：
@@ -493,7 +493,7 @@ class KylinTool():
         参数：
         cubeName - 必需 string 多维数据集名称.
         """
-        code,data = self.put("cubes/{cubeName}/init_start_offsets".format(cubeName=cubeName))
+        code,data = self._put("cubes/{cubeName}/init_start_offsets".format(cubeName=cubeName))
         return code,data
 
     def api_build_stream_cube(self,cubeName,sourceOffsetStart,sourceOffsetEnd,buildType):
@@ -514,7 +514,7 @@ class KylinTool():
         code,data = self._put("cubes/{cubeName}/build2".format(cubeName=cubeName),params=params)
         return code ,data
 
-    def api_chaeck_segment_holes(self):
+    def api_chaeck_segment_holes(self,cubeName):
         """
         检查分段缺口
         参数：
@@ -523,7 +523,7 @@ class KylinTool():
         code,data = self._get("cubes/{cubeName}/holes".format(cubeName=cubeName))
         return code ,data
 
-    def api_chaeck_segment_holes(self):
+    def api_full_segment_holes(self, cubeName):
         """
         填充分段缺口
         参数：
@@ -654,33 +654,33 @@ class KylinTool():
     """
 
     def api_get_hive_table(self,tableName):
-         """
-         根据表名获取hive表
+        """
+        根据表名获取hive表
 
-         参数：
-         tableName - 必需 string 查找的表名称。
-         """
+        参数：
+        tableName - 必需 string 查找的表名称。
+        """
         code,data = self._get("tables/{tableName}".format(tableName=tableName))
         return code,data
 
     def api_get_hive_table_ext(self,tableName):
-         """
-         根据表名获取hive表(扩展信息)
+        """
+        根据表名获取hive表(扩展信息)
 
-         参数：
-         tableName - 必需 string 查找的表名称。
-         """
+        参数：
+        tableName - 必需 string 查找的表名称。
+        """
         code,data = self._get("tables/{tableName}/exd-map".format(tableName=tableName))
         return code,data
 
     def api_get_hive_tables(self,project,ext=False):
-         """
-         获取hive表
+        """
+        获取hive表
 
-         参数：
-         project -必需 string 将列出项目中的所有表。
-         ext - 可选 boolean 设置为true可获得表的扩展信息。
-         """
+        参数：
+        project -必需 string 将列出项目中的所有表。
+        ext - 可选 boolean 设置为true可获得表的扩展信息。
+        """
         params = {
             "project":project,
             "ext":ext
@@ -699,7 +699,7 @@ class KylinTool():
         code,data = self._post("tables/{tables}/{project}".format(tables=tables,project=project))
         return code,data
 
-    def api_load_hive_tables(self,tables,project):
+    def api_unload_hive_tables(self,tables,project):
         """
         卸载hive表
         参数：
@@ -750,7 +750,7 @@ class KylinTool():
         code,data = self._get("acl/table/{project}/{type}/black/{table}".format(project=project,utype=utype,table=table))
         return code,data
 
-    def api_put_user_2_table_blacklist(self,project,utype,table,name)
+    def api_put_user_2_table_blacklist(self,project,utype,table,name):
         """
         将用户放入表黑名单
         参数：
@@ -762,7 +762,7 @@ class KylinTool():
         code,data = self._del("table/{project}/{type}/{table}/{name}".format(project=project,utype=utype,table=table,name=name))
         return code,data
 
-    def api_delete_user_from_table_blacklist(self,project,utype,table,name)
+    def api_delete_user_from_table_blacklist(self,project,utype,table,name):
         """
         将用户从表黑名单删除
         参数：
@@ -786,7 +786,7 @@ class KylinTool():
         name - 必需 string 缓存键，例如多维数据集名称。
         action - 必需 string ‘create’, ‘update’ or ‘drop’
         """
-        code,data = self._put("cache/{ctype}/{name}/{action}".format(ctype=ctype,name=name,action=sction))
+        code,data = self._put("cache/{ctype}/{name}/{action}".format(ctype=ctype,name=name,action=action))
         return code,data
 
     def api_announce_wipe_cache(self,name,ctype,action):
@@ -797,7 +797,7 @@ class KylinTool():
         name - 必需 string 缓存键，例如多维数据集名称。
         action - 必需 string ‘create’, ‘update’ or ‘drop’
         """
-        code,data = self._put("cache/announce/{ctype}/{name}/{action}".format(ctype=ctype,name=name,action=sction))
+        code,data = self._put("cache/announce/{ctype}/{name}/{action}".format(ctype=ctype,name=name,action=action))
         return code,data
 
     def api_hot_load_kylin_config(self):
