@@ -40,7 +40,7 @@ def get_dashboards_and_archives(desc):
         description: 发布状态
       - name: name
         type: string
-        required: false
+        required: true
         description: 要检索的看板名或用户名
       - name: pagenum
         type: int
@@ -63,15 +63,13 @@ def get_dashboards_and_archives(desc):
         return resp_hanlder(code=201, msg=valid.str_errors)
     upper_dmp_dashboard_archive_id = request_json.get("upper_dmp_dashboard_archive_id",None)
     is_owner = request_json.get("is_owner",False)
-    state = request_json.get("state","012")
-    states = list(str(state))
+    state = request_json.get("state",3)
     name = request_json.get("name",None)
     pagenum = request_json.get("pagenum",1)
     pagesize = request_json.get("pagesize",10)
 
     dashboards_filters = {
             Dashboard.upper_dmp_dashboard_archive_id == upper_dmp_dashboard_archive_id,
-            Dashboard.release.in_(states)
             }
 
     archives_filters = {
@@ -86,6 +84,8 @@ def get_dashboards_and_archives(desc):
         dashboards_filters.add(Dashboard.dmp_dashboard_name.like("%"+name+"%"))
         archives_filters.add(DashboardArchive.dashboard_archive_name.like("%"+name+"%"))
 
+    if state != 3:
+        dashboards_filters.add(Dashboard.release == state)
 
     dashboards = db.session.query(Dashboard.id.label("id"),
             literal("dashboard").label("type"),
