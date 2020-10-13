@@ -14,7 +14,7 @@ class Dashboard(db.Model, DMPModel):
     id = db.Column(db.Integer, primary_key=True,
                    autoincrement=True, comment='看板ID')
     dmp_dashboard_name = db.Column(
-        db.String(64), unique=True, nullable=False, comment='数据看板名称')
+        db.String(64), unique=False, nullable=False, comment='数据看板名称')
     description = db.Column(db.String(512), default=None, comment='备注,简介')
     release = db.Column(db.Integer, default=0, comment='是否发布，0否1是2下线')
     charts_position = db.Column(db.Text, comment='图标布局数据')
