@@ -19,6 +19,7 @@ from .index import index
 from .bi import bi
 from .dataservice import ds
 from .task import task
+from .sql import sql
 
 # 蓝本配置
 DEFAULT_BLUEPRINT = (
@@ -37,6 +38,7 @@ DEFAULT_BLUEPRINT = (
     (bi, "/bi"),
     (ds, "/ds"),
     (task, "/task"),
+    (sql, "/sql"),
 )
 
 

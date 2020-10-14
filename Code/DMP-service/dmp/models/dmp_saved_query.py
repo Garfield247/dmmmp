@@ -36,10 +36,23 @@ class SavedQuery(db.Model, DMPModel):
         return "-"
 
     @property
+    def dmp_case_name(self):
+        from .dmp_data_table import DataTable
+        from .dmp_case import Case
+        if DataTable.exist_item_by_id(self.dmp_data_table_id):
+            case_id = DataTable.get(
+                self.dmp_data_table_id).dmp_case_id
+            if Case.exist_item_by_id(case_id):
+                case_name = Case.get(case_id).dmp_case_name
+                return case_name
+        return "-"
+
+    @property
     def _json_tmp(self):
         _d = {
             "created_dmp_user_name": self.created_dmp_user_name,
             "changed_dmp_user_name": self.changed_dmp_user_name,
-            "dmp_data_table_name": dmp_data_table_name,
+            "dmp_data_table_name": self.dmp_data_table_name,
+            "dmp_case_name": self.dmp_case_name,
         }
         return _d

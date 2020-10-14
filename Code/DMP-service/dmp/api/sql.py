@@ -1,55 +1,115 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Date    : 2020/8/20
+# @Date    : 2020/10/14
 # @Author  : SHTD
 
+import datetime
 from flask import Blueprint
 from dmp.utils.engine import auto_connect
 from flask import Blueprint, request
+from sqlalchemy import tuple_
 from dmp.utils import resp_hanlder
 from dmp.utils.engine import auto_connect
-from dmp.utils.validators.dataservice import DataServiceForm, DataServiceParameterForm
-from dmp.models import SavedQuery
-
+from dmp.models import SavedQuery,Case,DataTable,Users
+from dmp.utils.validators.sql import Get_queries_validator,Add_queries_validator, Update_queries_validator
+from dmp.extensions import db
 
 sql = Blueprint("sql", __name__)
 
 
 @sql.route("/queries", methods=["GET"],defaults={"desc": {"interface_name": "获取多个保存的SQL", "is_permission": True, "permission_belong": 0}})
-def get_data_services(desc):
+def get_queries(desc):
 
     """
     获取多个保存的SQL
-
+    名称查询均支持模糊查询
     ---
     tags:
       - SQL
     parameters:
-      - name: <++>
-        in: <++>
-        type: <++>
-        required: <++>
-        description: <++>
+      - name: query_name
+        in:
+        type: string
+        required: false
+        description: 查询的名称，最长64字符
+      - name: case_name
+        in:
+        type: string
+        required: false
+        description: 案例名称，最长64字符
+      - name: table_name
+        in:
+        type: string
+        required: false
+        description: 数据表名称,最长64字符
+      - name: start_time
+        in:
+        type: string
+        required: false
+        description: 开始时间,最长64字符,示例：2020-10-14 17:58:00
+      - name: end_time
+        in:
+        type: string
+        required: false
+        description: 结束时间,最长64字符,格式同上
+      - name: pagesize
+        in:
+        type: int
+        required: false
+        description: 一页数量，最小值为1
+      - name: pagenum
+        in:
+        type: int
+        required: false
+        description: 页码，最小值为1
     responses:
-      <++>:
-        description: <++>
-        schema:
-          id: result
-          properties:
-            <++>:
-              type: <++>
-              description: <++>
-              default: <++>
-            <++>:
-              type: <++>
-              description: <++>
-              items:
-                type: <++>
-              default: ["<++>", "<++>", "<++>"]
-	"""
+      0:
+        description: ok
+    """
+
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+    request_json = request.json if request.json else {}
+
+    valid = Get_queries_validator(request_json)
+    if not valid.is_valid():
+        return resp_hanlder(code=201, msg=valid.str_errors)
+
+    query_name = request_json.get("query_name")
+    case_name = request_json.get("case_name")
+    table_name = request_json.get("table_name")
+    start_time = request_json.get("start_time")
+    end_time = request_json.get("end_time", str(datetime.datetime.now()))
+
+    pagesize = request_json.get("pagesize", 10)
+    pagenum = request_json.get("pagenum", 1)
+
+    queries_filters = {
+        SavedQuery.created_dmp_user_id == current_user_id
+            }
+    if query_name:
+        queries_filters.add(SavedQuery.query_name.like("%"+query_name+"%"))
+    if case_name:
+        queries_filters.add(tuple_(SavedQuery.dmp_data_table_id).in_( db.session.query(DataTable.id).filter(tuple_(DataTable.dmp_case_id).in_(db.session.query(Case.id).filter(Case.dmp_case_name.like("%"+case_name+"%")).all())).all() ))
+    if table_name:
+        queries_filters.add(tuple_(SavedQuery.dmp_data_table_id).in_(db.session.query(DataTable.id).filter(DataTable.dmp_data_table_name.like("%"+table_name+"%")).all()))
+    if start_time and end_time:
+        queries_filters.add(SavedQuery.changed_on.between(start_time,end_time))
+
+    queries_query = SavedQuery.query.filter(*queries_filters)
+    count = queries_query.count()
+    queries_objs = queries_query.offset((pagenum-1)*pagesize).limit(pagesize)
+    queries_data = [q.__json__() for q in queries_objs]
+    result = {
+        "data":queries_data,
+        "pagenum":pagenum,
+        "pagesize":pagesize,
+        "count":count
+    }
+    return resp_hanlder(code=0,result = result)
 
 @sql.route("/queries/<int:query_id>", methods=["GET"],defaults={"desc": {"interface_name": "根据ID获取保存的SQL", "is_permission": True, "permission_belong": 0}})
-def get_data_services(desc):
+def get_queries_by_id(desc, query_id):
 
     """
     根据ID获取保存的SQL
@@ -58,31 +118,33 @@ def get_data_services(desc):
     tags:
       - SQL
     parameters:
-      - name: <++>
-        in: <++>
-        type: <++>
-        required: <++>
-        description: <++>
+      - name: query_id
+        in:
+        type: int
+        required: ture
+        description: 查询的ID
     responses:
-      <++>:
-        description: <++>
-        schema:
-          id: result
-          properties:
-            <++>:
-              type: <++>
-              description: <++>
-              default: <++>
-            <++>:
-              type: <++>
-              description: <++>
-              items:
-                type: <++>
-              default: ["<++>", "<++>", "<++>"]
-	"""
+      0:
+        description: ok
+    """
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+    if SavedQuery.exist_item_by_id(query_id):
+        query_obj =  SavedQuery.get(query_id)
+        if query_obj.created_dmp_user_id == current_user_id:
+            query_info = query_obj.__json__()
+            result = {
+                "data":query_info
+            }
+            return resp_hanlder(code=0, result=result)
+        else:
+            return resp_hanlder(code=999, msg="非改查询的所有者，无权查看")
+    else:
+        return resp_hanlder(code=999, msg="查询不存在或已被删除")
+
 
 @sql.route("/queries", methods=["POST"],defaults={"desc": {"interface_name": "保存SQL", "is_permission": True, "permission_belong": 0}})
-def get_data_services(desc):
+def add_queries(desc):
 
     """
     保存SQL
@@ -91,90 +153,154 @@ def get_data_services(desc):
     tags:
       - SQL
     parameters:
-      - name: <++>
-        in: <++>
-        type: <++>
-        required: <++>
-        description: <++>
+      - name: query_name
+        in:
+        type: string
+        required: true
+        description: 查询的名称，最长64字符
+      - name: query_sql
+        in:
+        type: string
+        required: true
+        description: 查询语句，最长65535字符
+      - name: description
+        in:
+        type: string
+        required: false
+        description: 查询的简介，最长512字符
+      - name: dmp_case_id
+        in:
+        type: int
+        required: true
+        description: 原数据案例ID
+      - name: dmp_data_table_id
+        in:
+        type: int
+        required: true
+        description: 原数据表ID
     responses:
-      <++>:
-        description: <++>
-        schema:
-          id: result
-          properties:
-            <++>:
-              type: <++>
-              description: <++>
-              default: <++>
-            <++>:
-              type: <++>
-              description: <++>
-              items:
-                type: <++>
-              default: ["<++>", "<++>", "<++>"]
-	"""
+      0:
+        description: OK
+    """
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+    request_json = request.json if request.json else {}
 
-@sql.route("/queries/<int:query_id>", methods=["PUT"],defaults={"desc": {"interface_name": "获取多个保存的SQL", "is_permission": True, "permission_belong": 0}})
-def get_data_services(desc):
+    valid = Add_queries_validator(request_json)
+    if not valid.is_valid():
+        return resp_hanlder(code=201, msg=valid.str_errors)
+    new_queries = SavedQuery(
+        query_name = request_json.get("query_name"),
+        query_sql = request_json.get("query_sql"),
+        description = request_json.get("description"),
+        dmp_data_table_id = request_json.get("dmp_data_table_id"),
+        dmp_case_id = request_json.get("dmp_case_id"),
+        created_dmp_user_id = current_user_id,
+        changed_dmp_user_id = current_user_id,
+        )
+    new_queries.save()
+    return resp_hanlder(code=0,result="OK")
+
+@sql.route("/queries/<int:query_id>", methods=["PUT"],defaults={"desc": {"interface_name": "更新保存的SQL", "is_permission": True, "permission_belong": 0}})
+def update_queries_by_id(desc,query_id):
 
     """
-    获取多个保存的SQL
+    更新保存的SQL
 
     ---
     tags:
       - SQL
     parameters:
-      - name: <++>
-        in: <++>
-        type: <++>
-        required: <++>
-        description: <++>
+      - name: query_id
+        in:
+        type: int
+        required: false
+        description: 要进行修改的查询ID
+      - name: query_name
+        in:
+        type: string
+        required: false
+        description: 查询的名称，最长64字符
+      - name: query_sql
+        in:
+        type: string
+        required: true
+        description: 查询语句，最长65535字符
+      - name: description
+        in:
+        type: string
+        required: false
+        description: 查询的简介，最长512字符
+      - name: dmp_case_id
+        in:
+        type: int
+        required: false
+        description: 原数据案例ID
+      - name: dmp_data_table_id
+        in:
+        type: int
+        required: false
+        description: 原数据表ID
     responses:
-      <++>:
-        description: <++>
-        schema:
-          id: result
-          properties:
-            <++>:
-              type: <++>
-              description: <++>
-              default: <++>
-            <++>:
-              type: <++>
-              description: <++>
-              items:
-                type: <++>
-              default: ["<++>", "<++>", "<++>"]
-	"""
-@sql.route("/queries", methods=["GET"],defaults={"desc": {"interface_name": "获取多个保存的SQL", "is_permission": True, "permission_belong": 0}})
-def get_data_services(desc):
+      0:
+        description: OK
+    """
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+    request_json = request.json if request.json else {}
+    print(request_json)
+    valid = Update_queries_validator(request_json)
+    if not valid.is_valid():
+        return resp_hanlder(code=201, msg=valid.str_errors)
+    if SavedQuery.exist_item_by_id(query_id):
+        current_queries = SavedQuery.get(query_id)
+        if current_queries.created_dmp_user_id == current_user_id:
+            if request_json.get("query_name"):
+                current_queries.query_name = request_json.get("query_name")
+            if request_json.get("query_sql"):
+                current_queries.query_sql = request_json.get("query_sql")
+            if request_json.get("description"):
+                current_queries.description = request_json.get("description")
+            if request_json.get("dmp_data_table_id"):
+                current_queries.dmp_data_table_id = request_json.get("dmp_data_table_id")
+            if request_json.get("dmp_case_id"):
+                current_queries.dmp_case_id = request_json.get("dmp_case_id")
+            current_queries.changed_dmp_user_id = current_user_id
+            current_queries.put()
+            return resp_hanlder(code=0,result="OK")
+        else:
+            return resp_hanlder(code=999, msg="您不是该查询的所有者,无权修改本查询")
+    else:
+        return resp_hanlder(code=999, msg="该查询不存在或已被删除")
+
+@sql.route("/queries/<int:query_id>", methods=["DELETE"],defaults={"desc": {"interface_name": "删除保存的SQL", "is_permission": True, "permission_belong": 0}})
+def del_queries_by_id(desc,query_id):
 
     """
-    获取多个保存的SQL
+    删除保存的SQL
 
     ---
     tags:
       - SQL
     parameters:
-      - name: <++>
-        in: <++>
-        type: <++>
-        required: <++>
-        description: <++>
+      - name: query_id
+        in:
+        type: int
+        required: true
+        description: 要删除的查询的ID
     responses:
-      <++>:
-        description: <++>
-        schema:
-          id: result
-          properties:
-            <++>:
-              type: <++>
-              description: <++>
-              default: <++>
-            <++>:
-              type: <++>
-              description: <++>
-              items:
-                type: <++>
-              default: ["<++>", "<++>", "<++>"]
-	"""
+      o:
+        description: ok
+    """
+    auth_token = request.headers.get('Authorization')
+    current_user_id = Users.decode_auth_token(auth_token)
+
+    if SavedQuery.exist_item_by_id(query_id):
+        current_queries = SavedQuery.get(query_id)
+        if current_queries.created_dmp_user_id == current_user_id:
+            current_queries.delete()
+            return resp_hanlder(code=0,result="OK")
+        else:
+            return resp_hanlder(code=999, msg="您不是该查询的所有者,无权删除改查询")
+    else:
+        return resp_hanlder(code=999, msg="该查询不存在或已被删除")
