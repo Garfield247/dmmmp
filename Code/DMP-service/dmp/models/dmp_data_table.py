@@ -54,7 +54,7 @@ class DataTable(db.Model, DMPModel):
     def dmp_database_type(self):
         from dmp.models import Database
         d = Database.get(self.dmp_database_id)
-        d_type = d.dmp_database_type if d else "-"
+        d_type = d.db_type if d else "-"
         return d_type
 
     def data_count(self):
@@ -82,7 +82,7 @@ class DataTable(db.Model, DMPModel):
             "dmp_user_name": self.dmp_user_name,
             "dmp_case_name": self.dmp_case_name,
             "dmp_database_name": self.dmp_database_name,
-            "database_type": self.database_type,
+            "database_type": self.dmp_database_type,
         }
         return _d
 
