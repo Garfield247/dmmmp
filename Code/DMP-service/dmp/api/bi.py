@@ -772,16 +772,16 @@ def delete_charts_by_id(id, desc):
         res = PuttingData.get_obj_data(Users, auth_token)
         if not isinstance(res, dict):
             return resp_hanlder(code=999)
-        del_chart_obj = Chart.query.filter(Chart.id == id).first()
+        if Chart.exist_item_by_id(id):
+            del_chart_obj = Chart.get(id)
 
-        if del_chart_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
-            if del_chart_obj and id:
+            if del_chart_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
                 del_chart_obj.delete()
                 return resp_hanlder(code=0, msg='图表删除成功.')
             else:
-                return resp_hanlder(code=999, msg='图表ID错误或对象不存在,请重新确认.')
+                return resp_hanlder(code=999, msg='没有权限删除图表,请联系超级管理员.')
         else:
-            return resp_hanlder(code=999, msg='没有权限删除图表,请联系超级管理员.')
+            return resp_hanlder(code=999, msg='图表ID错误或对象不存在,请重新确认.')
     except Exception as err:
         db.session.rollback()
         return resp_hanlder(code=999, err=str(err))

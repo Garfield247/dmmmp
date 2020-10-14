@@ -54,10 +54,11 @@ class Chart(db.Model, DMPModel):
             'changed_on': self.changed_on.strftime("%Y-%m-%d %H:%M:%S")
         }
         return chart_dict
-        
+
     def delete(self):
         from dmp.extensions import apscheduler
-        apscheduler.delete_job(id=self.update_task_id)
+        if self.update_task_id:
+            apscheduler.delete_job(id=self.update_task_id)
         db.session.delete(self)
         db.session.commit()
 
