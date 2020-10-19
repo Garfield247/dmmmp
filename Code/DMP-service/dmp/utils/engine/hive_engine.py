@@ -3,6 +3,7 @@
 # @Date    : 2020/5/11
 # @Author  : SHTD
 
+import re
 from flask import current_app
 from pyhive import hive
 
@@ -53,6 +54,20 @@ class HiveEngone():
     def execsql(self, sql):
         cursor = self.conn.cursor()
         cursor.execute(sql)
+
+    def exec_query(self,**kwargs):
+        sql = kwargs.get("sql")
+        limit = kwargs.get("limit", 100)
+        if not re.search(r"limit\s+\d+", sql,re.IGNORECASE):
+            if limit:
+                sql+" limit %d"%limit
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(sql)
+            res = cursor.fetchall()
+            return res
+        except Exception as e:
+            return str(e)
 
     def retrieve(self, table_name, limit=100):
         cursor = self.conn.cursor()

@@ -18,15 +18,31 @@ engines = {
 def auto_connect(db_id=None, table_id=None):
     try:
         from dmp.models import Database, DataTable
-        if table_id != None:
-            table = DataTable.get(table_id)
-            db_id = table.dmp_database_id
+        if table_id != None  and db_id==None:
+            if DataTable.exist_item_by_id(table_id):
+                table = DataTable.get(table_id)
+                db_id = table.dmp_database_id
+                print("=========\n",db_id)
+
+            else:
+                print("数据表不存在")
+                raise Exception("数据表不存在")
+        else:
+            raise Exception("缺少数据表ID[%s]"%table_id)
+
         if db_id != None:
-            db = Database.get(db_id)
-            Engine = engines.get(db.db_type)
-            conn = Engine(host=db.db_host, port=db.db_port,
-                          user=db.db_username, passwd=db.db_passwd, db=db.db_name)
-        return conn
+            if Database.exist_item_by_id(db_id):
+
+                db = Database.get(db_id)
+                Engine = engines.get(db.db_type)
+                conn = Engine(host=db.db_host, port=db.db_port,
+                              user=db.db_username, passwd=db.db_passwd, db=db.db_name)
+                return conn
+            else:
+                print("数据库不存在")
+                raise Exception("数据库不存在")
+        else:
+            raise Exception("缺少数据库ID")
     except Exception as e:
         raise e
 

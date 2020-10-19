@@ -199,7 +199,7 @@ def add_queries(desc):
         changed_dmp_user_id = current_user_id,
         )
     new_queries.save()
-    return resp_hanlder(code=0,result="OK")
+    return resp_hanlder(code=0,result=new_queries.__json__())
 
 @sql.route("/queries/<int:query_id>", methods=["PUT"],defaults={"desc": {"interface_name": "更新保存的SQL", "is_permission": True, "permission_belong": 0}})
 def update_queries_by_id(desc,query_id):
@@ -304,3 +304,45 @@ def del_queries_by_id(desc,query_id):
             return resp_hanlder(code=999, msg="您不是该查询的所有者,无权删除改查询")
     else:
         return resp_hanlder(code=999, msg="该查询不存在或已被删除")
+
+@sql.route("/retrieve", methods=["GET"], defaults={"desc": {"interface_name": "SQL查询", "is_permission": True, "permission_belong": 0}})
+def retrieve(desc):
+    """
+    SQL查询
+
+    ---
+    tags:
+      - SQL
+    parameters:
+      - name: dmp_data_table_id
+        in:
+        type: int
+        required: True
+        description: 数据表ID
+      - name: sql
+        in:
+        type: string
+        required: false
+        description: SQL 语句，mysql，hive ，kylin 必填
+      - name: collection
+        in:
+        type: string
+        required: false
+        description: mongodb 参数  集合名(表名)
+
+    responses:
+      0:
+        description: OK
+    """
+    request_json = request.json if request.json else {}
+    print(request_json)
+    data_table_id = request_json.get("dmp_data_table_id")
+    conn = auto_connect(table_id= data_table_id)
+    result = conn.exec_query(**request_json)
+    return resp_hanlder(code=0,result=result)
+
+
+
+
+
+
