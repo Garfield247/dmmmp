@@ -335,11 +335,17 @@ def retrieve(desc):
         description: OK
     """
     request_json = request.json if request.json else {}
-    print(request_json)
     data_table_id = request_json.get("dmp_data_table_id")
-    conn = auto_connect(table_id= data_table_id)
-    result = conn.exec_query(**request_json)
-    return resp_hanlder(code=0,result=result)
+    if data_table_id:
+        try:
+            conn = auto_connect(table_id= data_table_id)
+            result = conn.exec_query(**request_json)
+            return resp_hanlder(code=0,result=result)
+        except Exception as e:
+            return resp_hanlder(code=999, msg=str(e))
+
+    else:
+        return resp_hanlder(code=999, msg="缺少dmp_data_table_id")
 
 
 

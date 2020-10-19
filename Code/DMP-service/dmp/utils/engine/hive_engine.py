@@ -57,10 +57,10 @@ class HiveEngone():
 
     def exec_query(self,**kwargs):
         sql = kwargs.get("sql")
-        limit = kwargs.get("limit", 100)
-        if not re.search(r"limit\s+\d+", sql,re.IGNORECASE):
-            if limit:
-                sql+" limit %d"%limit
+        # limit = kwargs.get("limit", 100)
+        # if not re.search(r"limit\s+\d+", sql,re.IGNORECASE):
+            # if limit:
+                # sql+" limit %d"%limit
         try:
             cursor = self.conn.cursor()
             cursor.execute(sql)
