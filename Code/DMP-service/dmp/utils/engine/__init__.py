@@ -37,10 +37,8 @@ def auto_connect(db_id=None, table_id=None):
             else:
                 print("数据表不存在")
                 raise Exception("数据表不存在")
-        else:
-            raise Exception("缺少数据表ID[%s]"%table_id)
 
-        if db_id != None:
+        elif db_id != None:
             if Database.exist_item_by_id(db_id):
 
                 db = Database.get(db_id)
@@ -52,7 +50,7 @@ def auto_connect(db_id=None, table_id=None):
                 print("数据库不存在")
                 raise Exception("数据库不存在")
         else:
-            raise Exception("缺少数据库ID")
+            raise Exception("缺少必要参数")
     except Exception as e:
         raise e
 
