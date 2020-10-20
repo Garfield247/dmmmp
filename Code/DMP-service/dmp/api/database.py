@@ -83,8 +83,8 @@ def connect(desc):
                 # conn = hive.Connection(host=db_host, port=db_port, username=db_user, password=db_password,
                 #                        database=db_name)
                 # current_app.logger.info(conn.client)
-                from dmp.utils.engine import HiveEngone
-                hive_conn = HiveEngone(host=db_host, port=db_port, user=db_user, passwd=db_password, db=db_name)
+                from dmp.utils.engine import HiveEngine
+                hive_conn = HiveEngine(host=db_host, port=db_port, user=db_user, passwd=db_password, db=db_name)
                 hive_conn.close_conn()
                 res = {"connect": "ok!"}
             except Exception as err:

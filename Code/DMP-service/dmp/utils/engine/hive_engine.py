@@ -8,7 +8,7 @@ from flask import current_app
 from pyhive import hive
 
 
-class HiveEngone():
+class HiveEngine():
 
     type=1
     def __init__(self, host, port, user, passwd, db):

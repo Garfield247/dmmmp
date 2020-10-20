@@ -4,14 +4,16 @@
 # @Author  : SHTD
 
 
-from .hive_engine import HiveEngone
+from .hive_engine import HiveEngine
 from .mongo_engine import MongodbEngine
 from .mysql_engine import MysqlEngine
+from .kylin_engine import KylinEngin
 
 engines = {
-    1: HiveEngone,
+    1: HiveEngine,
     3: MongodbEngine,
     2: MysqlEngine,
+    4: KylinEngin,
 }
 
 
@@ -22,8 +24,16 @@ def auto_connect(db_id=None, table_id=None):
             if DataTable.exist_item_by_id(table_id):
                 table = DataTable.get(table_id)
                 db_id = table.dmp_database_id
-                print("=========\n",db_id)
-
+                if Database.exist_item_by_id(db_id):
+                    db = Database.get(db_id)
+                    db_type = 4 if db.db_type == 1 and db.is_kylin else db.db_type
+                    Engine = engines.get(db_type)
+                    if db_type == 4:
+                        conn = Engine()
+                    else:
+                        conn = Engine(host=db.db_host, port=db.db_port,
+                                  user=db.db_username, passwd=db.db_passwd, db=db.db_name)
+                return conn
             else:
                 print("数据表不存在")
                 raise Exception("数据表不存在")

@@ -96,7 +96,7 @@ class KylinTool():
     +++++++++++++++++++++++++++Query 查询相关API+++++++++++++++++++++++++++++++++
     """
 
-    def api_query(self, sql, offset=0, limit=None, acceptPartial=False, project="DEFAULT"):
+    def api_query(self, sql, offset=0, limit=None, acceptPartial=True, project="DEFAULT"):
         """
         查询
         参数：
@@ -932,4 +932,3 @@ class KylinTool():
         return result
 
 
-kt = KylinTool(host, port, username, password)
