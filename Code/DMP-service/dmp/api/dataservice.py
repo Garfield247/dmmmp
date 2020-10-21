@@ -189,12 +189,14 @@ def get_data_services(desc):
             results = DataService.query.filter_by(created_dmp_user_id=user_id)
             if data_service_name and len(data_service_name) > 0:
                 results = results.filter(DataService.data_service_name.like('%' + data_service_name + '%'))
+            data_count = results.count()
             results = results.limit(pagesize).offset((int(page_num) - 1) * int(pagesize))
             data = [d.__json__() for d in results]
             results = {
                 'data': data,
                 'page_num': page_num,
-                'pagesize': pagesize
+                'pagesize': pagesize,
+                'data_count': data_count
             }
             return resp_hanlder(result=results)
         except Exception as err:
