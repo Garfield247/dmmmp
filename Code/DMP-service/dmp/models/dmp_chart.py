@@ -77,6 +77,6 @@ class Chart(db.Model, DMPModel):
         _d = {
             "created_dmp_user_name": self.created_dmp_user_name,
             "changed_dmp_user_name": self.changed_dmp_user_name,
-            "dmp_data_table_name": dmp_data_table_name,
+            "dmp_data_table_name": self.dmp_data_table_name,
         }
         return _d
