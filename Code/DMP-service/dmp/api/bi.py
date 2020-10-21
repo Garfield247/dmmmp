@@ -506,7 +506,7 @@ def update_archive_by_id(id, desc):
             if not form.validate_on_submit():
                 return resp_hanlder(code=999, err=str(form.errors))
             update_dashboard_archive_obj = DashboardArchive.query.filter(DashboardArchive.id == id).first()
-            if DashboardArchive.created_dmp_user_id == res.get('id'):
+            if update_dashboard_archive_obj.created_dmp_user_id == res.get('id'):
                 if dashboard_archive_name and update_dashboard_archive_obj:
                     update_dashboard_archive_obj.dashboard_archive_name = dashboard_archive_name
                     update_dashboard_archive_obj.changed_dmp_user_id = res.get('id')
@@ -556,6 +556,40 @@ def delete_archive_by_id(id, desc):
     except Exception as err:
         db.session.rollback()
         return resp_hanlder(code=999, err=str(err))
+
+
+@bi.route("/charts/<int:dashboard_id>", methods=["GET"], defaults={"desc": {"interface_name": "获取图表信息", "is_permission": True, "permission_belong": 0}})
+def get_charts_by_dashboard_id(dashboard_id, desc):
+    """
+    获取图表信息
+    ---
+    tags:
+      - Bi
+        parameters:
+      - name: dashboard_id
+        in: path
+        type: int
+        required: true
+        description: url参数id(看板ID)
+    responses:
+      0:
+        description: ok
+    """
+    try:
+        auth_token = request.headers.get('Authorization')
+        res = PuttingData.get_obj_data(Users, auth_token)
+        if not isinstance(res, dict):
+            return resp_hanlder(code=999)
+        if Chart.exist_item_by_id(dashboard_id):
+            change_chart_obj = Chart.query.filter(Chart.dmp_dashboard_id == dashboard_id).all()
+            change_chart_obj_dict_list = [c.chart_to_dict() for c in change_chart_obj]
+            return resp_hanlder(code=0, msg='获取图表信息成功.',
+                                result=change_chart_obj_dict_list)
+        return resp_hanlder(code=999, msg='看板ID获取失败.')
+    except Exception as err:
+        db.session.rollback()
+        return resp_hanlder(code=999, err=str(err))
+
 
 @bi.route("/charts/",methods=["POST"], defaults={"desc": {"interface_name": "添加图表接口", "is_permission": True, "permission_belong": 0}})
 def add_chart(desc):
