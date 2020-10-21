@@ -13,7 +13,7 @@ class Chart(db.Model, DMPModel):
     __tablename__ = 'dmp_chart'
     id = db.Column(db.Integer, primary_key=True,
                    autoincrement=True, comment='看板ID')
-    chart_name = db.Column(db.String(64), nullable=False, comment='图标名称')
+    chart_name = db.Column(db.String(64), nullable=False, comment='图表名称')
     dmp_data_table_id = db.Column(db.Integer,  comment='数据表ID')
     query_string = db.Column(db.Text,  comment='查询语句')
     chart_data = db.Column(db.Text,  comment='数据')
@@ -26,7 +26,7 @@ class Chart(db.Model, DMPModel):
                              comment='时间间隔单位，0小时，1日，3周')
 
     description = db.Column(db.String(512), comment='简介')
-    charts_position = db.Column(db.Text, comment='图表布局数据')
+    charts_position = db.Column(db.Text, nullable=False, comment='图表布局数据')
     dmp_dashboard_id = db.Column(db.Integer, nullable=False, comment='数据看板ID')
     update_task_id = db.Column(db.String(64), comment='更新任务ID')
     created_dmp_user_id = db.Column(db.Integer, nullable=False, comment='创建人')

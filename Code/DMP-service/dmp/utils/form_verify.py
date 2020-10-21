@@ -39,6 +39,9 @@ class ChartForm(FlaskForm):
     chart_type = IntegerField("chart_type",
                               validators=[DataRequired(message="图表类型代码不能为空")]
                               )
+    charts_position = StringField("charts_position",
+                                  validators=[DataRequired(message="图表布局参数不能为空")]
+                                  )
     dmp_dashboard_id = IntegerField("dmp_dashboard_id",
                                     validators=[DataRequired(message="数据看板ID不能为空")]
                                     )

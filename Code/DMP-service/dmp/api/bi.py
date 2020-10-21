@@ -520,6 +520,11 @@ def add_chart(desc):
         type: string
         required: false
         description: 图表简介
+      - name: charts_position
+        in: path
+        type: string
+        required: true
+        description: 图表布局数据
       - name: dmp_dashboard_id
         in: path
         type: id
@@ -544,12 +549,14 @@ def add_chart(desc):
         chart_type = data.get('chart_type')
         chart_params = data.get('chart_params')
         description = data.get('description')
+        charts_position = data.get('charts_position')
         dmp_dashboard_id = data.get('dmp_dashboard_id')
         # 字段表单验证
         form = ChartForm(meta={"csrf": False})
         if not form.validate_on_submit():
             return resp_hanlder(code=999, err=str(form.errors))
-        if chart_name and chart_type and dmp_dashboard_id and dmp_data_table_id:
+        if chart_name and chart_type \
+                and dmp_dashboard_id and charts_position:
             chart_obj = Chart(
                 chart_name=chart_name,
                 dmp_data_table_id=dmp_data_table_id,
@@ -558,6 +565,7 @@ def add_chart(desc):
                 chart_type=chart_type,
                 params=chart_params,
                 description=description,
+                charts_position=charts_position,
                 dmp_dashboard_id=dmp_dashboard_id,
                 created_dmp_user_id=res.get('id'),
                 changed_dmp_user_id=res.get('id')
@@ -614,6 +622,11 @@ def update_charts_by_id(id, desc):
         type: string
         required: false
         description: 图表简介
+      - name: charts_position
+        in: path
+        type: string
+        required: true
+        description: 图表布局信息
       - name: dmp_dashboard_id
         in: path
         type: id
@@ -639,6 +652,7 @@ def update_charts_by_id(id, desc):
             chart_type = data.get('chart_type')
             chart_params = data.get('chart_params')
             description = data.get('description')
+            charts_position = data.get('charts_position')
             dmp_dashboard_id = data.get('dmp_dashboard_id')
             form = ChartForm(meta={"csrf": False})
             if not form.validate_on_submit():
@@ -646,9 +660,11 @@ def update_charts_by_id(id, desc):
             chart_obj = Chart.query.filter(Chart.id == id).first()
             # 图表信息只能自己修改，其他人无权修改
             if chart_obj.created_dmp_user_id == res.get('id'):
-                if chart_name and chart_type and dmp_dashboard_id and chart_obj:
+                if chart_name and chart_type and dmp_dashboard_id \
+                        and charts_position and chart_obj:
                     chart_obj.chart_name = chart_name
                     chart_obj.chart_type = chart_type
+                    chart_obj.charts_position = charts_position
                     chart_obj.dmp_dashboard_id = dmp_dashboard_id
                     if dmp_data_table_id != None:
                         chart_obj.dmp_data_table_id = dmp_data_table_id
