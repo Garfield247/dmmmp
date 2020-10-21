@@ -145,7 +145,7 @@ def delete_query_data_task(desc,task_id):
         description: 删除成功
 	"""
     current_task = apscheduler.get_job(task_id)
-    current_task = Chart.query.filter_by(update_task_id=task_id).first()
+    current_chart = Chart.query.filter_by(update_task_id=task_id).first()
     if current_task:
         current_task.remove()
         if current_chart:
