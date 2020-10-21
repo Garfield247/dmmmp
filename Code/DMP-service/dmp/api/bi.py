@@ -451,7 +451,7 @@ def get_charts_by_dashboard_id(dashboard_id, desc):
     ---
     tags:
       - Bi
-        parameters:
+    parameters:
       - name: dashboard_id
         in: path
         type: int
