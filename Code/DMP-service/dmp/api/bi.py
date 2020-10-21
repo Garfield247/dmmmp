@@ -392,7 +392,7 @@ def update_archive_by_id(id, desc):
             if not form.validate_on_submit():
                 return resp_hanlder(code=999, err=str(form.errors))
             update_dashboard_archive_obj = DashboardArchive.query.filter(DashboardArchive.id == id).first()
-            if DashboardArchive.created_dmp_user_id == res.get('id'):
+            if update_dashboard_archive_obj.created_dmp_user_id == res.get('id'):
                 if dashboard_archive_name and update_dashboard_archive_obj:
                     update_dashboard_archive_obj.dashboard_archive_name = dashboard_archive_name
                     update_dashboard_archive_obj.changed_dmp_user_id = res.get('id')
