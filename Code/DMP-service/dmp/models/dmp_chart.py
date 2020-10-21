@@ -26,7 +26,7 @@ class Chart(db.Model, DMPModel):
                              comment='时间间隔单位，0小时，1日，3周')
 
     description = db.Column(db.String(512), comment='简介')
-    charts_position = db.Column(db.Text, comment='图标布局数据')
+    charts_position = db.Column(db.Text, comment='图表布局数据')
     dmp_dashboard_id = db.Column(db.Integer, nullable=False, comment='数据看板ID')
     update_task_id = db.Column(db.String(64), comment='更新任务ID')
     created_dmp_user_id = db.Column(db.Integer, nullable=False, comment='创建人')
