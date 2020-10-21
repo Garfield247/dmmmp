@@ -20,6 +20,8 @@ class DataTable(db.Model, DMPModel):
     db_table_name = db.Column(
         db.String(32), nullable=False, comment='数据库内数据表名称')
     db_data_count = db.Column(db.Integer, default=0, comment='数据表内的数据量')
+    is_kylin = db.Column(db.Integer, default=0, comment='是否是Kylin表,0否，1是， 2转化中 ')
+    kylin_info_id = db.Column(db.Integer,  comment='Kylin信息表ID')
     description = db.Column(db.Text, comment='数据说明')
     created_on = db.Column(db.DateTime, nullable=False,
                            default=datetime.datetime.now, comment='创建时间')

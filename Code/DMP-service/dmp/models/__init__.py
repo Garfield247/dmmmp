@@ -148,4 +148,4 @@ from .dmp_case import Case
 from .dmp_user import Users
 from .dmp_saved_query import SavedQuery
 from .dmp_dashboard_star import DashboardStar
-
+from .dmp_kylin import KylinTable

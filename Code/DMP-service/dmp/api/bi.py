@@ -3,7 +3,7 @@
 # @Date    : 2020/8/20
 # @Author  : SHTD
 
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 
 from sqlalchemy import literal,and_,or_,exists,union,desc,union_all
 from sqlalchemy import desc as desc_
@@ -108,9 +108,9 @@ def get_dashboards_and_archives(desc):
             literal("archive").label("type"),
             DashboardArchive.dashboard_archive_name.label("name"),
             literal("-").label("description"),
-            literal("-").label("release"),
+            literal(0).label("release"),
             exists().where(and_(ArchiveStar.dmp_archive_id ==DashboardArchive.id,ArchiveStar.dmp_user_id==current_user_id)).label("is_star"),
-            literal("-").label("is_index"),
+            literal(0).label("is_index"),
             DashboardArchive.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
             # db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             DashboardArchive.created_dmp_user_id.label("created_dmp_user_id"),
@@ -120,10 +120,12 @@ def get_dashboards_and_archives(desc):
             DashboardArchive.changed_on.label("changed_on")
             ).filter(*archives_filters)
 
-    dashboards_and_archives = dashboards.union(archives)
-    print(dashboards_and_archives)
+    dashboards_and_archives = dashboards.union( archives)
+    # dashboards_and_archives = union(dashboards.alias("dashboards"), archives.alias("archives"))
+    # dashboards_and_archives = db.session.query([dashboards, archives]).select_entity_from(union(dashboards.select(), archives.select()))
+    current_app.logger.info(dashboards_and_archives)
     count = dashboards_and_archives.count()
-    data = [d._asdict() for d in dashboards_and_archives.order_by(desc_("is_index"),desc_("is_star"),desc_("changed_on")).offset((pagenum-1)*pagesize).limit(pagesize)]
+    data = [d._asdict() for  d in dashboards_and_archives.order_by(desc_("is_index"), desc_("is_star"),desc_("changed_on"), "type").offset((pagenum-1)*pagesize).limit(pagesize)]
     res = {
         "data_count":count,
         "pagenum":pagenum,

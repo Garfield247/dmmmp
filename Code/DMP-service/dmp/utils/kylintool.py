@@ -5,16 +5,17 @@ import os
 import json
 import base64
 import requests
+from flask import current_app
 
 
 class KylinTool():
 
-    def __init__(self, host, port, user, pswd):
+    def __init__(self, host, port, user, passwd):
         """
         初始化连接信息
         """
         self.headers = {
-            "Authorization": self.build_authorization(user, pswd),
+            "Authorization": self.build_authorization(user, passwd),
             "Content-Type": "application/json"
         }
         print(self.headers)
@@ -930,5 +931,4 @@ class KylinTool():
         """
         result = self._get("jmetrics/{mtype}".format(mtype=mtype))
         return result
-
 

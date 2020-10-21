@@ -3,7 +3,7 @@
 # @Date    : 2020/5/11
 # @Author  : SHTD
 
-
+from flask import current_app
 from .hive_engine import HiveEngine
 from .mongo_engine import MongodbEngine
 from .mysql_engine import MysqlEngine
@@ -26,13 +26,25 @@ def auto_connect(db_id=None, table_id=None):
                 db_id = table.dmp_database_id
                 if Database.exist_item_by_id(db_id):
                     db = Database.get(db_id)
-                    db_type = 4 if db.db_type == 1 and db.is_kylin else db.db_type
+                    db_type = 4 if db.db_type == 1 and table.is_kylin else db.db_type
                     Engine = engines.get(db_type)
                     if db_type == 4:
-                        conn = Engine()
+                        conn = Engine(
+                            host = current_app.config.get("KYLIN_HOST"),
+                            port = current_app.config.get("KYLIN_PORT"),
+                            user = current_app.config.get("KYLIN_USER"),
+                            passwd= current_app.config.get("KYLIN_PASSWD"),
+                            db = current_app.config.get("KYLIN_PROJECT")
+                            )
+
                     else:
-                        conn = Engine(host=db.db_host, port=db.db_port,
-                                  user=db.db_username, passwd=db.db_passwd, db=db.db_name)
+                        conn = Engine(
+                            host=db.db_host,
+                            port=db.db_port,
+                            user=db.db_username,
+                            passwd=db.db_passwd,
+                            db=db.db_name
+                            )
                 return conn
             else:
                 print("数据表不存在")

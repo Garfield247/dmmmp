@@ -11,21 +11,23 @@ from dmp.utils.kylintool import KylinTool
 
 
 class KylinEngin():
-    def __init__(self):
-        self.kt = KylinTool(
-            host = current_app.config.get("KYLIN_HOST"),
-            port = current_app.config.get("KYLIN_PORT"),
-            user = current_app.config.get("KYLIN_USER"),
-            pswd= current_app.config.get("KYLIN_PASSWD")
-            )
-        self.project = current_app.config.get("KYLIN_PROJECT")
+    type=4
+
+    def __init__(self, host, port, user, passwd, db):
+        self.kt = KylinTool(host=host, port= port, user= user, passwd=passwd)
+        self.project = db
+
+    def columns(self, table_name):
+        # res = self.kt.api_get_cube_descriptor()
+        pass
+
 
     def exec_query(self, **kwages):
         sql = kwages.get("sql")
         offset = kwages.get("offset",0)
         limit = kwages.get("limit", 100)
         project = self.project
-        q = self.kt.api_query(sql=sql, offset=offset, limit=limit, project=project)
+        q = self.kt.api_query(sql=sql, offset=offset, limit=limit, project=self.project)
 
         result = q.get("results")
         return result

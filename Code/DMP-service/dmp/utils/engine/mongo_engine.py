@@ -42,9 +42,9 @@ class MongodbEngine():
     def exec_query(self,**kwages):
         collection=kwages.get("collection")
         try:
-            filters=eval(kwages.get("filters",'{}'))
-            projection=eval(kwages.get("projection",'{"_id": 0}'))
-            sort=eval(kwages.get("sort",'[("_id", 1)]'))
+            filters=eval("{}" if not kwages.get("filters") else kwages.get("filters"))
+            projection=eval('{"_id": 0}' if not kwages.get("projection") else kwages.get("projection"))
+            sort=eval('[("_id", 1)]' if not kwages.get("sort") else kwages.get("sort"))
         except:
             raise Exception("查询参数解析异常")
         skip=kwages.get("skip",0)
