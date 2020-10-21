@@ -41,11 +41,17 @@ class MongodbEngine():
 
     def exec_query(self,**kwages):
         collection=kwages.get("collection")
+        print(kwages)
         try:
-            filters=eval("{}" if not kwages.get("filters") else kwages.get("filters"))
-            projection=eval('{"_id": 0}' if not kwages.get("projection") else kwages.get("projection"))
-            sort=eval('[("_id", 1)]' if not kwages.get("sort") else kwages.get("sort"))
-        except:
+            filters_str = kwages.get("filters") if  kwages.get("filters") else '{}'
+            projection_str = kwages.get("projection") if kwages.get("projection") else  '{"_id": 0}'
+            sort_str = kwages.get("sort") if  kwages.get("sort") else '[("_id", 1)]'
+            print(filters_str, projection_str , sort_str)
+            filters=eval(filters_str)
+            projection=eval(projection_str)
+            sort=eval(sort_str)
+        except Exception as e:
+            print(e)
             raise Exception("查询参数解析异常")
         skip=kwages.get("skip",0)
         limit=kwages.get("limit",100)
