@@ -580,7 +580,10 @@ def get_charts_by_dashboard_id(dashboard_id, desc):
         res = PuttingData.get_obj_data(Users, auth_token)
         if not isinstance(res, dict):
             return resp_hanlder(code=999)
-        if Chart.exist_item_by_id(dashboard_id):
+
+        get_chart_obj = Chart.query.filter(Chart.dmp_dashboard_id == dashboard_id).first()
+        # if Chart.exist_item_by_id(dashboard_id):
+        if get_chart_obj:
             change_chart_obj = Chart.query.filter(Chart.dmp_dashboard_id == dashboard_id).all()
             change_chart_obj_dict_list = [c.chart_to_dict() for c in change_chart_obj]
             return resp_hanlder(code=0, msg='获取图表信息成功.',
@@ -668,7 +671,7 @@ def add_chart(desc):
         # 字段表单验证
         form = ChartForm(meta={"csrf": False})
         if not form.validate_on_submit():
-            return resp_hanlder(code=999, err=str(form.errors))
+            return resp_hanlder(code=999, msg=str(form.errors))
         if chart_name and chart_type and dmp_dashboard_id and charts_position:
             chart_obj = Chart(
                 chart_name=chart_name,
@@ -690,7 +693,7 @@ def add_chart(desc):
             return resp_hanlder(code=999, msg='缺少必要参数,并确定其参数是否正确.')
     except Exception as err:
         db.session.rollback()
-        return resp_hanlder(code=999, err=str(err))
+        return resp_hanlder(code=999,msg=str(err), err=str(err))
 
 @bi.route("/charts/<int:id>",methods=["PUT"], defaults={"desc": {"interface_name": "修改图表", "is_permission": True, "permission_belong": 0}})
 def update_charts_by_id(id, desc):

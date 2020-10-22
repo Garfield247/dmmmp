@@ -15,8 +15,8 @@ class Chart(db.Model, DMPModel):
                    autoincrement=True, comment='看板ID')
     chart_name = db.Column(db.String(64), nullable=False, comment='图表名称')
     dmp_data_table_id = db.Column(db.Integer,  comment='数据表ID')
-    query_string = db.Column(db.Text,  comment='查询语句')
-    chart_data = db.Column(db.Text,  comment='数据')
+    query_string = db.Column(db.JSON,  comment='查询语句')
+    chart_data = db.Column(db.JSON,  comment='数据')
     chart_type = db.Column(db.Integer, nullable=False,
                            comment='图表类型，柱状图1，折线图2，饼图3，地图4，雷达图5')
     params = db.Column(db.Text,  comment='图表参数')
@@ -72,6 +72,14 @@ class Chart(db.Model, DMPModel):
             data_table_name = DataTable.get(
                 self.dmp_data_table_id).dmp_data_table_name
             return data_table_name
+        return "-"
+
+    @property
+    def dmp_data_table(self):
+        from .dmp_data_table import DataTable
+        if DataTable.exist_item_by_id(self.dmp_data_table_id):
+            data_table = DataTable.get(self.dmp_data_table_id)
+            return data_table if data_table else None
         return "-"
 
     @property

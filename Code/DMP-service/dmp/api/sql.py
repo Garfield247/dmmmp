@@ -3,6 +3,7 @@
 # @Date    : 2020/10/14
 # @Author  : SHTD
 
+import json
 import datetime
 from flask import Blueprint
 from dmp.utils.engine import auto_connect
@@ -399,7 +400,7 @@ def chart_retrieve(desc):
             if type(_data) ==  list:
                 result = {}
                 result["data"] = [dict(zip(dimension_names+measure_names_methods, d)) for d in _data]
-                result["sql"] = sql
+                result["query_string"] = {"sql":sql, "fields":dimension_names+measure_names_methods}
 
                 return resp_hanlder(code=0,result=result)
             else:

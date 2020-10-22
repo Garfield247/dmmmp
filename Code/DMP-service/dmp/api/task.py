@@ -3,14 +3,40 @@
 # @Date    : 2020/5/6
 # @Author  : SHTD
 
-from flask import Blueprint,request
+from flask import Blueprint,request, current_app
 from dmp.models import Chart
 from dmp.extensions import apscheduler
 from dmp.utils.aps_task import task2json, update_chart_data
 from dmp.utils.validators.task import Add_query_data_task_validator,Update_query_data_task_validator
 from dmp.utils import resp_hanlder,uuid_str
+from dmp.utils.engine import auto_connect
 
 task = Blueprint("task",__name__)
+
+
+# def update_chart_data(chart_id):
+        # if Chart.exist_item_by_id(chart_id):
+            # current_chart = Chart.get(chart_id)
+            # data_table_id = current_chart.dmp_data_table_id
+            # query_string = current_chart.query_string
+            # conn = auto_connect(table_id=data_table_id)
+            # if current_chart.data_table.dmp_database_type in [1, 2, 4]:
+                # request_json = {
+                    # "sql":eval(query_string).get("sql")
+                        # }
+                # _data = conn.exec_query(**request_json)
+                # print(_data)
+                # if type(_data) ==  list:
+                    # field = eval(query_string).get("fields")
+
+                    # current_chart.chart_data = [dict(zip(field , d)) for d in _data]
+                    # print(current_chart.chart_data)
+                    # current_chart.put()
+                # return True,"OK"
+        # else:
+            # return False,"item not exist"
+
+
 
 
 
