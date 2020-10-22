@@ -24,7 +24,6 @@ class Chart(db.Model, DMPModel):
         db.Integer, default=0,  comment='时间间隔时间')
     update_unit = db.Column(db.Integer, default=0,
                              comment='时间间隔单位，0小时，1日，3周')
-
     description = db.Column(db.String(512), comment='简介')
     charts_position = db.Column(db.Text, nullable=False, comment='图表布局数据')
     dmp_dashboard_id = db.Column(db.Integer, nullable=False, comment='数据看板ID')
@@ -50,6 +49,7 @@ class Chart(db.Model, DMPModel):
             'description': self.description,
             'charts_position': self.charts_position,
             'dmp_dashboard_id': self.dmp_dashboard_id,
+            'update_task_id': self.update_task_id,
             'created_dmp_user_id': self.created_dmp_user_id,
             'changed_dmp_user_id': self.changed_dmp_user_id,
             'created_on': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
