@@ -48,6 +48,7 @@ class Chart(db.Model, DMPModel):
             'update_interval': self.update_interval,
             'update_unit': self.update_unit,
             'description': self.description,
+            'charts_position': self.charts_position,
             'dmp_dashboard_id': self.dmp_dashboard_id,
             'created_dmp_user_id': self.created_dmp_user_id,
             'changed_dmp_user_id': self.changed_dmp_user_id,
