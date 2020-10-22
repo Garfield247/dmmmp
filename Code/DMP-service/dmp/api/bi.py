@@ -466,7 +466,8 @@ def get_charts_by_dashboard_id(dashboard_id, desc):
         res = PuttingData.get_obj_data(Users, auth_token)
         if not isinstance(res, dict):
             return resp_hanlder(code=999)
-        if Chart.exist_item_by_id(dashboard_id):
+        get_chart_obj = Chart.query.filter(Chart.dmp_dashboard_id == dashboard_id).first()
+        if get_chart_obj:
             change_chart_obj = Chart.query.filter(Chart.dmp_dashboard_id == dashboard_id).all()
             change_chart_obj_dict_list = [c.chart_to_dict() for c in change_chart_obj]
             return resp_hanlder(code=0, msg='获取图表信息成功.',
