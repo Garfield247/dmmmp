@@ -3,6 +3,7 @@
 # @Date    : 2020/8/19
 # @Author  : SHTD
 
+import json
 import datetime
 from dmp.extensions import db
 from dmp.models import DMPModel
@@ -25,7 +26,7 @@ class Chart(db.Model, DMPModel):
     update_unit = db.Column(db.Integer, default=0,
                              comment='时间间隔单位，0小时，1日，3周')
     description = db.Column(db.String(512), comment='简介')
-    charts_position = db.Column(db.Text, nullable=False, comment='图表布局数据')
+    charts_position = db.Column(db.JSON, nullable=False, comment='图表布局数据')
     dmp_dashboard_id = db.Column(db.Integer, nullable=False, comment='数据看板ID')
     update_task_id = db.Column(db.String(64), comment='更新任务ID')
     created_dmp_user_id = db.Column(db.Integer, nullable=False, comment='创建人')
@@ -40,14 +41,14 @@ class Chart(db.Model, DMPModel):
             'id': self.id,
             'chart_name': self.chart_name,
             'dmp_data_table_id': self.dmp_data_table_id,
-            'query_string': self.query_string,
-            'chart_data': self.chart_data,
+            'query_string': json.loads(self.query_string) if self.query_string else None,
+            'chart_data': json.loads(self.chart_data) if self.chart_data else None,
             'chart_type': self.chart_type,
             'params': self.params,
             'update_interval': self.update_interval,
             'update_unit': self.update_unit,
             'description': self.description,
-            'charts_position': self.charts_position,
+            'charts_position': json.loads(self.charts_position) if self.charts_position else None,
             'dmp_dashboard_id': self.dmp_dashboard_id,
             'update_task_id': self.update_task_id,
             'created_dmp_user_id': self.created_dmp_user_id,
