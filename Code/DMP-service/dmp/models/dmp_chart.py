@@ -41,7 +41,7 @@ class Chart(db.Model, DMPModel):
             'id': self.id,
             'chart_name': self.chart_name,
             'dmp_data_table_id': self.dmp_data_table_id,
-            'query_string': self.query_string),
+            'query_string': self.query_string,
             'chart_data': self.chart_data,
             'chart_type': self.chart_type,
             'params': self.params,
