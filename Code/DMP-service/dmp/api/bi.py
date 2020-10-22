@@ -564,7 +564,7 @@ def get_charts_by_dashboard_id(dashboard_id, desc):
     获取图表信息
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: dashboard_id
         in: path
