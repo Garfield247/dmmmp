@@ -388,15 +388,18 @@ def chart_retrieve(desc):
         db_type = data_table.dmp_database_type
         dimension_names = [d.get("name") for d in dimension]
         measure_names = [m.get("name") if m.get("method")==None else "%s(%s)"%(m.get("method"), m.get("name"))  for m in measure ]
-        measure_only_names = [m.get("name")  for m in measure ]
+        measure_names_methods = [m.get("name") if m.get("method")==None else "%s_%s"%( m.get("name"),m.get("method"))  for m in measure ]
+
         groupby =  bool(sum([True if m.get("method") else False for m in measure]))
         sql = "select {p1} from {p2} {p3} {p4}".format(p1=",".join(dimension_names+measure_names), p2=data_table_name, p3 = "group by "+",".join(dimension_names) if groupby else "" , p4 = ";" if db_type == 2 else "")
         request_json["sql"] = sql
         try:
             conn = auto_connect(table_id= data_table_id)
-            _result = conn.exec_query(**request_json)
-            if type(_result) ==  list:
-                result = [dict(zip(dimension_names+measure_only_names, d)) for d in _result]
+            _data = conn.exec_query(**request_json)
+            if type(_data) ==  list:
+                result = {}
+                result["data"] = [dict(zip(dimension_names+measure_names_methods, d)) for d in _data]
+                result["sql"] = sql
 
                 return resp_hanlder(code=0,result=result)
             else:
