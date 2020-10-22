@@ -348,6 +348,71 @@ def retrieve(desc):
         return resp_hanlder(code=999, msg="缺少dmp_data_table_id")
 
 
+@sql.route("/chart_retrieve", methods=["GET"], defaults={"desc": {"interface_name": "图表查询", "is_permission": True, "permission_belong": 0}})
+def chart_retrieve(desc):
+    """
+    图表查询
+
+    ---
+    tags:
+      - SQL
+    parameters:
+      - name: dmp_data_table_id
+        in:
+        type: int
+        required: True
+        description: 数据表ID
+      - name: dimension
+        in:
+        type: array
+        required: True
+        description: 维度，格式[{"name":"xxx"},{"name":"xxxxx"}]
+      - name: measure
+        in:
+        type: array
+        required: true
+        description: 度量，格式[{"name":"xxx", "method":"count/sum/avg"},{......}]
+
+    responses:
+      0:
+        description: OK
+    """
+    request_json = request.json if request.json else {}
+    data_table_id = request_json.get("dmp_data_table_id")
+    dimension = request_json.get("dimension")
+    measure = request_json.get("measure")
+    limit = request_json.get("limit")
+    if data_table_id and DataTable.exist_item_by_id(data_table_id):
+        data_table = DataTable.get(data_table_id)
+        data_table_name = data_table.db_table_name
+        db_type = data_table.dmp_database_type
+        dimension_names = [d.get("name") for d in dimension]
+        measure_names = [m.get("name") if m.get("method")==None else "%s(%s)"%(m.get("method"), m.get("name"))  for m in measure ]
+        measure_only_names = [m.get("name")  for m in measure ]
+        groupby =  bool(sum([True if m.get("method") else False for m in measure]))
+        sql = "select {p1} from {p2} {p3} {p4}".format(p1=",".join(dimension_names+measure_names), p2=data_table_name, p3 = "group by "+",".join(dimension_names) if groupby else "" , p4 = ";" if db_type == 2 else "")
+        request_json["sql"] = sql
+        try:
+            conn = auto_connect(table_id= data_table_id)
+            _result = conn.exec_query(**request_json)
+            if type(_result) ==  list:
+                result = [dict(zip(dimension_names+measure_only_names, d)) for d in _result]
+
+                return resp_hanlder(code=0,result=result)
+            else:
+                return resp_hanlder(code=999,msg = "查询出错 你的查询SQl：%s"%sql)
+
+        except Exception as e:
+            return resp_hanlder(code=999, msg=str(e))
+
+    else:
+        return resp_hanlder(code=999, msg="缺少dmp_data_table_id")
+
+
+
+
+
+
 
 
 
