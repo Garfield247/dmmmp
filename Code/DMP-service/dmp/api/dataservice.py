@@ -511,6 +511,8 @@ def add_ds_parameters(desc):
                         return resp_hanlder(code=301)
                     else:
                         parameters = data.get("parameters")
+                        if parameters is None or len(parameters) == 0:
+                            return resp_hanlder(result={"add_data_service_parameter": "success"})
                         data_service_parameters = []
                         for item in parameters:
                             form = DataServiceParameterForm(csrf_enabled=False, data=item)
