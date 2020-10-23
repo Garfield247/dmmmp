@@ -90,7 +90,7 @@ def cubeDescDataHanlder(cubeName,modelsName,tableName,description,project):
       },
       "aggregation_groups": [
         {
-          "includes": [],
+          "includes": ["%s.%s"%(tableName.split(".")[1], col.get("name"))  for col in kt.api_get_hive_table(project=project,tableName=tableName).get("columns")],
           "select_rule": {
             "hierarchy_dims": [],
             "mandatory_dims": [],
