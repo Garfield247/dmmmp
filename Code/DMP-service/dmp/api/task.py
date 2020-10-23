@@ -75,7 +75,7 @@ def add_query_data_task(desc):
         description: 要添加定时更新任务的图表ID
       - name: time_unit
         type: string
-        enum: ['weeks','days','hours','mins','seconds']
+        enum: ['weeks','days','hours','minutes','seconds']
         required: true
         description: 时间单位
       - name: time_value
@@ -100,7 +100,7 @@ def add_query_data_task(desc):
     task_params["trigger"] = "interval"
     task_params[time_unit] = time_value
     print(task_params)
-    apscheduler.add_job(**task_params)
+    apscgeduler.add_job(**task_params)
     current_chart = Chart.get(chart_id)
     if current_chart:
         current_chart.update_task_id = task_params.get("id")
@@ -121,7 +121,7 @@ def update_query_data_task(desc,task_id):
     parameters:
       - name: time_unit
         type: string
-        enum: ['weeks','days','hours','mins','seconds']
+        enum: ['weeks','days','hours','minutes','seconds']
         required: true
         description: 时间单位
       - name: time_value
@@ -141,9 +141,11 @@ def update_query_data_task(desc,task_id):
         time_unit = _task_param.get("time_unit")
         time_value = _task_param.get("time_value")
         task_params = {}
+        task_params["id"] = current_task.id
+        task_params["trigger"] = "interval"
         task_params[time_unit] = time_value
-        current_task.modify(**task_params)
-        current_task = Chart.query.filter_by(update_task_id=task_id).first()
+        apscheduler.modify_job(**task_params)
+        current_chart= Chart.query.filter_by(update_task_id=task_id).first()
         if current_chart:
             current_chart.update_task_id = task_params.get("id")
             current_chart.put()

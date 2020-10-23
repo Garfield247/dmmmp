@@ -15,9 +15,9 @@ from validator import Validator, StringField, IntegerField, EnumField
 
 class Add_query_data_task_validator(Validator):
     chart_id = IntegerField(min_value=1, required=True)
-    time_unit = EnumField(choices=["weeks","days","hours","mins","seconds"], required=True)
+    time_unit = EnumField(choices=["weeks","days","hours","minutes","seconds"], required=True)
     time_value = IntegerField(min_value=1, required=True)
 
 class Update_query_data_task_validator(Validator):
-    time_unit = EnumField(choices=["weeks","days","hours","mins","seconds"], required=True)
+    time_unit = EnumField(choices=["weeks","days","hours","minutes","seconds"], required=True)
     time_value = IntegerField(min_value=1, required=True)

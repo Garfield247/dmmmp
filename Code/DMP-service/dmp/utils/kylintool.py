@@ -234,7 +234,7 @@ class KylinTool():
         params = {
             "modelName": modelName,
             "modelDescData": modelDescData,
-            "projectName": projectName
+            "project": projectName
         }
         result = self._post("models", params=params)
         return result
