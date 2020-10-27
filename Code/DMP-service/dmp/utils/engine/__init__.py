@@ -84,4 +84,5 @@ def create_table_query_handler(table_name, fields, uniform_type, id_primary_key=
     sql = create.format(table_name=table_name) + p1 + col.format(
         columns=columns) + p2 + p3
 
+    print(sql)
     return sql
