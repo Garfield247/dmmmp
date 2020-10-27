@@ -75,7 +75,7 @@ def create_table_query_handler(table_name, fields, uniform_type, id_primary_key=
     Delimiter = "row format delimited fields terminated by '{fieldDelimiter}'"
     # if id_primary_key and "id" in fields:
     #     fields.remove("id")
-    columns = ",".join(["%s %s" % (col, uniform_type)if id_primary_key != True and col != "id" for col in fields ])
+    columns = ",".join(["%s %s" % (col, uniform_type)if id_primary_key != True and col != "id" else None for col in fields ])
     p1 = id_pri if id_primary_key else ""
     p2 = Delimiter.format(
         fieldDelimiter=fieldDelimiter) if fieldDelimiter else ""
