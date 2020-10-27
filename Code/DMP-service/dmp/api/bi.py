@@ -123,7 +123,7 @@ def get_dashboards_and_archives(desc):
     dashboards_and_archives = dashboards.union( archives)
     # dashboards_and_archives = union(dashboards.alias("dashboards"), archives.alias("archives"))
     # dashboards_and_archives = db.session.query([dashboards, archives]).select_entity_from(union(dashboards.select(), archives.select()))
-    current_app.logger.info(dashboards_and_archives)
+    # current_app.logger.info(dashboards_and_archives)
     count = dashboards_and_archives.count()
     data = [d._asdict() for  d in dashboards_and_archives.order_by(desc_("is_index"), desc_("is_star"),desc_("changed_on"), "type").offset((pagenum-1)*pagesize).limit(pagesize)]
     res = {

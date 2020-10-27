@@ -637,8 +637,9 @@ def approve(desc):
                                                     column=column,
                                                     )
 
+                        meta = {"form_id":approve_form.id}
                         job_hanlder.delay(
-                            reader=reader, writer=writer, channel=3)
+                            reader=reader, writer=writer, channel=3, func = job_finish , meta=meta)
                     except Exception as err:
                         approve_form.result = "CREATE MIGRATE JOB FAILED，ERROR MESSAGE：%s" % str(
                             err)
