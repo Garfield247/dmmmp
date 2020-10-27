@@ -76,8 +76,10 @@ def create_table_query_handler(table_name, fields, uniform_type, id_primary_key=
     # if id_primary_key and "id" in fields:
     #     fields.remove("id")
     ccc = ["%s %s" % (col, uniform_type)if id_primary_key != True and col != "id" else None for col in fields ]
+    print(ccc)
     if None in ccc:
         ccc.remove(None)
+    print(ccc)
     columns = ",".join(ccc)
     p1 = id_pri if id_primary_key else ""
     p2 = Delimiter.format(
