@@ -422,7 +422,7 @@ def approve(desc):
                                                                       semicolon=False,
                                                                       fieldDelimiter=",")
 
-                        current_app.logger.error(create_table_sql)
+                        print(create_table_sql)
                         if method == 1:
                             hive_conn.execsql(create_table_sql)
                         elif method == 3:
