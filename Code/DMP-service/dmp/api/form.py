@@ -614,7 +614,7 @@ def approve(desc):
                             mysql_conn = auto_connect(
                                 db_id=approve_form.info_form.destination_dmp_database_id)
                             mysql_conn.execsql(sql=create_table_sql)
-                            preSQL = []
+                            # preSQL = []
                             writer = mysql_writer(model=1,
                                                   username=destination_db_username,
                                                   password=destination_db_passwd,
@@ -644,6 +644,7 @@ def approve(desc):
                         approve_form.result = "CREATE MIGRATE JOB FAILED，ERROR MESSAGE：%s" % str(
                             err)
                         approve_form.finish = True
+                        raise err
 
             elif form_type == 4:
                 # 数据导出表单
