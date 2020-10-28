@@ -680,6 +680,7 @@ def get_data_by_data_service(api):
       0:
         description: 正常响应
 	"""
+    api = str(api)
     request_params = request.json
     code = 100
     msg = None
