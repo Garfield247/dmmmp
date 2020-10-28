@@ -30,6 +30,7 @@ class Config:
         r"^/file/success/",
         r"^/database/connect/",
         r"^/index/.*"
+        r"^/ds/api/.*"
     ]
     # 免认证
     NO_PERMISSION_LIST = [

@@ -625,21 +625,24 @@ def parse_query_params(request_params, dataservice):
     query_params = {}
     missing = []
     dsparams = dataservice.params
-    for dsp in dsparams:
-        p_name = dsp.get("parameter_name")
-        p_required = dsp.get("required")
-        value = request_params.get(p_name, None)
-        if p_required == True and value != None:
-            query_params[p_name] = value
-        elif p_required == False and value != None:
-            query_params[p_name] = value
-        elif p_required == True and value == None:
-            missing.append(p_name)
-            legal = False
-    if legal:
-        return None, query_params
+    if len(dsparams)>0:
+        for dsp in dsparams:
+            p_name = dsp.get("parameter_name")
+            p_required = dsp.get("required")
+            value = request_params.get(p_name, None)
+            if p_required == True and value != None:
+                query_params[p_name] = value
+            elif p_required == False and value != None:
+                query_params[p_name] = value
+            elif p_required == True and value == None:
+                missing.append(p_name)
+                legal = False
+        if legal:
+            return None, query_params
+        else:
+            return missing, None
     else:
-        return missing, None
+        None,None
 
 
 def format_sql(query_sql_tmp, query_params):
@@ -688,38 +691,60 @@ def get_data_by_data_service(api):
     secret_key = request_params.get("secret_key", None)
     if secret_key:
         user_id = Users.encode_auth_token(secret_key)
-        if DataService.exsit_data_service_by_apipath(api):
-            current_data_sevice = DataService.query.filter_by(
-                api_path=api).first()
-            if current_data_sevice.state:
-                dataservice_log = UserDataService(
-                    dmp_user_id=user_id,
-                    dmp_data_service_id=current_data_sevice.id,
-                )
-                dataservice_log.save()
-                missing, query_params = parse_query_params(
-                    request_params, current_data_sevice)
-                if missing == None:
-                    query_sql_tmp = current_data_sevice.query_sql
-                    source_dmp_data_table_id = current_data_sevice.source_dmp_data_table_id
-                    if query_sql_tmp and source_dmp_data_table_id:
-                        page_num = request_params.get(page_num, 1)
-                        query_sql = format_sql(query_sql_tmp, query_params)
-                        conn = auto_connect(table_id=source_dmp_data_table_id)
-                        res, data = conn.exec_query_sql(query_sql)
-                        if res:
-                            result = data
-                        else:
-                            code = 8107
-                    else:
-                        code = 8106
-                else:
-                    code = 8105
-                    msg = "缺少%d个必要参数：%s" % (len(missing), ",".join(missing))
-            else:
-                code = 8108
-        else:
-            code = 8104
     else:
         code = 8101
-    return resp_hanlder(code=code, msg=msg, result=result)
+        msg = "缺少秘钥或秘钥已失效"
+        return resp_hanlder(code=code, msg=msg, result=result)
+
+    if DataService.exsit_data_service_by_apipath(api):
+        current_data_sevice = DataService.query.filter_by(api_path=api).first()
+    else:
+        code = 8104
+        msg = "未匹配到改数据服务"
+        return resp_hanlder(code=code, msg=msg, result=result)
+    if current_data_sevice.state:
+        dataservice_log = UserDataService(
+            dmp_user_id=user_id,
+            dmp_data_service_id=current_data_sevice.id,
+        )
+        dataservice_log.save()
+    else:
+        code = 8108
+        msg = "当前数据服务未开启"
+        return resp_hanlder(code=code, msg=msg, result=result)
+    db_type = current_data_sevice.database_type
+    missing, query_params = parse_query_params(request_params, current_data_sevice)
+    if missing == None:
+        query_sql_tmp = current_data_sevice.query_sql
+        source_dmp_data_table_id = current_data_sevice.source_dmp_data_table_id
+    else:
+        code = 8105
+        msg = "缺少%d个必要参数：%s" % (len(missing), ",".join(missing))
+        return resp_hanlder(code=code, msg=msg, result=result)
+    if query_sql_tmp and source_dmp_data_table_id:
+        page_num = request_params.get("page_num", 1)
+        page_size = request_params.get("page_size", 100)
+        conn = auto_connect(table_id=source_dmp_data_table_id)
+        qp = {}
+        if db_type in [1, 2]:
+            query_sql = format_sql(query_sql_tmp, query_params)
+            qp["sql"] = query_sql
+            data = conn.exec_query(qp)
+            result = data
+            return resp_hanlder(code=code, msg=msg, result=result)
+        elif db_type == 3:
+            query_sql = eval(query_sql_tmp)
+            query_sql[filter] = query_params
+            qp = query_sql
+            data = conn.exec_query(qp)
+            result = data
+            return resp_hanlder(code=code, msg=msg, result=result)
+        else:
+            code = 8107
+            msg = "源数据库异常"
+            return resp_hanlder(code=code, msg=msg, result=result)
+
+    else:
+        msg = "源数据库异常"
+        code = 8106
+
