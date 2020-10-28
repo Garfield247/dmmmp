@@ -15,17 +15,17 @@ class Chart(db.Model, DMPModel):
                    autoincrement=True, comment='看板ID')
     chart_name = db.Column(db.String(64), nullable=False, comment='图表名称')
     dmp_data_table_id = db.Column(db.Integer,  comment='数据表ID')
-    query_string = db.Column(db.Text,  comment='查询语句')
-    chart_data = db.Column(db.Text,  comment='数据')
+    query_string = db.Column(db.JSON, comment='查询语句')
+    chart_data = db.Column(db.JSON, comment='数据')
     chart_type = db.Column(db.Integer, nullable=False,
                            comment='图表类型，柱状图1，折线图2，饼图3，地图4，雷达图5')
     params = db.Column(db.Text,  comment='图表参数')
     update_interval = db.Column(
-        db.Integer, default=0,  comment='时间间隔时间')
+        db.Integer, default=0, comment='时间间隔时间')
     update_unit = db.Column(db.Integer, default=0,
                              comment='时间间隔单位，0小时，1日，3周')
     description = db.Column(db.String(512), comment='简介')
-    charts_position = db.Column(db.Text, nullable=False, comment='图表布局数据')
+    charts_position = db.Column(db.JSON, nullable=False, comment='图表布局数据')
     dmp_dashboard_id = db.Column(db.Integer, nullable=False, comment='数据看板ID')
     update_task_id = db.Column(db.String(64), comment='更新任务ID')
     created_dmp_user_id = db.Column(db.Integer, nullable=False, comment='创建人')

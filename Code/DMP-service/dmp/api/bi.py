@@ -96,7 +96,7 @@ def add_dashboard(desc):
     创建看板
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: dmp_dashboard_name
         in: path
@@ -167,7 +167,7 @@ def update_dashboard_by_id(id, desc):
     修改看板
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: id
         in: path
@@ -249,7 +249,7 @@ def delete_dashboard_by_id(id, desc):
     删除看板
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: id
         in: path
@@ -286,7 +286,7 @@ def add_archive(desc):
     创建文件夹
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: dashboard_archive_name
         in: path
@@ -361,7 +361,7 @@ def update_archive_by_id(id, desc):
     修改文件夹信息
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: id
         in: path
@@ -413,7 +413,7 @@ def delete_archive_by_id(id, desc):
     删除文件夹
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: id
         in: path
@@ -450,7 +450,7 @@ def get_charts_by_dashboard_id(dashboard_id, desc):
     获取图表信息
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: dashboard_id
         in: path
@@ -472,7 +472,7 @@ def get_charts_by_dashboard_id(dashboard_id, desc):
             change_chart_obj_dict_list = [c.chart_to_dict() for c in change_chart_obj]
             return resp_hanlder(code=0, msg='获取图表信息成功.',
                                 result=change_chart_obj_dict_list)
-        return resp_hanlder(code=999, msg='看板ID获取失败.')
+        return resp_hanlder(code=999, msg='看板ID获取失败或不存在图表信息.')
     except Exception as err:
         db.session.rollback()
         return resp_hanlder(code=999, err=str(err))
@@ -484,7 +484,7 @@ def add_chart(desc):
     添加图表接口
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: chart_name
         in: path
@@ -586,7 +586,7 @@ def update_charts_by_id(id, desc):
     修改图表
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: chart_name
         in: path
@@ -695,7 +695,7 @@ def delete_charts_by_id(id, desc):
     删除图表
     ---
     tags:
-      - Bi
+      - BI
     parameters:
       - name: id
         in: path

@@ -132,7 +132,6 @@ def belong(desc):
                             # 不进行操作
                             continue
                     res_group_list = EnvelopedData.return_group_list(except_teacher_groups_list)
-                    print('hhhh', res_group_list)
                     return resp_hanlder(code=5001, msg='Display all user group information successfully.', result=res_group_list)
                 else:
                     # 没有新添加的用户组，默认仅展示学生用户组
