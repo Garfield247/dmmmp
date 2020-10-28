@@ -624,7 +624,7 @@ def parse_query_params(request_params, dataservice):
     legal = True
     query_params = {}
     missing = []
-    dsparams = crrent_data_sevice.params
+    dsparams = dataservice.params
     for dsp in dsparams:
         p_name = dsp.get("parameter_name")
         p_required = dsp.get("required")
@@ -652,7 +652,7 @@ def format_sql(query_sql_tmp, query_params):
 
 @ds.route("/api/<path:api>", methods=["GET"])
 @limiter.limit("1/second")
-def get_data_by_data_service():
+def get_data_by_data_service(api):
     """
     数据服务调用
 
