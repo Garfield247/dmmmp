@@ -397,7 +397,9 @@ def chart_retrieve(desc):
         try:
             conn = auto_connect(table_id= data_table_id)
             _data = conn.exec_query(**request_json)
-            if type(_data) ==  list:
+            print(_data)
+            if t1ype(_data) ==  list:
+
                 result = {}
                 result["data"] = [dict(zip(dimension_names+measure_names_methods, d)) for d in _data]
                 result["query_string"] = {"sql":sql, "fields":dimension_names+measure_names_methods}

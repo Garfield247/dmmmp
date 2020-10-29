@@ -625,22 +625,26 @@ def parse_query_params(request_params, dataservice):
     query_params = {}
     missing = []
     dsparams = dataservice.params
-    if len(dsparams)>0:
-        for dsp in dsparams:
-            p_name = dsp.get("parameter_name")
-            p_required = dsp.get("required")
-            value = request_params.get(p_name, None)
-            if p_required == True and value != None:
-                query_params[p_name] = value
-            elif p_required == False and value != None:
-                query_params[p_name] = value
-            elif p_required == True and value == None:
-                missing.append(p_name)
-                legal = False
-        if legal:
-            return None, query_params
+    print(dsparams)
+    if dsparams:
+        if len(dsparams)>0:
+            for dsp in dsparams:
+                p_name = dsp.get("parameter_name")
+                p_required = dsp.get("required")
+                value = request_params.get(p_name, None)
+                if p_required == True and value != None:
+                    query_params[p_name] = value
+                elif p_required == False and value != None:
+                    query_params[p_name] = value
+                elif p_required == True and value == None:
+                    missing.append(p_name)
+                    legal = False
+            if legal:
+                return None, query_params
+            else:
+                return missing, None
         else:
-            return missing, None
+            None,None
     else:
         None,None
 
@@ -685,6 +689,7 @@ def get_data_by_data_service(api):
 	"""
     try:
         api = str(api)
+        print(api)
         request_params = request.json
         code = 100
         msg = None
@@ -704,40 +709,43 @@ def get_data_by_data_service(api):
             msg = "未匹配到改数据服务"
             return resp_hanlder(code=code, msg=msg, result=result)
         if current_data_sevice.state:
-            dataservice_log = UserDataService(
-                dmp_user_id=user_id,
-                dmp_data_service_id=current_data_sevice.id,
-            )
-            dataservice_log.save()
+            # dataservice_log = UserDataService(
+                # dmp_user_id=user_id,
+                # dmp_data_service_id=current_data_sevice.id,
+            # )
+            # dataservice_log.save()
+            db_type = current_data_sevice.database_type
+            missing, query_params = parse_query_params(request_params, current_data_sevice)
         else:
             code = 8108
             msg = "当前数据服务未开启"
             return resp_hanlder(code=code, msg=msg, result=result)
-        db_type = current_data_sevice.database_type
-        missing, query_params = parse_query_params(request_params, current_data_sevice)
         if missing == None:
-            query_sql_tmp = current_data_sevice.query_sql
             source_dmp_data_table_id = current_data_sevice.source_dmp_data_table_id
         else:
             code = 8105
             msg = "缺少%d个必要参数：%s" % (len(missing), ",".join(missing))
             return resp_hanlder(code=code, msg=msg, result=result)
-        if query_sql_tmp and source_dmp_data_table_id:
+        if source_dmp_data_table_id:
             page_num = request_params.get("page_num", 1)
             page_size = request_params.get("page_size", 100)
             conn = auto_connect(table_id=source_dmp_data_table_id)
             qp = {}
             if db_type in [1, 2]:
+                query_sql_tmp = current_data_sevice.query_sql
                 query_sql = format_sql(query_sql_tmp, query_params)
                 qp["sql"] = query_sql
-                data = conn.exec_query(qp)
+                print(qp)
+                data = conn.exec_query(**qp)
                 result = data
                 return resp_hanlder(code=code, msg=msg, result=result)
             elif db_type == 3:
+                query_sql_tmp = current_data_sevice.query_params
                 query_sql = eval(query_sql_tmp)
                 query_sql[filter] = query_params
                 qp = query_sql
-                data = conn.exec_query(qp)
+                print(qp)
+                data = conn.exec_query(**qp)
                 result = data
                 return resp_hanlder(code=code, msg=msg, result=result)
             else:
@@ -749,4 +757,5 @@ def get_data_by_data_service(api):
             msg = "源数据库异常"
             code = 8106
     except Exception as err:
+        raise err
         return resp_hanlder(code=999, msg=str(err))

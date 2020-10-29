@@ -53,7 +53,8 @@ class DataService(db.Model, DMPModel):
 
     @classmethod
     def exsit_data_service_by_apipath(cls, apipath):
-        item = cls.query.filter_by(api_path=apipath).first()
+        item = cls.query.filter(cls.api_path==apipath).first()
+        # print(db.session.query(cls.api_path).all())
         if item:
             return True
         return False
@@ -71,11 +72,12 @@ class DataService(db.Model, DMPModel):
     def params(self):
 
         from .dmp_data_service_parameter import DataServiceParameter
-        _params = DataServiceParameter.query.filter_by(
-            dmp_data_service_id=self.id).all()
-        res = [{"parameter_name": p.parameter_name, "required": bool(
-            p.required_parameter)} for p in _params]
-        return res
+        _params = DataServiceParameter.query.filter_by(dmp_data_service_id=self.id).all()
+        if len(_params) > 0:
+            res = [{"parameter_name": p.parameter_name, "required": bool(p.required_parameter)} for p in _params]
+            return res
+        else:
+            return []
 
     @ property
     def source_dmp_data_table_name(self):
