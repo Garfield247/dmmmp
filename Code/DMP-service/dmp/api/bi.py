@@ -76,16 +76,21 @@ def get_dashboards_and_archives(desc):
             DashboardArchive.upper_dmp_dashboard_archive_id == upper_dmp_dashboard_archive_id,
             }
 
+    if name != None:
+        dashboards_filters.clear()
+        archives_filters.clear()
+        dashboards_filters.add(Dashboard.dmp_dashboard_name.like("%"+name+"%"))
+        archives_filters.add(DashboardArchive.dashboard_archive_name.like("%"+name+"%"))
+
     if is_owner == True:
         dashboards_filters.add(Dashboard.created_dmp_user_id==current_user_id)
         archives_filters.add(DashboardArchive.created_dmp_user_id==current_user_id)
 
-    if name != None:
-        dashboards_filters.add(Dashboard.dmp_dashboard_name.like("%"+name+"%"))
-        archives_filters.add(DashboardArchive.dashboard_archive_name.like("%"+name+"%"))
 
     if state != 3:
         dashboards_filters.add(Dashboard.release == state)
+
+    name_subquery = db.session.query(Users.id,Users.dmp_username.label("username")).subquery()
 
     dashboards = db.session.query(Dashboard.id.label("id"),
             literal("dashboard").label("type"),
@@ -96,13 +101,15 @@ def get_dashboards_and_archives(desc):
             db.session.query(DashboardStar.id).filter(and_(UserDashboard.dmp_dashboard_id==Dashboard.id,UserDashboard.dmp_user_id==current_user_id)).exists().label("is_index"),
             # exists().where(and_(UserDashboard.dmp_dashboard_id ==Dashboard.id,UserDashboard.dmp_user_id==current_user_id)).label("is_index"),
             Dashboard.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
-            # db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             Dashboard.created_dmp_user_id.label("created_dmp_user_id"),
-            db.session.query(Users.dmp_username).filter(Users.id == Dashboard.changed_dmp_user_id).subquery().c.dmp_username.label("changed_dmp_user_name"),
+            name_subquery.c.username.label("created_dmp_user_name"),
+            # db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             Dashboard.changed_dmp_user_id.label("changed_dmp_user_id"),
+            name_subquery.c.username.label("changed_dmp_user_name"),
+            # db.session.query(Users.dmp_username.label("changed_dmp_user_name")).join(Dashboard,Users.id == Dashboard.changed_dmp_user_id).subquery(),
             Dashboard.created_on.label("created_on"),
            Dashboard.changed_on.label("changed_on")
-           ).filter(*dashboards_filters)
+           ).outerjoin(name_subquery,Dashboard.changed_dmp_user_id==name_subquery.c.id).filter(*dashboards_filters)
 
     archives = db.session.query(DashboardArchive.id.label("id"),
             literal("archive").label("type"),
@@ -112,18 +119,20 @@ def get_dashboards_and_archives(desc):
             exists().where(and_(ArchiveStar.dmp_archive_id ==DashboardArchive.id,ArchiveStar.dmp_user_id==current_user_id)).label("is_star"),
             literal(0).label("is_index"),
             DashboardArchive.upper_dmp_dashboard_archive_id.label("upper_dmp_dashboard_archive_id"),
-            # db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             DashboardArchive.created_dmp_user_id.label("created_dmp_user_id"),
-            db.session.query(Users.dmp_username).filter(Users.id == Dashboard.changed_dmp_user_id).subquery().c.dmp_username.label("changed_dmp_user_name"),
+            name_subquery.c.username.label("created_dmp_user_name"),
+            # db.session.query(Users.dmp_username).filter(Users.id == Dashboard.created_dmp_user_id).subquery().c.dmp_username.label("created_dmp_user_name"),
             DashboardArchive.changed_dmp_user_id.label("changed_dmp_user_id"),
+            name_subquery.c.username.label("changed_dmp_user_name"),
+            # db.session.query(Users.dmp_username.label("changed_dmp_user_name")).join(DashboardArchive,Users.id == DashboardArchive.changed_dmp_user_id).subquery(),
             DashboardArchive.created_on.label("created_on"),
             DashboardArchive.changed_on.label("changed_on")
-            ).filter(*archives_filters)
+            ).outerjoin(name_subquery,DashboardArchive.changed_dmp_user_id==name_subquery.c.id).filter(*archives_filters)
 
     dashboards_and_archives = dashboards.union( archives)
     # dashboards_and_archives = union(dashboards.alias("dashboards"), archives.alias("archives"))
     # dashboards_and_archives = db.session.query([dashboards, archives]).select_entity_from(union(dashboards.select(), archives.select()))
-    # current_app.logger.info(dashboards_and_archives)
+    current_app.logger.info(dashboards_and_archives)
     count = dashboards_and_archives.count()
     data = [d._asdict() for  d in dashboards_and_archives.order_by(desc_("is_index"), desc_("is_star"),desc_("changed_on"), "type").offset((pagenum-1)*pagesize).limit(pagesize)]
     res = {
@@ -348,7 +357,8 @@ def update_dashboard_by_id(id, desc):
             if upper_dmp_dashboard_archive_id != None:
                 dashboard_obj.upper_dmp_dashboard_archive_id = upper_dmp_dashboard_archive_id
             dashboard_obj.changed_dmp_user_id = res.get('id')
-            db.session.commit()
+            # db.session.commit()
+            dashboard_obj.save()
             return resp_hanlder(code=0, msg='看板数据修改成功.',
                                 result=dashboard_obj.dashboard_to_dict())
         else:

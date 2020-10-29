@@ -41,13 +41,14 @@ class DashboardArchive(db.Model, DMPModel):
         try:
             self.put()
             self.commit()
-            if self.upper_dmp_dashboard_archive_id:
-                if DashboardArchive.exist_item_by_id(self.upper_dmp_dashboard_archive_id):
-                    upper = DashboardArchive.get(self.upper_dmp_dashboard_archive_id)
-                    upper.changed_on = self.changed_on
-                    upper.save()
-        except Exception:
+            # if self.upper_dmp_dashboard_archive_id:
+                # if DashboardArchive.exist_item_by_id(self.upper_dmp_dashboard_archive_id):
+                    # upper = DashboardArchive.get(self.upper_dmp_dashboard_archive_id)
+                    # upper.changed_on = self.changed_on
+                    # upper.save()
+        except Exception as e:
             self.rollback()
+            raise e
 
     @classmethod
     def exsit_archive_by_name(cls, archive_name):
@@ -66,7 +67,7 @@ class DashboardArchive(db.Model, DMPModel):
     @property
     def upper_dmp_dashboard_archive_name(self):
 
-        if self.upper_dmp_dashboard_archive_id > 0:
+        if self.upper_dmp_dashboard_archive_id:
             if self.exist_item_by_id(self.upper_dmp_dashboard_archive_id):
                 archive_name = DashboardArchive.get(
                     self.upper_dmp_dashboard_archive_id).dashboard_archive_name
@@ -79,6 +80,6 @@ class DashboardArchive(db.Model, DMPModel):
         _d = {
             "created_dmp_user_name": self.created_dmp_user_name,
             "changed_dmp_user_name": self.changed_dmp_user_name,
-            "upper_dmp_dashboard_archive_name": upper_dmp_dashboard_archive_name,
+            "upper_dmp_dashboard_archive_name": self.upper_dmp_dashboard_archive_name,
         }
         return _d

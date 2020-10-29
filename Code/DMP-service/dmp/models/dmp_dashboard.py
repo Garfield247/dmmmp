@@ -42,18 +42,24 @@ class Dashboard(db.Model, DMPModel):
         }
         return dashboard_dict
 
+    def update_change_time(self, item):
+        from .dmp_archive import DashboardArchive
+        if DashboardArchive.exist_item_by_id(item.upper_dmp_dashboard_archive_id):
+            upper = DashboardArchive.get(item.upper_dmp_dashboard_archive_id)
+            upper.changed_on = item.changed_on
+            upper.save()
+            if upper.upper_dmp_dashboard_archive_id:
+                self.update_change_time(upper)
+
     def save(self):
         try:
             self.put()
             self.commit()
-            from .dmp_archive import DashboardArchive
             if self.upper_dmp_dashboard_archive_id:
-                if DashboardArchive.exist_item_by_id(self.upper_dmp_dashboard_archive_id):
-                    upper = DashboardArchive.get(self.upper_dmp_dashboard_archive_id)
-                    upper.changed_on = self.changed_on
-                    upper.save()
-        except Exception:
+                self.update_change_time(item = self)
+        except Exception as e:
             self.rollback()
+            raise e
 
 
     @classmethod
@@ -75,7 +81,7 @@ class Dashboard(db.Model, DMPModel):
     def upper_dmp_dashboard_archive_name(self):
 
         from .dmp_archive import DashboardArchive
-        if self.upper_dmp_dashboard_archive_id > 0:
+        if self.upper_dmp_dashboard_archive_id:
             if DashboardArchive.exist_item_by_id(self.upper_dmp_dashboard_archive_id):
                 archive_name = DashboardArchive.get(
                     self.upper_dmp_dashboard_archive_id).dashboard_archive_name
@@ -88,6 +94,6 @@ class Dashboard(db.Model, DMPModel):
         _d = {
             "created_dmp_user_name": self.created_dmp_user_name,
             "changed_dmp_user_name": self.changed_dmp_user_name,
-            "upper_dmp_dashboard_archive_name": upper_dmp_dashboard_archive_name,
+            "upper_dmp_dashboard_archive_name": self.upper_dmp_dashboard_archive_name,
         }
         return _d
