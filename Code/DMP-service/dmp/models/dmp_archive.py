@@ -16,7 +16,7 @@ class DashboardArchive(db.Model, DMPModel):
     dashboard_archive_name = db.Column(
         db.String(64), unique=True, nullable=False, comment='文件夹名称')
     upper_dmp_dashboard_archive_id = db.Column(
-        db.Integer, default=0, comment='文件夹ID')
+        db.Integer, comment='文件夹ID')
 
     created_dmp_user_id = db.Column(db.Integer, nullable=False, comment='创建人')
     changed_dmp_user_id = db.Column(db.Integer, comment='修改人')
