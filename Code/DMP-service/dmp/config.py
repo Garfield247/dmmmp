@@ -29,9 +29,9 @@ class Config:
         r"^/file/upload/",
         r"^/file/success/",
         r"^/database/connect/",
-        r"^/index/.*"
-        r"^/ds/api/*"
-        r"^/apidocs/*"
+        r"^/index/.*",
+        r"^/ds/api/*",
+        r"^/apidocs/#/*",
     ]
     # 免认证
     NO_PERMISSION_LIST = [
