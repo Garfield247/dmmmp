@@ -30,7 +30,7 @@ class Config:
         r"^/file/success/",
         r"^/database/connect/",
         r"^/index/.*"
-        r"^/ds/api/.*"
+        r"^/ds/api/*"
         r"^/apidocs/*"
     ]
     # 免认证
