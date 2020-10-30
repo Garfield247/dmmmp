@@ -31,7 +31,8 @@ class Config:
         r"^/database/connect/",
         r"^/index/.*",
         r"^/ds/api/*",
-        r"^/apidocs/*",
+        r"^/api*",
+        r"^/flasgger*",
     ]
     # 免认证
     NO_PERMISSION_LIST = [
