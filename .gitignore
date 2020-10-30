@@ -115,7 +115,6 @@ venv.bak/
 .DS_Store
 
 upload/
-migrations/
 
 *.db
 *.sqlite
