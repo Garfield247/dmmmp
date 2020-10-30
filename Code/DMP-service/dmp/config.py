@@ -31,7 +31,7 @@ class Config:
         r"^/database/connect/",
         r"^/index/.*"
         r"^/ds/api/.*"
-        r"^/apidocs/.*"
+        r"^/apidocs/*"
     ]
     # 免认证
     NO_PERMISSION_LIST = [
