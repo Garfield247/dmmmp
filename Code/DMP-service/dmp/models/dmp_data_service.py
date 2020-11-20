@@ -88,6 +88,16 @@ class DataService(db.Model, DMPModel):
             return data_table_name
         return "-"
 
+
+    @ property
+    def dmp_case_id(self):
+        from .dmp_data_table import DataTable
+        if DataTable.exist_item_by_id(self.source_dmp_data_table_id):
+            dmp_case_id = DataTable.get(
+                self.source_dmp_data_table_id).dmp_case_id
+            return dmp_case_id
+        return "-"
+
     @ property
     def database_type(self):
         from .dmp_data_table import DataTable
@@ -110,6 +120,8 @@ class DataService(db.Model, DMPModel):
             "changed_dmp_user_name": self.changed_dmp_user_name,
             "source_dmp_data_table_name": self.source_dmp_data_table_name,
             "database_type": self.database_type,
-            "full_api":self.full_api
+            "full_api":self.full_api,
+            "dmp_case_id":self.dmp_case_id,
+
         }
         return _d

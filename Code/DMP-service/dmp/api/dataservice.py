@@ -37,13 +37,13 @@ def get_data_services(desc):
       - name: page_num
         in: json
         type: string
-        required: false
+        required: int
         description: 页码
         default: '1'
       - name: pagesize
         in: json
         type: string
-        required: false
+        required: int
         description: 单页数量
         default: '10'
     definitions:
