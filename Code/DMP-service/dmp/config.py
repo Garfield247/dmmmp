@@ -130,6 +130,8 @@ class TestingConfig(Config):
     # ICON_URL
     SAVE_URL = os.path.join(base_dir, "static/icon")
     ICON_URL = 'http://192.168.3.87:7789/static/icon/'
+    DS_API_URL = 'http://192.168.3.87:7789/ds/api/'
+
 
     JOBS = []
     SCHEDULER_API_ENABLED = True

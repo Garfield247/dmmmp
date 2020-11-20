@@ -1,27 +1,34 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# @FileName  :dataservice.py
-# @Time      :2020/9/28 18:14
+# vim:fenc=utf-8
+#
+# Copyright © 2020 CatMan <garfield_lv@163.com>
+#
+# Distributed under terms of the MIT license.
 
-from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField
-from wtforms.validators import DataRequired, Length
+"""
 
-
-class DataServiceForm(FlaskForm):
-    data_service_name = StringField("data_service_name",
-                                    validators=[DataRequired(message="API名称不能为空"),
-                                                Length(max=50, message="API名称长度不能超过50!")])
-    api_path = StringField("api_path",
-                           validators=[DataRequired(message="API路径不能为空"), Length(max=255, message="API路径长度不能超过255!")])
-    request_method = SelectField("request_method", choices={1})
-    description = StringField("description", validators=[Length(max=400, message="API描述长度不能超过400")])
+"""
+from validator import Validator, StringField, IntegerField, EnumField
 
 
-class DataServiceParameterForm(FlaskForm):
-    parameter_name = StringField("parameter_name",
-                                 validators=[DataRequired(message="参数名不能为空"),
-                                             Length(max=100, message="参数名长度不能超过100!")])
-    type = StringField("type", validators=[DataRequired(), Length(max=50, message="字段类型长度不能超过50!")])
-    required_parameter = SelectField("required_parameter", choices={0, 1})
-    description = StringField("description", validators=[Length(max=400, message="简介长度不能超过400")])
+class Add_dataservice_validator(Validator):
+    source_dmp_data_table_id = IntegerField(min_value=1, required=True)
+    request_method = EnumField(choices=[1,2], required=True)
+    state = EnumField(choices=[0, 1], required=True)
+    data_service_name = StringField(max_length=64, required=True)
+    api_path = StringField(max_length=64, required=True)
+    query_sql = StringField(max_length=65535, required=True)
+
+class Update_dataservice_validator(Validator):
+    source_dmp_data_table_id = IntegerField(min_value=1, required=False)
+    request_method = EnumField(choices=[1,2], required=False)
+    state = EnumField(choices=[0, 1], required=False)
+    data_service_name = StringField(max_length=64, required=False)
+    api_path = StringField(max_length=64, required=False)
+    query_sql = StringField(max_length=65535, required=False)
+
+class Get_dataservice_validator(Validator):
+    page_num = IntegerField(min_value=1,required=False)
+    pagesize = IntegerField(min_value=1,required=False)
+    data_service_name = StringField(max_length=64,required=False)

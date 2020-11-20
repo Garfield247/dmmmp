@@ -15,6 +15,7 @@ from dmp.models import SavedQuery,Case,DataTable,Users
 from dmp.utils.validators.sql import Get_queries_validator,Add_queries_validator, Update_queries_validator
 from dmp.extensions import db
 
+
 sql = Blueprint("sql", __name__)
 
 
@@ -423,3 +424,77 @@ def chart_retrieve(desc):
 
 
 
+@sql.route("/ds_retrieve", methods=["GET"], defaults={"desc": {"interface_name": "数据服务参数调试", "is_permission": True, "permission_belong": 0}})
+def ds_retrieve(desc):
+    """
+    图表查询
+
+    ---
+    tags:
+      - SQL
+    parameters:
+      - name: source_dmp_data_table_id
+        in:
+        type: int
+        required: True
+        description: 数据表ID
+      - name: query_sql_tmp
+        in:
+        type: string
+        required: True
+        description: 要调试的查询语句
+      - name: parameters
+        in:
+        type: dict
+        required: true
+        description: 参数，{"参数名":"参数值"}
+
+    responses:
+      0:
+        description: OK
+    """
+    from .dataservice import format_sql
+    try:
+        request_json = request.json if request.json else {}
+        data_table_id = request_json.get("source_dmp_data_table_id")
+        query_sql_tmp = request_json.get("query_sql_tmp",None)
+        parameters = request_json.get("parameters",{})
+        code = 0
+        if all([ data_table_id,query_sql_tmp ]):
+            if DataTable.exist_item_by_id(data_table_id):
+                current_data_table = DataTable.get(data_table_id)
+            else:
+                code=999
+                msg="数据表不存在"
+                return resp_hanlder(code=code,msg=msg)
+            db_type = current_data_table.dmp_database_type
+            qp = {}
+            conn = auto_connect(table_id=data_table_id)
+            if db_type in [1, 2]:
+                query_sql = format_sql(query_sql_tmp, parameters) if  parameters else query_sql_tmp
+                qp["sql"] = query_sql
+                print(qp)
+                data = conn.exec_query(**qp)
+                result = data
+                return resp_hanlder(code=code, result=result)
+            elif db_type == 3:
+                query_sql_tmp = current_data_sevice.query_params
+                query_sql = eval(query_sql_tmp)
+                query_sql[filter] = parameters
+                qp = query_sql
+                print(qp)
+                data = conn.exec_query(**qp)
+                result = data
+                return resp_hanlder(code=code, result=result)
+            else:
+                code = 8107
+                msg = "源数据库异常"
+                return resp_hanlder(code=code, msg=msg)
+        else:
+            code = 201
+            msg = "参数异常"
+            return resp_hanlder(code=code, msg=msg)
+    except Exception as err:
+        code =999
+        msg = str(err)
+        return resp_hanlder(code=code, msg=msg)

@@ -97,6 +97,12 @@ class DataService(db.Model, DMPModel):
             return dmp_database_type
         return "-"
 
+    @property
+    def full_api(self):
+        from flask import current_app
+        return current_app.config.get("DS_API_URL") + self.api_path
+
+
     @ property
     def _json_tmp(self):
         _d = {
@@ -104,5 +110,6 @@ class DataService(db.Model, DMPModel):
             "changed_dmp_user_name": self.changed_dmp_user_name,
             "source_dmp_data_table_name": self.source_dmp_data_table_name,
             "database_type": self.database_type,
+            "full_api":self.full_api
         }
         return _d

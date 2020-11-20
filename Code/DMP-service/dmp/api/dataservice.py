@@ -13,7 +13,9 @@ from wtforms.validators import DataRequired, Length
 from dmp.models import DataService, Users, DataServiceParameter, DataTable
 from dmp.models import UserDataService
 from dmp.utils import resp_hanlder
-from dmp.utils.validators.dataservice import DataServiceForm, DataServiceParameterForm
+# from dmp.utils.validators.dataservice import DataServiceForm, DataServiceParameterForm
+from dmp.utils.validators.dataservice import Add_dataservice_validator,Update_dataservice_validator,Get_dataservice_validator
+
 
 ds = Blueprint("ds", __name__)
 
@@ -175,23 +177,23 @@ def get_data_services(desc):
     if request.method == 'GET':
         try:
             auth_token = request.headers.get("Authorization")
-            user_id = Users.decode_auth_token(auth_token)
-            if request.json:
-                data_service_name = request.json.get("data_service_name", None)
-                if data_service_name and len(data_service_name) > 50:
-                    return resp_hanlder(code=101, msg="要进行检索的服务名称超长")
-                page_num = request.json.get("page_num", 1)
-                pagesize = request.json.get("pagesize", 10)
-            else:
-                page_num = 1
-                pagesize = 10
-                data_service_name = None
-            results = DataService.query.filter_by(created_dmp_user_id=user_id)
-            if data_service_name and len(data_service_name) > 0:
-                results = results.filter(DataService.data_service_name.like('%' + data_service_name + '%'))
-            data_count = results.count()
-            results = results.limit(pagesize).offset((int(page_num) - 1) * int(pagesize))
-            data = [d.__json__() for d in results]
+            current_user_id = Users.decode_auth_token(auth_token)
+            request_json = request.json if request.json else {}
+            valid = Get_dataservice_validator(request_json)
+            if not valid.is_valid():
+                return resp_hanlder(code=201, msg=valid.str_errors)
+            data_service_name = request.json.get("data_service_name", None)
+            page_num = request.json.get("page_num", 1)
+            pagesize = request.json.get("pagesize", 10)
+            filters = {
+                DataService.created_dmp_user_id == current_user_id,
+            }
+            if data_service_name != None:
+                filters.add(DataService.data_service_name.like("%"+data_service_name+"%"))
+            data_services_query = DataService.query.filter(*filters)
+            data_count = data_services_query.count()
+            data_services = data_services_query.limit(pagesize).offset((int(page_num) - 1) * int(pagesize))
+            data = [d.__json__() for d in data_services]
             results = {
                 'data': data,
                 'page_num': page_num,
@@ -200,6 +202,7 @@ def get_data_services(desc):
             }
             return resp_hanlder(result=results)
         except Exception as err:
+            raise err
             return resp_hanlder(code=999, error=err)
 
 
@@ -283,20 +286,22 @@ def add_data_services(desc):
     """
     if request.method == 'POST':
         try:
-            form = DataServiceForm(csrf_enabled=False)
-            if not form.validate_on_submit():
-                return resp_hanlder(code=101, err=form.errors)
             auth_token = request.headers.get("Authorization")
             user_id = Users.decode_auth_token(auth_token)
-            data = request.json
+            request_json = request.json
+            valid = Add_dataservice_validator(request_json)
+            if not valid.is_valid():
+                return resp_hanlder(code=201, msg=valid.str_errors)
             data_service_name = data.get("data_service_name")
             api_path = data.get("api_path")
             if DataService.exsit_data_service_by_apipath(apipath=api_path):
                 return resp_hanlder(code=101, msg="API路径已存在")
             request_method = data.get("request_method")
             description = data.get("description")
+            source_dmp_data_table_id = request_json.get("source_dmp_data_table_id")
             data_service = DataService(data_service_name=data_service_name,
                                        api_path=api_path,
+                                       source_dmp_data_table_id=source_dmp_data_table_id,
                                        request_method=request_method,
                                        created_dmp_user_id=user_id,
                                        changed_dmp_user_id=user_id,
@@ -377,6 +382,9 @@ def update_data_service_by_id(id, desc):
                 data_service = DataService.get(id)
                 if current_user_id == data_service.created_dmp_user_id:
                     data = request.json
+                    valid = Update_dataservice_validator(data)
+                    if not valid.is_valid():
+                        return resp_hanlder(code=201,msg=valid.str_errors)
                     if "data_service_name" in data.keys():
                         data_service.data_service_name = data.get("data_service_name")
                     if "api_path" in data.keys():
@@ -404,9 +412,6 @@ def update_data_service_by_id(id, desc):
                     if "state" in data.keys():
                         data_service.state = data.get("state")
                     data_service.changed_dmp_user_id = current_user_id
-                    form = DataServiceForm(csrf_enabled=False)
-                    if not form.validate_on_submit():
-                        return resp_hanlder(code=101, err=form.errors)
                     data_service.put()
                     return resp_hanlder(result={"update_data_service": "complete!"})
                 else:
@@ -630,7 +635,7 @@ def parse_query_params(request_params, dataservice):
         if len(dsparams)>0:
             for dsp in dsparams:
                 p_name = dsp.get("parameter_name")
-                p_required = dsp.get("required")
+                p_required = dsp.get("required_parameter")
                 value = request_params.get(p_name, None)
                 if p_required == True and value != None:
                     query_params[p_name] = value
@@ -644,15 +649,32 @@ def parse_query_params(request_params, dataservice):
             else:
                 return missing, None
         else:
-            None,None
+            return None,None
     else:
-        None,None
+        return None,None
 
 
 def format_sql(query_sql_tmp, query_params):
+
     for param_name, value in query_params.items():
-        query_sql_tmp = query_sql_tmp.replace(
-            "{%s}" % str(param_name), str(value))
+        value_ = value
+        if type(value) == int or type(value) == float:
+            value_ = str(value)
+        elif type(value) == str:
+            value_ = "'%s'"%(value)
+        elif type(value) == list:
+            vs = []
+            for v in value:
+                if type(v) == int or type(v) == float:
+                    vs.append(str(v))
+                elif type(v) == str:
+                    vs.append( "'%s'"%(v))
+                else:
+                    raise Exception("参数值不合法")
+            value_ = ",".join(vs)
+        else:
+            raise Exception("参数值不合法")
+        query_sql_tmp = query_sql_tmp.replace("{%s}" % str(param_name), "%s"%value_)
 
     return query_sql_tmp
 
@@ -733,7 +755,7 @@ def get_data_by_data_service(api):
             qp = {}
             if db_type in [1, 2]:
                 query_sql_tmp = current_data_sevice.query_sql
-                query_sql = format_sql(query_sql_tmp, query_params)
+                query_sql = format_sql(query_sql_tmp, query_params) if  query_params else query_sql_tmp
                 qp["sql"] = query_sql
                 print(qp)
                 data = conn.exec_query(**qp)
@@ -756,6 +778,7 @@ def get_data_by_data_service(api):
         else:
             msg = "源数据库异常"
             code = 8106
+            return resp_hanlder(code=code, msg=msg, result=result)
     except Exception as err:
-        raise err
+        # raise err
         return resp_hanlder(code=999, msg=str(err))
