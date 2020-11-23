@@ -520,9 +520,9 @@ def add_ds_parameters(desc):
                             return resp_hanlder(result={"add_data_service_parameter": "success"})
                         data_service_parameters = []
                         for item in parameters:
-                            form = DataServiceParameterForm(csrf_enabled=False, data=item)
-                            if not form.validate_on_submit():
-                                return resp_hanlder(code=201, err=form.errors)
+                            # form = DataServiceParameterForm(csrf_enabled=False, data=item)
+                            # if not form.validate_on_submit():
+                                # return resp_hanlder(code=201, err=form.errors)
                             parameter_name = item.get("parameter_name")
                             parameter_type = item.get("type")
                             required_parameter = item.get("required_parameter")
