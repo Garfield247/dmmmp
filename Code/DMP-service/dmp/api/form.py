@@ -12,6 +12,8 @@ from sqlalchemy import or_, and_, tuple_
 from sqlalchemy.sql import exists
 from sqlalchemy.testing import in_
 
+from pypinyin import lazy_pinyin
+
 from dmp.extensions import db
 from dmp.models import FormUpload, FormMigrate, FormDownload, FormAddDataTable, Forms, Users, DataTable, Database, Permissions
 from dmp.utils import resp_hanlder, uuid_str
@@ -311,6 +313,11 @@ def job_finish(meta):
     approve_form.finish = True
     approve_form.put()
 
+def is_contains_chinese(strs):
+    for _char in strs:
+        if '\u4e00' <= _char <= '\u9fa5':
+            return True
+    return False
 
 @form.route("/approve/", methods=["PUT"],
             defaults={"desc": {"interface_name": "表单审批", "is_permission": True, "permission_belong": 2}})
@@ -384,7 +391,8 @@ def approve(desc):
                     if file_type == 1 or file_type == 3:
                         # csv、excel
                         dt = pd.read_csv(csv_filepath, header=column_line)
-                        csv_column = list(dt.columns)
+                        csv_column = ["_".join(lazy_pinyin(d)) if is_contains_chinese(d) else d for d in list(dt.columns)]
+
                         text_column = column if column and len(
                             column) == len(csv_column) else csv_column
                         csv_column_d = [{"index": i, "type": "string"}
@@ -396,7 +404,7 @@ def approve(desc):
                     elif file_type == 2:
                         # json
                         dt = pd.read_csv(csv_filepath, header=0)
-                        csv_column = list(dt.columns)
+                        csv_column = ["_".join(lazy_pinyin(d)) if is_contains_chinese(d) else d for d in list(dt.columns)]
                         text_column = column if column and len(
                             column) == len(csv_column) else csv_column
                         csv_column_d = [{"index": i, "type": "string"}
