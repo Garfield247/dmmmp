@@ -309,7 +309,7 @@ def add_data_services(desc):
             data_service.save()
             return resp_hanlder(result={"add_data_service": "complete!", "id": data_service.id})
         except Exception as err:
-            return resp_hanlder(code=999, error=err)
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @ds.route("/dataservices/<int:id>", methods=["PUT"],
