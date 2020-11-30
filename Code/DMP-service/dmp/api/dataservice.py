@@ -509,13 +509,13 @@ def add_ds_parameters(desc):
             if user_id:
                 data = request.json
                 data_service_id = data.get("dmp_data_service_id")
+                parameters = data.get("parameters",[])
                 if DataService.exist_item_by_id(data_service_id):
                     data_service = DataService.get(data_service_id)
                     create_user_id = data_service.created_dmp_user_id
                     if user_id != create_user_id:
                         return resp_hanlder(code=301)
                     else:
-                        parameters = data.get("parameters")
                         if parameters is None or len(parameters) == 0:
                             return resp_hanlder(result={"add_data_service_parameter": "success"})
                         data_service_parameters = []
@@ -538,7 +538,7 @@ def add_ds_parameters(desc):
                 else:
                     return resp_hanlder(code=7401, msg="数据服务不存在或在操作期间被删除")
             else:
-                return resp_hanlder(code=301)
+                return resp_hanlder(code=301,msg="用户ID获取异常")
         except Exception as err:
             return resp_hanlder(code=999, msg=str(err))
 
