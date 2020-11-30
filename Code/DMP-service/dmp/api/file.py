@@ -36,7 +36,7 @@ def upload(desc):
 def success(desc):
     target_filename = request.args.get('filename')
     task = request.args.get('task_id')
-    filetype = request.args.get("filetype") or 1
+    filetype = int(request.args.get("filetype")) or 1
 
     current_app.logger.info(request.args)
     chunk = 0
