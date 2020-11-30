@@ -366,7 +366,7 @@ def approve(desc):
                 method = approve_form.info_form.method
                 description = approve_form.description
                 submit_dmp_user_id = approve_form.submit_dmp_user_id
-                dmp_case_id = approve_form.dmp_case_id
+                dmp_case_id = approve_form.info_form.dmp_case_id
 
                 destination_database = Database.get(
                     destination_dmp_database_id)
