@@ -298,7 +298,7 @@ def add_data_services(desc):
                 return resp_hanlder(code=101, msg="API路径已存在")
             request_method = data.get("request_method")
             description = data.get("description")
-            source_dmp_data_table_id = request_json.get("source_dmp_data_table_id")
+            source_dmp_data_table_id = data.get("source_dmp_data_table_id")
             data_service = DataService(data_service_name=data_service_name,
                                        api_path=api_path,
                                        source_dmp_data_table_id=source_dmp_data_table_id,
