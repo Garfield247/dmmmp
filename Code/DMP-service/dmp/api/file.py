@@ -37,6 +37,8 @@ def success(desc):
     target_filename = request.args.get('filename')
     task = request.args.get('task_id')
     filetype = request.args.get("filetype") or 1
+
+    current_app.logger.info(request.args)
     chunk = 0
     upload_path = current_app.config.get("UPLOADED_PATH")
     current_app.logger.info("%s%s%s" % (target_filename, task, upload_path))
