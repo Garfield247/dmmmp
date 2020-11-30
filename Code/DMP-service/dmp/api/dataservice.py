@@ -540,7 +540,7 @@ def add_ds_parameters(desc):
             else:
                 return resp_hanlder(code=301)
         except Exception as err:
-            return resp_hanlder(code=999, error=err)
+            return resp_hanlder(code=999, msg=str(err))
 
 
 @ds.route("/ds_parameters/<int:id>", methods=["PUT"],
@@ -622,7 +622,7 @@ def update_ds_parameters(id, desc):
             else:
                 return resp_hanlder(code=301)
         except Exception as err:
-            return resp_hanlder(code=999, err=err)
+            return resp_hanlder(code=999, msg=str(err))
 
 
 def parse_query_params(request_params, dataservice):
