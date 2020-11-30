@@ -289,7 +289,7 @@ def add_data_services(desc):
             auth_token = request.headers.get("Authorization")
             user_id = Users.decode_auth_token(auth_token)
             data = request.json
-            valid = Add_dataservice_validator(request_json)
+            valid = Add_dataservice_validator(data)
             if not valid.is_valid():
                 return resp_hanlder(code=201, msg=valid.str_errors)
             data_service_name = data.get("data_service_name")
