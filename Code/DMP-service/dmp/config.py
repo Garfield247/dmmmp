@@ -29,7 +29,11 @@ class Config:
         r"^/file/upload/",
         r"^/file/success/",
         r"^/database/connect/",
-        r"^/index/.*"
+        r"^/index/.*",
+        r"^/ds/api/*",
+        r"^/api*",
+        r"^/flasgger*",
+        r"^/bi/.*",
     ]
     # 免认证
     NO_PERMISSION_LIST = [
@@ -85,6 +89,16 @@ class DevelopmentConfig(Config):
         'coalesce': False,
         'max_instances': 5
     }
+
+    # KYLIN
+    KYLIN_HOST = "192.168.3.60"
+    KYLIN_PORT = "7070"
+    KYLIN_NAME = "ADMIN"
+    KYLIN_PASSWD = "KYLIN"
+    KYLIN_PROJECT = "dmp_test"
+
+
+
 # 测试环境
 class TestingConfig(Config):
     # Mail
@@ -117,6 +131,8 @@ class TestingConfig(Config):
     # ICON_URL
     SAVE_URL = os.path.join(base_dir, "static/icon")
     ICON_URL = 'http://192.168.3.87:7789/static/icon/'
+    DS_API_URL = 'http://192.168.3.87:7789/ds/api/'
+
 
     JOBS = []
     SCHEDULER_API_ENABLED = True
@@ -129,6 +145,12 @@ class TestingConfig(Config):
         'coalesce': False,
         'max_instances': 5
     }
+    # KYLIN
+    KYLIN_HOST = "192.168.3.60"
+    KYLIN_PORT = "7070"
+    KYLIN_NAME = "ADMIN"
+    KYLIN_PASSWD = "KYLIN"
+    KYLIN_PROJECT = "dmp_test"
 
 # 生产环境
 class ProductionConfig(Config):

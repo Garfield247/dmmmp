@@ -53,7 +53,8 @@ class DataService(db.Model, DMPModel):
 
     @classmethod
     def exsit_data_service_by_apipath(cls, apipath):
-        item = cls.query.filter_by(api_path=apipath).first()
+        item = cls.query.filter(cls.api_path==apipath).first()
+        # print(db.session.query(cls.api_path).all())
         if item:
             return True
         return False
@@ -71,11 +72,12 @@ class DataService(db.Model, DMPModel):
     def params(self):
 
         from .dmp_data_service_parameter import DataServiceParameter
-        _params = DataServiceParameter.query.filter_by(
-            dmp_data_service_id=self.id).all()
-        res = [{"parameter_name": p.parameter_name, "required": bool(
-            p.required_parameter)} for p in _params]
-        return res
+        _params = DataServiceParameter.query.filter_by(dmp_data_service_id=self.id).all()
+        if len(_params) > 0:
+            res = [{"parameter_name": p.parameter_name, "required": bool(p.required_parameter)} for p in _params]
+            return res
+        else:
+            return []
 
     @ property
     def source_dmp_data_table_name(self):
@@ -86,11 +88,40 @@ class DataService(db.Model, DMPModel):
             return data_table_name
         return "-"
 
+
+    @ property
+    def dmp_case_id(self):
+        from .dmp_data_table import DataTable
+        if DataTable.exist_item_by_id(self.source_dmp_data_table_id):
+            dmp_case_id = DataTable.get(
+                self.source_dmp_data_table_id).dmp_case_id
+            return dmp_case_id
+        return "-"
+
+    @ property
+    def database_type(self):
+        from .dmp_data_table import DataTable
+        if DataTable.exist_item_by_id(self.source_dmp_data_table_id):
+            dmp_database_type = DataTable.get(
+                self.source_dmp_data_table_id).dmp_database_type
+            return dmp_database_type
+        return "-"
+
+    @property
+    def full_api(self):
+        from flask import current_app
+        return current_app.config.get("DS_API_URL") + self.api_path
+
+
     @ property
     def _json_tmp(self):
         _d = {
             "created_dmp_user_name": self.created_dmp_user_name,
             "changed_dmp_user_name": self.changed_dmp_user_name,
             "source_dmp_data_table_name": self.source_dmp_data_table_name,
+            "database_type": self.database_type,
+            "full_api":self.full_api,
+            "dmp_case_id":self.dmp_case_id,
+
         }
         return _d

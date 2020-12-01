@@ -39,7 +39,22 @@ class MongodbEngine():
     def count(self, collection):
         return int(self.database[collection].count())
 
-    def exec_query_by_param(self, collection, filters={}, projection={"_id": 0}, sort=[("_id", 1)], skip=0, limit=100):
+    def exec_query(self,**kwages):
+        collection=kwages.get("collection")
+        print(kwages)
+        try:
+            filters_str = kwages.get("filters") if  kwages.get("filters") else '{}'
+            projection_str = kwages.get("projection") if kwages.get("projection") else  '{"_id": 0}'
+            sort_str = kwages.get("sort") if  kwages.get("sort") else '[("_id", 1)]'
+            print(filters_str, projection_str , sort_str)
+            filters=eval(filters_str)
+            projection=eval(projection_str)
+            sort=eval(sort_str)
+        except Exception as e:
+            print(e)
+            raise Exception("查询参数解析异常")
+        skip=kwages.get("skip",0)
+        limit=kwages.get("limit",100)
 
         res = self.database[collection].find(filters, projection).sort(
             sort).skip(skip).limit(limit)

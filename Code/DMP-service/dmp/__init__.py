@@ -29,9 +29,19 @@ def create_app(config_name):
     config_blueprint(app)
 
     # RBAC权限拦截
-    # app.before_request(rbac_middleware)
+    app.before_request(rbac_middleware)
 
     # 返回应用实例
     return app
 
 
+# 获取配置
+config_name = os.environ.get('DMP_CONFIG') or 'testing'
+
+# 创建实例
+app = create_app(config_name)
+
+
+
+def get_app():
+    return app

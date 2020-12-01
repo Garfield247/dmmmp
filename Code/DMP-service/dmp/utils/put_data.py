@@ -70,6 +70,8 @@ class PuttingData():
             # 普通管理员无法单一添加管理员角色,需要超级管理员添加管理员角色
             if res_token.get('dmp_group_id') == 1 and res_token.get('id') != 1:
                 dmp_group_obj = Groups.query.filter(Groups.dmp_group_name == dmp_group_name).first()
+                if dmp_group_obj == None:
+                    return (-1, 'Missing parameter or incorrect user group name.')
                 dmp_group_id = dmp_group_obj.id
                 if dmp_group_id == 1:
                     return False
@@ -83,6 +85,8 @@ class PuttingData():
             # 教师可以单一添加教师
             if res_token.get('dmp_group_id') == 2:
                 dmp_group_obj = Groups.query.filter(Groups.dmp_group_name == dmp_group_name).first()
+                if dmp_group_obj == None:
+                    return (-1, 'Missing parameter or incorrect user group name.')
                 dmp_group_id = dmp_group_obj.id
                 if dmp_group_id == 1:
                     return False

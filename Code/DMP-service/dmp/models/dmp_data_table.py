@@ -20,6 +20,8 @@ class DataTable(db.Model, DMPModel):
     db_table_name = db.Column(
         db.String(32), nullable=False, comment='数据库内数据表名称')
     db_data_count = db.Column(db.Integer, default=0, comment='数据表内的数据量')
+    is_kylin = db.Column(db.Integer, default=0, comment='是否是Kylin表,0否，1是， 2转化中 ')
+    kylin_info_id = db.Column(db.Integer,  comment='Kylin信息表ID')
     description = db.Column(db.Text, comment='数据说明')
     created_on = db.Column(db.DateTime, nullable=False,
                            default=datetime.datetime.now, comment='创建时间')
@@ -50,6 +52,13 @@ class DataTable(db.Model, DMPModel):
         d_name = d.dmp_database_name if d else "-"
         return d_name
 
+    @property
+    def dmp_database_type(self):
+        from dmp.models import Database
+        d = Database.get(self.dmp_database_id)
+        d_type = d.db_type if d else "-"
+        return d_type
+
     def data_count(self):
         from dmp.utils.engine import auto_connect
         conn = auto_connect(db_id=self.dmp_database_id)
@@ -75,6 +84,7 @@ class DataTable(db.Model, DMPModel):
             "dmp_user_name": self.dmp_user_name,
             "dmp_case_name": self.dmp_case_name,
             "dmp_database_name": self.dmp_database_name,
+            "database_type": self.dmp_database_type,
         }
         return _d
 

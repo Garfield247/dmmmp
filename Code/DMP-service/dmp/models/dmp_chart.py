@@ -3,6 +3,7 @@
 # @Date    : 2020/8/19
 # @Author  : SHTD
 
+import json
 import datetime
 from dmp.extensions import db
 from dmp.models import DMPModel
@@ -56,10 +57,11 @@ class Chart(db.Model, DMPModel):
             'changed_on': self.changed_on.strftime("%Y-%m-%d %H:%M:%S")
         }
         return chart_dict
-        
+
     def delete(self):
         from dmp.extensions import apscheduler
-        apscheduler.delete_job(id=self.update_task_id)
+        if self.update_task_id:
+            apscheduler.delete_job(id=self.update_task_id)
         db.session.delete(self)
         db.session.commit()
 
@@ -74,10 +76,18 @@ class Chart(db.Model, DMPModel):
         return "-"
 
     @property
+    def dmp_data_table(self):
+        from .dmp_data_table import DataTable
+        if DataTable.exist_item_by_id(self.dmp_data_table_id):
+            data_table = DataTable.get(self.dmp_data_table_id)
+            return data_table if data_table else None
+        return "-"
+
+    @property
     def _json_tmp(self):
         _d = {
             "created_dmp_user_name": self.created_dmp_user_name,
             "changed_dmp_user_name": self.changed_dmp_user_name,
-            "dmp_data_table_name": dmp_data_table_name,
+            "dmp_data_table_name": self.dmp_data_table_name,
         }
         return _d

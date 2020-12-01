@@ -59,14 +59,15 @@ class MysqlEngine():
         cursor = self.conn.cursor()
         cursor.execute(sql)
 
-    def exec_query_sql(self, sql):
+    def exec_query(self,**kwages):
+        sql =kwages.get("sql")
         if bool(re.match(r"^select ", sql, re.I)):
             cursor = self.conn.cursor()
             cursor.execute(sql)
             res = cursor.fetchall()
-            return True, res
+            return res
         else:
-            return False, None
+            return "只能执行select 语句！"
 
     def retrieve(self, table_name, limit=100):
         cursor = self.conn.cursor()

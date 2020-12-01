@@ -12,6 +12,8 @@ from sqlalchemy import or_, and_, tuple_
 from sqlalchemy.sql import exists
 from sqlalchemy.testing import in_
 
+from pypinyin import lazy_pinyin
+
 from dmp.extensions import db
 from dmp.models import FormUpload, FormMigrate, FormDownload, FormAddDataTable, Forms, Users, DataTable, Database, Permissions
 from dmp.utils import resp_hanlder, uuid_str
@@ -311,6 +313,11 @@ def job_finish(meta):
     approve_form.finish = True
     approve_form.put()
 
+def is_contains_chinese(strs):
+    for _char in strs:
+        if '\u4e00' <= _char <= '\u9fa5':
+            return True
+    return False
 
 @form.route("/approve/", methods=["PUT"],
             defaults={"desc": {"interface_name": "表单审批", "is_permission": True, "permission_belong": 2}})
@@ -366,7 +373,7 @@ def approve(desc):
                 method = approve_form.info_form.method
                 description = approve_form.description
                 submit_dmp_user_id = approve_form.submit_dmp_user_id
-                dmp_case_id = approve_form.dmp_case_id
+                dmp_case_id = approve_form.info_form.dmp_case_id
 
                 destination_database = Database.get(
                     destination_dmp_database_id)
@@ -384,7 +391,8 @@ def approve(desc):
                     if file_type == 1 or file_type == 3:
                         # csv、excel
                         dt = pd.read_csv(csv_filepath, header=column_line)
-                        csv_column = list(dt.columns)
+                        csv_column = ["_".join(lazy_pinyin(d)) if is_contains_chinese(d) else d for d in list(dt.columns)]
+
                         text_column = column if column and len(
                             column) == len(csv_column) else csv_column
                         csv_column_d = [{"index": i, "type": "string"}
@@ -396,7 +404,7 @@ def approve(desc):
                     elif file_type == 2:
                         # json
                         dt = pd.read_csv(csv_filepath, header=0)
-                        csv_column = list(dt.columns)
+                        csv_column = ["_".join(lazy_pinyin(d)) if is_contains_chinese(d) else d for d in list(dt.columns)]
                         text_column = column if column and len(
                             column) == len(csv_column) else csv_column
                         csv_column_d = [{"index": i, "type": "string"}
@@ -422,7 +430,7 @@ def approve(desc):
                                                                       semicolon=False,
                                                                       fieldDelimiter=",")
 
-                        # current_app.logger.info(create_table_sql)
+                        print(create_table_sql)
                         if method == 1:
                             hive_conn.execsql(create_table_sql)
                         elif method == 3:
@@ -614,7 +622,7 @@ def approve(desc):
                             mysql_conn = auto_connect(
                                 db_id=approve_form.info_form.destination_dmp_database_id)
                             mysql_conn.execsql(sql=create_table_sql)
-                            preSQL = []
+                            # preSQL = []
                             writer = mysql_writer(model=1,
                                                   username=destination_db_username,
                                                   password=destination_db_passwd,
@@ -637,12 +645,14 @@ def approve(desc):
                                                     column=column,
                                                     )
 
+                        meta = {"form_id":approve_form.id}
                         job_hanlder.delay(
-                            reader=reader, writer=writer, channel=3)
+                            reader=reader, writer=writer, channel=3, func = job_finish , meta=meta)
                     except Exception as err:
                         approve_form.result = "CREATE MIGRATE JOB FAILED，ERROR MESSAGE：%s" % str(
                             err)
                         approve_form.finish = True
+                        raise err
 
             elif form_type == 4:
                 # 数据导出表单
@@ -734,5 +744,5 @@ def approve(desc):
             approve_form.put()
             return resp_hanlder(result="OK!")
         except Exception as err:
-            # raise err
             return resp_hanlder(code=999, err=err, msg=str(err))
+

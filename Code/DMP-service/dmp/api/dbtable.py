@@ -92,10 +92,18 @@ def column(desc):
     if request.method == "GET":
         try:
             dmp_data_table_id = request.json.get("dmp_data_table_id")
-            data_table_info = DataTable.get(dmp_data_table_id)
-            # current_app.logger.info(data_table_info.__json__())
+            if DataTable.exist_item_by_id(dmp_data_table_id):
+
+                data_table_info = DataTable.get(dmp_data_table_id)
+            else:
+                return resp_hanlder(code=999, msg="数据表不存在或已被删除")
             db_table_name = data_table_info.db_table_name
-            database_info = Database.get(data_table_info.dmp_database_id)
+
+            if Database.exist_item_by_id(data_table_info.dmp_database_id):
+                database_info = Database.get(data_table_info.dmp_database_id)
+            else:
+
+                return resp_hanlder(code=999, msg="数据库不存在或已被删除")
             # current_app.logger.info(database_info.__json__())
             db_type = database_info.db_type
             db_host = database_info.db_host
