@@ -400,8 +400,11 @@ def info(desc):
                 new_res = EnvelopedData.info_s1_data(user_obj_list, ret)
                 # 只显示一次last_login的登陆时间(仪表盘页面上)
                 last_login = session.get('last_login')
+                if last_login == None:
+                    new_res['last_login'] = current_obj.last_login
+                else:
+                    new_res['last_login'] = last_login.strftime("%Y-%m-%d %H:%M:%S")
                 session.clear()
-                new_res['last_login'] = last_login.strftime("%Y-%m-%d %H:%M:%S")
                 return resp_hanlder(code=3002, msg=RET.alert_code[3002], result=new_res)
 
             dmp_user_id = data.get('dmp_user_id')
