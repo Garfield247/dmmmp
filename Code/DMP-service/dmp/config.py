@@ -105,7 +105,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     # Mail
     # TESTING = True
-    LOG_LEVE = "error"
+    LOG_LEVEL = "error"
     # Mail
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.shtdtech.com'
     EMAIL_PORT = 25

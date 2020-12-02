@@ -26,7 +26,7 @@ def cpost(desc):
     if request.method == "POST":
         if not case_info.get("case_id"):
             try:
-                current_app.logger.info(request.json)
+                # current_app.logger.info(request.json)
                 new_case = Case(
                     dmp_case_name=case_info.get("dmp_case_name"),
                     description=case_info.get("description"),
@@ -61,7 +61,7 @@ def cpost(desc):
 @case.route("/del/", methods=["DELETE"], defaults={"desc": {"interface_name": "删除案例","is_permission": True,"permission_belong": 2}})
 def cdel(desc):
     del_case_id = request.json.get("case_id")
-    current_app.logger.info("del case , case_id :%d" % del_case_id)
+    # current_app.logger.info("del case , case_id :%d" % del_case_id)
     try:
         del_case = Case.query.get(del_case_id)
         del_case.delete()
