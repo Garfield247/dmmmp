@@ -35,6 +35,7 @@ class Config:
         r"^/flasgger*",
         r"^/bi/.*",
         r"^/sql/.*",
+        r"^/task/.*",
     ]
     # 免认证
     NO_PERMISSION_LIST = [
