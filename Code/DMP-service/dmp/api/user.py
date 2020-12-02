@@ -117,8 +117,14 @@ def login(desc):
                 if r == True:
                     auth_token = user.encode_auth_token()
                     if auth_token:
+                        last_login_time = user.last_login
+                        new_last_login = datetime.datetime.now()
+                        user.last_login = new_last_login
+                        user.save()
                         # session['auth_token'] = auth_token.decode('utf-8')
-                        return resp_hanlder(code=1003, msg=RET.alert_code[1003], result=auth_token.decode('utf-8'))
+                        return resp_hanlder(code=1003, msg=RET.alert_code[1003],
+                                            result={"authorization": auth_token.decode('utf-8'),
+                                                    "last_login_time": last_login_time.strftime("%Y-%m-%d %H:%M:%S")})
                     return resp_hanlder(code=201)
                 else:
                     return resp_hanlder(code=999, msg=r[-1])
@@ -129,8 +135,14 @@ def login(desc):
                 if r == True:
                     auth_token = user.encode_auth_token()
                     if auth_token:
+                        last_login_time = user.last_login
+                        new_last_login = datetime.datetime.now()
+                        user.last_login = new_last_login
+                        user.save()
                         # session['auth_token'] = auth_token.decode('utf-8')
-                        return resp_hanlder(code=1003, msg=RET.alert_code[1003], result=auth_token.decode('utf-8'))
+                        return resp_hanlder(code=1003, msg=RET.alert_code[1003],
+                                            result={"authorization": auth_token.decode('utf-8'),
+                                                    "last_login_time": last_login_time.strftime("%Y-%m-%d %H:%M:%S")})
                     return resp_hanlder(code=201)
                 else:
                     return resp_hanlder(code=999, msg=r[-1])
@@ -383,11 +395,6 @@ def info(desc):
                 user_obj_list = user_obj_list + show_class_root_teacher_list
                 new_res = EnvelopedData.info_s1_data(user_obj_list, ret)
 
-                # 更新、显示上次登录时间
-                last_login = current_obj.last_login
-                new_res['last_login'] = last_login
-                current_obj.last_login = datetime.datetime.now()
-                current_obj.save()
                 return resp_hanlder(code=3002, msg=RET.alert_code[3002], result=new_res)
 
             dmp_user_id = data.get('dmp_user_id')
