@@ -369,6 +369,8 @@ def update_dashboard_by_id(id, desc):
         if not form.validate_on_submit():
             return resp_hanlder(code=999, err=str(form.errors))
         dashboard_obj = Dashboard.query.filter(Dashboard.id == id).first()
+        if dashboard_obj == None:
+            return resp_hanlder(code=999, msg='当前看板已被删除')
         # 看板只有自己和超级管理员能修改，别人无权利修改
         if dashboard_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
             # if dmp_dashboard_name and id:
