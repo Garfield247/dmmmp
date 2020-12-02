@@ -100,7 +100,7 @@ def add_query_data_task(desc):
     task_params["trigger"] = "interval"
     task_params[time_unit] = time_value
     print(task_params)
-    apscgeduler.add_job(**task_params)
+    apscheduler.add_job(**task_params)
     current_chart = Chart.get(chart_id)
     if current_chart:
         current_chart.update_task_id = task_params.get("id")
