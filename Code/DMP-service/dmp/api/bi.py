@@ -371,6 +371,9 @@ def update_dashboard_by_id(id, desc):
         dashboard_obj = Dashboard.query.filter(Dashboard.id == id).first()
         if dashboard_obj == None:
             return resp_hanlder(code=999, msg='当前看板已被删除')
+        # 已发布的看板不能修改看板信息
+        if dashboard_obj.release == 1:
+            return resp_hanlder(code=999, msg='当前看板已被发布')
         # 看板只有自己和超级管理员能修改，别人无权利修改
         if dashboard_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
             # if dmp_dashboard_name and id:
@@ -418,7 +421,8 @@ def delete_dashboard_by_id(id, desc):
         if not isinstance(res, dict):
             return resp_hanlder(code=999)
         del_dashboard_obj = Dashboard.query.filter(Dashboard.id == id).first()
-
+        if del_dashboard_obj == None:
+            return resp_hanlder(code=999, msg='当前看板已被删除')
         if del_dashboard_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
             if del_dashboard_obj and id:
                 # 封装的delete方法
@@ -485,7 +489,7 @@ def add_archive(desc):
                         return resp_hanlder(code=0, msg='子看板文件夹创建成功.',
                                             result=da_obj.dashboard_archive_to_dict())
                     else:
-                        return resp_hanlder(code=999, msg='无法创建该文件夹对象.')
+                        return resp_hanlder(code=999, msg='无法在其他用户文件夹下创建文件夹.')
                 else:
                     return resp_hanlder(code=999, msg='父文件夹对象不存在,请重新操作.')
             else:
@@ -582,7 +586,8 @@ def delete_archive_by_id(id, desc):
         if not isinstance(res, dict):
             return resp_hanlder(code=999)
         del_archive_obj = DashboardArchive.query.filter(DashboardArchive.id == id).first()
-
+        if del_archive_obj == None:
+            return resp_hanlder(code=999, msg='当前看板文件夹已被删除')
         if del_archive_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
             if del_archive_obj and id:
                 del_archive_obj.delete()
@@ -708,6 +713,9 @@ def add_chart(desc):
         form = ChartForm(meta={"csrf": False})
         if not form.validate_on_submit():
             return resp_hanlder(code=999, msg=str(form.errors))
+        chart_belong_dashboard_obj = Dashboard.query.filter(Dashboard.id == dmp_dashboard_id).first()
+        if chart_belong_dashboard_obj == None:
+            return resp_hanlder(code=999, msg='当前看板已被删除')
         if chart_name and chart_type and dmp_dashboard_id and charts_position:
             chart_obj = Chart(
                 chart_name=chart_name,
@@ -809,7 +817,19 @@ def update_charts_by_id(id, desc):
             form = ChartForm(meta={"csrf": False})
             if not form.validate_on_submit():
                 return resp_hanlder(code=999, err=str(form.errors))
+
             chart_obj = Chart.query.filter(Chart.id == id).first()
+            # 1. 判断该表所属的看板是否存在
+            chart_belong_dashboard_obj = Dashboard.query.filter(Dashboard.id == chart_obj.dmp_dashboard_id).first()
+            if chart_belong_dashboard_obj == None:
+                return resp_hanlder(code=999, msg='当前看板已被删除')
+            # 2. 看板存在，表不存在
+            if chart_belong_dashboard_obj != None and chart_obj == None:
+                return resp_hanlder(code=999, msg='当前图表已被删除')
+            # 3. 已发布看板不能修改图表信息
+            if chart_belong_dashboard_obj.release == 1:
+                return resp_hanlder(code=999, msg='当前看板已被发布')
+
             # 图表信息只能自己修改，其他人无权修改
             if chart_obj.created_dmp_user_id == res.get('id'):
                 if chart_name and chart_type and dmp_dashboard_id \
@@ -862,9 +882,18 @@ def delete_charts_by_id(id, desc):
         res = PuttingData.get_obj_data(Users, auth_token)
         if not isinstance(res, dict):
             return resp_hanlder(code=999)
+
+        d_chart_obj = Chart.query.filter(Chart.id == id).first()
+        # 1. 判断该表所属的看板是否存在
+        chart_belong_dashboard_obj = Dashboard.query.filter(Dashboard.id == d_chart_obj.dmp_dashboard_id).first()
+        if chart_belong_dashboard_obj == None:
+            return resp_hanlder(code=999, msg='当前看板已被删除')
+        # 2. 看板存在，表不存在
+        if chart_belong_dashboard_obj != None and d_chart_obj == None:
+            return resp_hanlder(code=999, msg='当前图表已被删除')
+
         if Chart.exist_item_by_id(id):
             del_chart_obj = Chart.get(id)
-
             if del_chart_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
                 del_chart_obj.delete()
                 return resp_hanlder(code=0, msg='图表删除成功.')
