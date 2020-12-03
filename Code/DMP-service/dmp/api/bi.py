@@ -372,8 +372,13 @@ def update_dashboard_by_id(id, desc):
         if dashboard_obj == None:
             return resp_hanlder(code=999, msg='当前看板已被删除')
         # 已发布的看板不能修改看板信息
-        if dashboard_obj.release == 1:
-            return resp_hanlder(code=999, msg='当前看板已被发布')
+        if release:
+            pass
+        else:
+            if dashboard_obj.release == 1:
+                return resp_hanlder(code=999, msg='当前看板已被发布')
+            else:
+                pass
         # 看板只有自己和超级管理员能修改，别人无权利修改
         if dashboard_obj.created_dmp_user_id == res.get('id') or res.get('id') == 1:
             # if dmp_dashboard_name and id:
@@ -820,7 +825,7 @@ def update_charts_by_id(id, desc):
 
             chart_obj = Chart.query.filter(Chart.id == id).first()
             # 1. 判断该表所属的看板是否存在
-            chart_belong_dashboard_obj = Dashboard.query.filter(Dashboard.id == chart_obj.dmp_dashboard_id).first()
+            chart_belong_dashboard_obj = Dashboard.query.filter(Dashboard.id == dmp_dashboard_id).first()
             if chart_belong_dashboard_obj == None:
                 return resp_hanlder(code=999, msg='当前看板已被删除')
             # 2. 看板存在，表不存在
@@ -879,13 +884,17 @@ def delete_charts_by_id(id, desc):
     """
     try:
         auth_token = request.headers.get('Authorization')
+        data = request.json
+        if data == None:
+            return resp_hanlder(code=999)
+        dmp_dashboard_id = data.get('dmp_dashboard_id')
         res = PuttingData.get_obj_data(Users, auth_token)
         if not isinstance(res, dict):
             return resp_hanlder(code=999)
 
         d_chart_obj = Chart.query.filter(Chart.id == id).first()
         # 1. 判断该表所属的看板是否存在
-        chart_belong_dashboard_obj = Dashboard.query.filter(Dashboard.id == d_chart_obj.dmp_dashboard_id).first()
+        chart_belong_dashboard_obj = Dashboard.query.filter(Dashboard.id == dmp_dashboard_id).first()
         if chart_belong_dashboard_obj == None:
             return resp_hanlder(code=999, msg='当前看板已被删除')
         # 2. 看板存在，表不存在
