@@ -721,6 +721,8 @@ def add_chart(desc):
         chart_belong_dashboard_obj = Dashboard.query.filter(Dashboard.id == dmp_dashboard_id).first()
         if chart_belong_dashboard_obj == None:
             return resp_hanlder(code=999, msg='当前看板已被删除')
+        if chart_belong_dashboard_obj.release == 1:
+            return resp_hanlder(code=999, msg='当前看板已被发布')
         if chart_name and chart_type and dmp_dashboard_id and charts_position:
             chart_obj = Chart(
                 chart_name=chart_name,
