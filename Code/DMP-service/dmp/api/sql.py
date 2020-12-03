@@ -398,11 +398,11 @@ def chart_retrieve(desc):
         try:
             conn = auto_connect(table_id= data_table_id)
             _data = conn.exec_query(**request_json)
-            print(_data)
+            func = lambda x:round(x,2) if type(x)==float else x
             if type(_data) ==  list or type(_data) == tuple:
 
                 result = {}
-                result["data"] = [dict(zip(dimension_names+measure_names_methods, d)) for d in _data]
+                result["data"] = [dict(zip(dimension_names+measure_names_methods, map(func,d)) for d in _data]
                 result["query_string"] = {"sql":sql, "fields":dimension_names+measure_names_methods}
 
                 return resp_hanlder(code=0,result=result)
