@@ -402,7 +402,7 @@ def chart_retrieve(desc):
             if type(_data) ==  list or type(_data) == tuple:
 
                 result = {}
-                result["data"] = [dict(zip(dimension_names+measure_names_methods, map(func2f,d)) for d in _data]
+                result["data"] = [dict(zip(dimension_names+measure_names_methods,map(func2f,d))) for d in _data]
                 result["query_string"] = {"sql":sql, "fields":dimension_names+measure_names_methods}
 
                 return resp_hanlder(code=0,result=result)
