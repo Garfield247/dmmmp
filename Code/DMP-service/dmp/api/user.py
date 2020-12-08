@@ -164,8 +164,11 @@ def forgetpwd(desc):
             data = request.json
             email = data.get('email')
             user = Users.query.filter(Users.email == email).first()
-            ValidationEmail().change_pwd(user, email)
-            return resp_hanlder(code=1002, msg=RET.alert_code[1002])
+            if user:
+                ValidationEmail().change_pwd(user, email)
+                return resp_hanlder(code=1002, msg=RET.alert_code[1002])
+            else:
+                return resp_hanlder(code=999, msg='The mailbox has been entered incorrectly. Please re-enter it.')
         except Exception as err:
             return resp_hanlder(code=999, msg=str(err))
 
