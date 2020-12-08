@@ -83,7 +83,7 @@ def activate(desc):
     '''
     try:
         # 激活邮箱--注册时激活、token失效或者忘记导致未激活
-        token = request.json.get('Authorization')
+        token = request.json.get('authorization')
         res = PuttingData.get_obj_data(Users, token)
         # 校验token的有效期及正确性
         if isinstance(res, dict):
