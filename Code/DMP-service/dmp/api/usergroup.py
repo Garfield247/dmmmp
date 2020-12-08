@@ -253,6 +253,8 @@ def ugdel(desc):
             data = request.json
             dmp_group_id = data.get('dmp_group_id')
             del_group_obj = Groups.query.filter(Groups.id == dmp_group_id).first()
+            # 没有设置级联删除，手动删除用户组关联的所有用户对象
+            Users.query.filter(Users.dmp_group_id == dmp_group_id).delete()
             db.session.delete(del_group_obj)
             db.session.commit()
             return resp_hanlder(code=5007, msg=RET.alert_code[5007])
