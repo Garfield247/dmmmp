@@ -8,7 +8,7 @@ from flask import Blueprint, request, current_app
 from sqlalchemy import literal,and_,or_,exists,union,desc,union_all
 from sqlalchemy import desc as desc_
 from dmp.extensions import db
-from dmp.models import Dashboard, DashboardArchive, Users, DashboardStar, ArchiveStar,Chart,UserDashboard
+from dmp.models import Dashboard, DashboardArchive, Users, DashboardStar, ArchiveStar, Chart, UserDashboard, DataTable
 from dmp.utils import resp_hanlder
 from dmp.utils.put_data import PuttingData
 from dmp.utils.validators.bi import Get_dashboards_and_archives_validator
@@ -632,9 +632,16 @@ def get_charts_by_dashboard_id(dashboard_id, desc):
         if get_chart_obj:
             change_chart_obj = Chart.query.filter(Chart.dmp_dashboard_id == dashboard_id).all()
             change_chart_obj_dict_list = [c.chart_to_dict() for c in change_chart_obj]
+            for d in change_chart_obj_dict_list:
+                if d.get('dmp_data_table_id') == None:
+                    d['dmp_case_id'] = None
+                else:
+                    data_table_obj = DataTable.query.filter(DataTable.id == get_chart_obj.dmp_data_table_id).first()
+                    table_case_id = data_table_obj.dmp_case_id
+                    d['dmp_case_id'] = table_case_id
             return resp_hanlder(code=0, msg='获取图表信息成功.',
                                 result=change_chart_obj_dict_list)
-        return resp_hanlder(code=999, msg='看板ID获取失败或不存在图表信息.')
+        return resp_hanlder(code=999, msg='看板ID获取失败.')
     except Exception as err:
         db.session.rollback()
         return resp_hanlder(code=999, err=str(err))
