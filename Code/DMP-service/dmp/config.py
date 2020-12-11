@@ -36,6 +36,7 @@ class Config:
         r"^/bi/.*",
         r"^/sql/.*",
         r"^/task/.*",
+        r"^/ds/.*",
     ]
     # 免认证
     NO_PERMISSION_LIST = [

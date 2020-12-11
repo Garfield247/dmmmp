@@ -628,17 +628,20 @@ def get_charts_by_dashboard_id(dashboard_id, desc):
         res = PuttingData.get_obj_data(Users, auth_token)
         if not isinstance(res, dict):
             return resp_hanlder(code=999)
+
         get_chart_obj = Chart.query.filter(Chart.dmp_dashboard_id == dashboard_id).first()
         if get_chart_obj:
             change_chart_obj = Chart.query.filter(Chart.dmp_dashboard_id == dashboard_id).all()
             change_chart_obj_dict_list = [c.chart_to_dict() for c in change_chart_obj]
             for d in change_chart_obj_dict_list:
-                if d.get('dmp_data_table_id') == None:
-                    d['dmp_case_id'] = None
-                else:
-                    data_table_obj = DataTable.query.filter(DataTable.id == get_chart_obj.dmp_data_table_id).first()
+                data_table_obj = DataTable.query.filter(DataTable.id == d.get('dmp_data_table_id')).first()
+                if d.get('dmp_data_table_id') != None and data_table_obj != None:
                     table_case_id = data_table_obj.dmp_case_id
                     d['dmp_case_id'] = table_case_id
+                else:
+                    d['dmp_data_table_id'] = None
+                    d['dmp_case_id'] = None
+
             return resp_hanlder(code=0, msg='获取图表信息成功.',
                                 result=change_chart_obj_dict_list)
         return resp_hanlder(code=999, msg='看板ID获取失败.')
