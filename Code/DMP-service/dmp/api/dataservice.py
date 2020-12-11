@@ -635,7 +635,7 @@ def parse_query_params(request_params, dataservice):
         if len(dsparams)>0:
             for dsp in dsparams:
                 p_name = dsp.get("parameter_name")
-                p_required = dsp.get("required_parameter")
+                p_required = dsp.get("required", False)
                 value = request_params.get(p_name, None)
                 if p_required == True and value != None:
                     query_params[p_name] = value
