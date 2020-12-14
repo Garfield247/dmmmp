@@ -74,7 +74,7 @@ class PuttingData():
                     return (-1, 'Missing parameter or incorrect user group name.')
                 dmp_group_id = dmp_group_obj.id
                 if dmp_group_id == 1:
-                    return False
+                    return -1
                 else:
                     r = cls.__add_info(res_token, user, dmp_group_name, dmp_username, real_name)
                     if r == True:
@@ -88,8 +88,8 @@ class PuttingData():
                 if dmp_group_obj == None:
                     return (-1, 'Missing parameter or incorrect user group name.')
                 dmp_group_id = dmp_group_obj.id
-                if dmp_group_id == 1:
-                    return False
+                if dmp_group_id == 1 or dmp_group_id == 2:
+                    return -2
                 else:
                     r = cls.__add_info(res_token, user, dmp_group_name, dmp_username, real_name)
                     if r == True:

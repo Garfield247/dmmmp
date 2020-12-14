@@ -62,8 +62,10 @@ def register(desc):
                 return resp_hanlder(code=999, msg=res[1])
 
             # 普通管理员和教师无法添加管理员角色，需要超级管理员添加
-            elif res == False:
+            elif res == -1:
                 return resp_hanlder(code=999, msg='无法添加管理员用户组用户,请联系管理员添加.')
+            elif res == -2:
+                return resp_hanlder(code=999, msg='无法添加管理员或教师用户组用户,请联系管理员添加.')
         # 返回token错误的字符串-注册成功(注册时无token)
         db.session.add(user)
         db.session.commit()
