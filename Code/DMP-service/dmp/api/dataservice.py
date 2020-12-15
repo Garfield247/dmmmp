@@ -718,7 +718,10 @@ def get_data_by_data_service(api):
         result = None
         secret_key = request_params.get("secret_key", None)
         if secret_key:
-            user_id = Users.encode_auth_token(secret_key)
+            # user_id = Users.encode_auth_token(secret_key)
+            user_id = Users.decode_auth_token(secret_key)
+            if isinstance(user_id, str):
+                return resp_hanlder(code=999, msg='缺少秘钥或秘钥已失效')
         else:
             code = 8101
             msg = "缺少秘钥或秘钥已失效"
