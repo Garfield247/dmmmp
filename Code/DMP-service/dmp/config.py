@@ -37,6 +37,7 @@ class Config:
         r"^/sql/.*",
         r"^/task/.*",
         r"^/ds/.*",
+        r"^/user/secretkey/",
     ]
     # 免认证
     NO_PERMISSION_LIST = [
