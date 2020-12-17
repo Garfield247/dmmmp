@@ -5,6 +5,7 @@
 
 import json
 import datetime
+from decimal import Decimal
 from flask import Blueprint
 from dmp.utils.engine import auto_connect
 from flask import Blueprint, request
@@ -398,12 +399,13 @@ def chart_retrieve(desc):
         try:
             conn = auto_connect(table_id= data_table_id)
             _data = conn.exec_query(**request_json)
-            func2f = lambda x:round(x,2) if type(x)==float else x
+            func2f = lambda x:round(float(x),2) if type(x) in [float,Decimal] else x
             if type(_data) ==  list or type(_data) == tuple:
 
                 result = {}
                 result["data"] = [dict(zip(dimension_names+measure_names_methods,map(func2f,d))) for d in _data]
                 result["query_string"] = {"sql":sql, "fields":dimension_names+measure_names_methods}
+                print(result)
 
                 return resp_hanlder(code=0,result=result)
             else:
