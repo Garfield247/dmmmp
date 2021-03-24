@@ -99,19 +99,6 @@ def column(desc):
                 return resp_hanlder(code=999, msg="数据表不存在或已被删除")
             db_table_name = data_table_info.db_table_name
 
-            if Database.exist_item_by_id(data_table_info.dmp_database_id):
-                database_info = Database.get(data_table_info.dmp_database_id)
-            else:
-
-                return resp_hanlder(code=999, msg="数据库不存在或已被删除")
-            # current_app.logger.info(database_info.__json__())
-            db_type = database_info.db_type
-            db_host = database_info.db_host
-            db_port = database_info.db_port
-            db_name = database_info.db_name
-            db_username = database_info.db_username
-            db_passwd = database_info.db_passwd
-
             colums4sdb = DataTableColumn.query.filter_by(
                 dmp_data_table_id=dmp_data_table_id)
             column4sdb_array = []
@@ -121,18 +108,6 @@ def column(desc):
             columns4db = []
             columns4db = auto_connect(
                 db_id=data_table_info.dmp_database_id).columns(db_table_name)
-            # if db_type == 1:
-            #     # hive
-            #     pass
-            # elif db_type == 2:
-            #     # mysql
-            #     db = MysqlEngine(host=db_host, port=db_port, user=db_username, passwd=db_passwd, db=db_name)
-            #     columns4db = db.columns(db_table_name)
-            # elif db_type == 3:
-            #     # mongo
-            #     db = MongodbEngine(host=db_host, port=db_port, user=db_username, passwd=db_passwd, db=db_name)
-            #     columns4db = db.columns(db_table_name)
-            # dmp_data_table_column_name
             current_app.logger.info(column4sdb_array)
             columns = []
             for i in columns4db:
@@ -143,7 +118,7 @@ def column(desc):
                         mark = False
                 if mark:
                     columns.append(i)
-            # current_app.logger.info(columns)
+            current_app.logger.info(columns)
             return resp_hanlder(result=columns)
         except Exception as err:
             current_app.logger.error(err)

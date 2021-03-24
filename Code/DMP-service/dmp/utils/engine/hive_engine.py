@@ -76,6 +76,8 @@ class HiveEngine():
         """
         cursor.execute(sql.format(table_name=table_name, limit=limit))
         res = cursor.fetchall()
+        clumns = cursor.description
+        print(res,clumns)
         return res
 
     def close_conn(self):

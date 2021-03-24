@@ -42,6 +42,7 @@ class MysqlEngine():
         """
         cursor.execute(sql.format(table_name=table_name))
         _d = cursor.fetchall()
+        print("_d",_d)
         columns_type_list = [
             {"dmp_data_table_column_name": str(column), "dmp_data_table_column_type": dtype} for column, dtype in _d]
         return columns_type_list
@@ -62,6 +63,7 @@ class MysqlEngine():
     def exec_query(self,**kwages):
         sql =kwages.get("sql")
         if bool(re.match(r"^select ", sql, re.I)):
+            # cursor = self.conn.cursor(pymysql.cursors.DictCursor)
             cursor = self.conn.cursor()
             cursor.execute(sql)
             res = cursor.fetchall()
