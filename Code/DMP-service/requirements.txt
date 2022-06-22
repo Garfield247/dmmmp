@@ -33,7 +33,7 @@ jwt==1.0.0
 kombu==3.0.37
 Mako==1.1.2
 MarkupSafe==1.1.1
-numpy==1.18.4
+numpy==1.22.0
 pandas==1.0.3
 pycodestyle==2.6.0
 pycparser==2.20
